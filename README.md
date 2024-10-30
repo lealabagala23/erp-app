@@ -1,1 +1,1 @@
-# inventory-tracker
+# pharma-erp
