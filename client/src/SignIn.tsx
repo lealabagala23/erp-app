@@ -17,6 +17,8 @@ import ForgotPassword from './ForgotPassword';
 import { SitemarkIcon } from './CustomIcons';
 import AppTheme from './theme/AppTheme';
 import ColorModeSelect from './theme/ColorModeSelect';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -61,8 +63,9 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignIn(props: { disableCustomTheme?: boolean }) {
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
+  const navigate = useNavigate();
+  const [usernameError, setUsernameError] = React.useState(false);
+  const [usernameErrorMessage, setUsernameErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [open, setOpen] = React.useState(false);
@@ -75,31 +78,49 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     setOpen(false);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    if (emailError || passwordError) {
-      event.preventDefault();
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (usernameError || passwordError) {
       return;
     }
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/auth/login`,
+        {
+          username: data.get('username'),
+          password: data.get('password'),
+        },
+        {
+          headers: {
+            'Content-type': 'application/json; charset=UTF-8',
+          },
+        },
+      );
+      const { token } = response.data;
+      localStorage.setItem('token', token); // Store the token for future requests
+      navigate('/dashboard'); // Navigate to dashboard
+    } catch (err) {
+      console.error(err);
+      setPasswordErrorMessage(
+        'Failed to log in. Please check your credentials.',
+      );
+    }
   };
 
   const validateInputs = () => {
-    const email = document.getElementById('email') as HTMLInputElement;
+    const username = document.getElementById('username') as HTMLInputElement;
     const password = document.getElementById('password') as HTMLInputElement;
 
     let isValid = true;
 
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true);
-      setEmailErrorMessage('Please enter a valid email address.');
+    if (!username.value || username.value.length < 4) {
+      setUsernameError(true);
+      setUsernameErrorMessage('Username must be at least 4 characters long.');
       isValid = false;
     } else {
-      setEmailError(false);
-      setEmailErrorMessage('');
+      setUsernameError(false);
+      setUsernameErrorMessage('');
     }
 
     if (!password.value || password.value.length < 6) {
@@ -142,21 +163,20 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             }}
           >
             <FormControl>
-              <FormLabel htmlFor="email">Email</FormLabel>
+              <FormLabel htmlFor="username">Username</FormLabel>
               <TextField
-                error={emailError}
-                helperText={emailErrorMessage}
-                id="email"
-                type="email"
-                name="email"
-                placeholder="your@email.com"
-                autoComplete="email"
+                error={usernameError}
+                helperText={usernameErrorMessage}
+                id="username"
+                type="username"
+                name="username"
+                autoComplete="username"
                 autoFocus
                 required
                 fullWidth
                 variant="outlined"
-                color={emailError ? 'error' : 'primary'}
-                sx={{ ariaLabel: 'email' }}
+                color={usernameError ? 'error' : 'primary'}
+                sx={{ ariaLabel: 'username' }}
               />
             </FormControl>
             <FormControl>
@@ -180,7 +200,6 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-                autoFocus
                 required
                 fullWidth
                 variant="outlined"
