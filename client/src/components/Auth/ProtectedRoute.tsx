@@ -6,7 +6,7 @@ const ProtectedRoute = () => {
   const token = localStorage.getItem('token');
   const isAuthenticated = isTokenValid(token);
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
+  return isAuthenticated ? <Outlet /> : <Navigate to="/log-in" />;
 };
 
 export default ProtectedRoute;

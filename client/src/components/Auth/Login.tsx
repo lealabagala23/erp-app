@@ -14,9 +14,9 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import ForgotPassword from './ForgotPassword';
-import { SitemarkIcon } from './CustomIcons';
-import AppTheme from './theme/AppTheme';
-import ColorModeSelect from './theme/ColorModeSelect';
+import { SitemarkIcon } from '../../CustomIcons';
+import AppTheme from '../../theme/AppTheme';
+import ColorModeSelect from '../../theme/ColorModeSelect';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -39,7 +39,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
   }),
 }));
 
-const SignInContainer = styled(Stack)(({ theme }) => ({
+const LoginContainer = styled(Stack)(({ theme }) => ({
   height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
   minHeight: '100%',
   padding: theme.spacing(2),
@@ -62,7 +62,7 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
   },
 }));
 
-export default function SignIn(props: { disableCustomTheme?: boolean }) {
+export default function Login(props: { disableCustomTheme?: boolean }) {
   const navigate = useNavigate();
   const [usernameError, setUsernameError] = React.useState(false);
   const [usernameErrorMessage, setUsernameErrorMessage] = React.useState('');
@@ -138,7 +138,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
-      <SignInContainer direction="column" justifyContent="space-between">
+      <LoginContainer direction="column" justifyContent="space-between">
         <ColorModeSelect
           sx={{ position: 'fixed', top: '1rem', right: '1rem' }}
         />
@@ -149,7 +149,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             variant="h4"
             sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
           >
-            Sign in
+            Log in
           </Typography>
           <Box
             component="form"
@@ -182,7 +182,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             <FormControl>
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <FormLabel htmlFor="password">Password</FormLabel>
-                <Link
+                {/* <Link
                   component="button"
                   type="button"
                   onClick={handleClickOpen}
@@ -190,7 +190,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                   sx={{ alignSelf: 'baseline' }}
                 >
                   Forgot your password?
-                </Link>
+                </Link> */}
               </Box>
               <TextField
                 error={passwordError}
@@ -206,24 +206,24 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 color={passwordError ? 'error' : 'primary'}
               />
             </FormControl>
-            <FormControlLabel
+            {/* <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
             />
-            <ForgotPassword open={open} handleClose={handleClose} />
+            <ForgotPassword open={open} handleClose={handleClose} /> */}
             <Button
               type="submit"
               fullWidth
               variant="contained"
               onClick={validateInputs}
             >
-              Sign in
+              Log in
             </Button>
             <Typography sx={{ textAlign: 'center' }}>
               Don&apos;t have an account?{' '}
               <span>
                 <Link
-                  href="/material-ui/getting-started/templates/sign-in/"
+                  href="/sign-up"
                   variant="body2"
                   sx={{ alignSelf: 'center' }}
                 >
@@ -237,22 +237,22 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             <Button
               fullWidth
               variant="outlined"
-              onClick={() => alert('Sign in with Google')}
+              onClick={() => alert('Log in with Google')}
               startIcon={<GoogleIcon />}
             >
-              Sign in with Google
+              Log in with Google
             </Button>
             <Button
               fullWidth
               variant="outlined"
-              onClick={() => alert('Sign in with Facebook')}
+              onClick={() => alert('Log in with Facebook')}
               startIcon={<FacebookIcon />}
             >
-              Sign in with Facebook
+              Log in with Facebook
             </Button>
           </Box> */}
         </Card>
-      </SignInContainer>
+      </LoginContainer>
     </AppTheme>
   );
 }

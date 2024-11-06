@@ -1,8 +1,9 @@
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import SignIn from './SignIn';
-import Dashboard from './Dashboard';
-import ProtectedRoute from './components/Auth/ProtectedRoute';
+import Login from './components/auth/Login';
+import Dashboard from './components/dashboard/Dashboard';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import Signup from './components/auth/Signup';
 
 const App = () => {
   return (
@@ -10,7 +11,8 @@ const App = () => {
       <Route path="/" element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
       </Route>
-      <Route path="/login" element={<SignIn />} />
+      <Route path="/log-in" element={<Login />} />
+      <Route path="/sign-up" element={<Signup />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
