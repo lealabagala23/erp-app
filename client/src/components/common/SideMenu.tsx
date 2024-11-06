@@ -8,8 +8,9 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import SelectContent from './SelectContent';
 import MenuContent from './MenuContent';
-import CardAlert from './CardAlert';
+// import CardAlert from './CardAlert';
 import OptionsMenu from './OptionsMenu';
+import { UserInfo } from '../dashboard/Dashboard';
 
 const drawerWidth = 240;
 
@@ -24,7 +25,11 @@ const Drawer = styled(MuiDrawer)({
   },
 });
 
-export default function SideMenu() {
+interface IProps {
+  userInfo: UserInfo;
+}
+
+export default function SideMenu({ userInfo }: IProps) {
   return (
     <Drawer
       variant="permanent"
@@ -46,7 +51,7 @@ export default function SideMenu() {
       </Box>
       <Divider />
       <MenuContent />
-      <CardAlert />
+      {/* <CardAlert /> */}
       <Stack
         direction="row"
         sx={{
@@ -68,10 +73,11 @@ export default function SideMenu() {
             variant="body2"
             sx={{ fontWeight: 500, lineHeight: '16px' }}
           >
-            Riley Carter
+            {userInfo?.first_name} {userInfo?.last_name}
           </Typography>
           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            riley@email.com
+            {userInfo?.first_name?.toLowerCase()}_
+            {userInfo?.last_name?.toLowerCase()}@email.com
           </Typography>
         </Box>
         <OptionsMenu />
