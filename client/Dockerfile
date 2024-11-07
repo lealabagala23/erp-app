@@ -19,6 +19,9 @@ RUN yarn build
 # Use a lightweight web server to serve the build
 FROM nginx:alpine
 
+# Nginx configuration
+COPY nginx/default.conf /etc/nginx/nginx.conf
+
 # Copy the build files to the Nginx server
 COPY --from=build /usr/src/app/build /usr/share/nginx/html
 
