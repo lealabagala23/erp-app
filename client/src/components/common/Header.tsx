@@ -8,7 +8,11 @@ import ColorModeIconDropdown from '../../theme/ColorModeIconDropdown';
 
 import Search from './Search';
 
-export default function Header() {
+interface IProps {
+  title: string;
+}
+
+export default function Header({ title }: IProps) {
   return (
     <Stack
       direction="row"
@@ -22,7 +26,7 @@ export default function Header() {
       }}
       spacing={2}
     >
-      <NavbarBreadcrumbs />
+      <NavbarBreadcrumbs title={title} />
       <Stack direction="row" sx={{ gap: 1 }}>
         <Search />
         <CustomDatePicker />

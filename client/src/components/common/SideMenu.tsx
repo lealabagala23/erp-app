@@ -10,7 +10,6 @@ import SelectContent from './SelectContent';
 import MenuContent from './MenuContent';
 // import CardAlert from './CardAlert';
 import OptionsMenu from './OptionsMenu';
-import { UserInfo } from '../dashboard/Dashboard';
 
 const drawerWidth = 240;
 
@@ -24,6 +23,12 @@ const Drawer = styled(MuiDrawer)({
     boxSizing: 'border-box',
   },
 });
+
+export type UserInfo = {
+  first_name: string;
+  last_name: string;
+  user_name: string;
+};
 
 interface IProps {
   userInfo: UserInfo;

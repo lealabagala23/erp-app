@@ -4,12 +4,32 @@ import { BrowserRouter } from 'react-router-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { StyledEngineProvider } from '@mui/material';
+import { CssBaseline, StyledEngineProvider } from '@mui/material';
+
+import type {} from '@mui/x-date-pickers/themeAugmentation';
+import type {} from '@mui/x-charts/themeAugmentation';
+import type {} from '@mui/x-data-grid/themeAugmentation';
+import type {} from '@mui/x-tree-view/themeAugmentation';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import AppTheme from './theme/AppTheme';
+
+import {
+  chartsCustomizations,
+  dataGridCustomizations,
+  datePickersCustomizations,
+  treeViewCustomizations,
+} from './theme/customizations';
+
+const xThemeComponents = {
+  ...chartsCustomizations,
+  ...dataGridCustomizations,
+  ...datePickersCustomizations,
+  ...treeViewCustomizations,
+};
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
@@ -18,9 +38,12 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <StyledEngineProvider injectFirst>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <AppTheme themeComponents={xThemeComponents}>
+        <CssBaseline enableColorScheme />
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </AppTheme>
     </StyledEngineProvider>
   </React.StrictMode>,
 );

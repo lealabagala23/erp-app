@@ -1,15 +1,15 @@
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Login from './components/auth/Login';
-import Dashboard from './components/dashboard/Dashboard';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Signup from './components/auth/Signup';
+import Dashboard from './components/layout/Dashboard';
 
 const App = () => {
   return (
     <Routes>
       <Route path="/" element={<ProtectedRoute />}>
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="*" element={<Dashboard />} />
       </Route>
       <Route path="/log-in" element={<Login />} />
       <Route path="/sign-up" element={<Signup />} />

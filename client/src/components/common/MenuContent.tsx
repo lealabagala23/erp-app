@@ -5,21 +5,24 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Stack from '@mui/material/Stack';
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
+import HomeRoundedIcon from '@mui/icons-material/DashboardRounded';
 import AnalyticsRoundedIcon from '@mui/icons-material/AnalyticsRounded';
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
-import { MoneyRounded, PeopleAltRounded } from '@mui/icons-material';
+import { MoneyRounded } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
 const mainListItems = [
-  { text: 'Dashboard', icon: <HomeRoundedIcon />, route: '/dashboard' },
-  { text: 'Transactions', icon: <MoneyRounded />, route: '/transactions' },
+  { text: 'Home', icon: <HomeRoundedIcon />, route: '/home' },
+  {
+    text: 'Generate Sales',
+    icon: <AnalyticsRoundedIcon />,
+    route: '/generate-sales',
+  },
+  { text: 'Orders', icon: <MoneyRounded />, route: '/orders' },
   { text: 'Inventory', icon: <AssignmentRoundedIcon />, route: '/inventory' },
-  { text: 'Customers', icon: <PeopleRoundedIcon />, route: '/customers' },
-  { text: 'Suppliers', icon: <PeopleAltRounded />, route: '/suppliers' },
-  { text: 'Reports', icon: <AnalyticsRoundedIcon />, route: '/reports' },
+  { text: 'Accounts', icon: <PeopleRoundedIcon />, route: '/accounts' },
 ];
 
 const secondaryListItems = [

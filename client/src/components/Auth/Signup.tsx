@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
 // import Divider from '@mui/material/Divider';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
@@ -12,7 +11,6 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import { SitemarkIcon } from '../../CustomIcons';
-import AppTheme from '../../theme/AppTheme';
 import ColorModeSelect from '../../theme/ColorModeSelect';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -60,7 +58,7 @@ const SignupContainer = styled(Stack)(({ theme }) => ({
   },
 }));
 
-export default function Signup(props: { disableCustomTheme?: boolean }) {
+export default function Signup() {
   const navigate = useNavigate();
   const [usernameError, setUsernameError] = React.useState(false);
   const [usernameErrorMessage, setUsernameErrorMessage] = React.useState('');
@@ -128,121 +126,112 @@ export default function Signup(props: { disableCustomTheme?: boolean }) {
   };
 
   return (
-    <AppTheme {...props}>
-      <CssBaseline enableColorScheme />
-      <SignupContainer direction="column" justifyContent="space-between">
-        <ColorModeSelect
-          sx={{ position: 'fixed', top: '1rem', right: '1rem' }}
-        />
-        <Card variant="outlined">
-          <SitemarkIcon />
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+    <SignupContainer direction="column" justifyContent="space-between">
+      <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
+      <Card variant="outlined">
+        <SitemarkIcon />
+        <Typography
+          component="h1"
+          variant="h4"
+          sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+        >
+          Sign up
+        </Typography>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          noValidate
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
+            gap: 2,
+          }}
+        >
+          <FormControl>
+            <FormLabel htmlFor="firstName">First Name</FormLabel>
+            <TextField
+              id="firstName"
+              type="firstName"
+              name="firstName"
+              autoComplete="firstName"
+              autoFocus
+              required
+              fullWidth
+              variant="outlined"
+              color={'primary'}
+              sx={{ ariaLabel: 'firstName' }}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="firstName">Last Name</FormLabel>
+            <TextField
+              id="lastName"
+              type="lastName"
+              name="lastName"
+              autoComplete="lastName"
+              required
+              fullWidth
+              variant="outlined"
+              color={'primary'}
+              sx={{ ariaLabel: 'lastName' }}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="username">Username</FormLabel>
+            <TextField
+              error={usernameError}
+              helperText={usernameErrorMessage}
+              id="username"
+              type="username"
+              name="username"
+              autoComplete="username"
+              required
+              fullWidth
+              variant="outlined"
+              color={usernameError ? 'error' : 'primary'}
+              sx={{ ariaLabel: 'username' }}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="password">Password</FormLabel>
+            <TextField
+              error={passwordError}
+              helperText={passwordErrorMessage}
+              name="password"
+              placeholder="••••••"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              required
+              fullWidth
+              variant="outlined"
+              color={passwordError ? 'error' : 'primary'}
+            />
+          </FormControl>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            onClick={validateInputs}
           >
             Sign up
+          </Button>
+          <Typography sx={{ textAlign: 'center' }}>
+            Already have an account?{' '}
+            <span>
+              <Link href="/log-in" variant="body2" sx={{ alignSelf: 'center' }}>
+                Log in
+              </Link>
+            </span>
           </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
-              gap: 2,
-            }}
-          >
-            <FormControl>
-              <FormLabel htmlFor="firstName">First Name</FormLabel>
-              <TextField
-                id="firstName"
-                type="firstName"
-                name="firstName"
-                autoComplete="firstName"
-                autoFocus
-                required
-                fullWidth
-                variant="outlined"
-                color={'primary'}
-                sx={{ ariaLabel: 'firstName' }}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel htmlFor="firstName">Last Name</FormLabel>
-              <TextField
-                id="lastName"
-                type="lastName"
-                name="lastName"
-                autoComplete="lastName"
-                required
-                fullWidth
-                variant="outlined"
-                color={'primary'}
-                sx={{ ariaLabel: 'lastName' }}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel htmlFor="username">Username</FormLabel>
-              <TextField
-                error={usernameError}
-                helperText={usernameErrorMessage}
-                id="username"
-                type="username"
-                name="username"
-                autoComplete="username"
-                required
-                fullWidth
-                variant="outlined"
-                color={usernameError ? 'error' : 'primary'}
-                sx={{ ariaLabel: 'username' }}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel htmlFor="password">Password</FormLabel>
-              <TextField
-                error={passwordError}
-                helperText={passwordErrorMessage}
-                name="password"
-                placeholder="••••••"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                required
-                fullWidth
-                variant="outlined"
-                color={passwordError ? 'error' : 'primary'}
-              />
-            </FormControl>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              onClick={validateInputs}
-            >
-              Sign up
-            </Button>
-            <Typography sx={{ textAlign: 'center' }}>
-              Already have an account?{' '}
-              <span>
-                <Link
-                  href="/log-in"
-                  variant="body2"
-                  sx={{ alignSelf: 'center' }}
-                >
-                  Log in
-                </Link>
-              </span>
-            </Typography>
-          </Box>
-        </Card>
-        <SuccessSnackbar
-          open={open}
-          setOpen={setOpen}
-          message="User created successfully."
-        />
-      </SignupContainer>
-    </AppTheme>
+        </Box>
+      </Card>
+      <SuccessSnackbar
+        open={open}
+        setOpen={setOpen}
+        message="User created successfully."
+      />
+    </SignupContainer>
   );
 }
