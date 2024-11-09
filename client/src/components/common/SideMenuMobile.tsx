@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useContext } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
@@ -10,7 +10,9 @@ import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 
 import MenuButton from './MenuButton';
 import MenuContent from './MenuContent';
-import CardAlert from './CardAlert';
+import AuthContext from '../auth/AuthContext';
+import { useNavigate } from 'react-router-dom';
+// import CardAlert from './CardAlert';
 
 interface SideMenuMobileProps {
   open: boolean | undefined;
@@ -21,6 +23,14 @@ export default function SideMenuMobile({
   open,
   toggleDrawer,
 }: SideMenuMobileProps) {
+  const navigate = useNavigate();
+  const { userInfo } = useContext(AuthContext);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/log-in');
+  };
+
   return (
     <Drawer
       anchor="right"
@@ -47,12 +57,12 @@ export default function SideMenuMobile({
           >
             <Avatar
               sizes="small"
-              alt="Riley Carter"
+              alt={`${userInfo?.first_name} ${userInfo?.last_name}`}
               src="/static/images/avatar/7.jpg"
               sx={{ width: 24, height: 24 }}
             />
             <Typography component="p" variant="h6">
-              Riley Carter
+              {`${userInfo?.first_name} ${userInfo?.last_name}`}
             </Typography>
           </Stack>
           <MenuButton showBadge>
@@ -70,6 +80,7 @@ export default function SideMenuMobile({
             variant="outlined"
             fullWidth
             startIcon={<LogoutRoundedIcon />}
+            onClick={handleLogout}
           >
             Logout
           </Button>

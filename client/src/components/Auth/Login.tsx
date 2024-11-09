@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 // import Checkbox from '@mui/material/Checkbox';
@@ -62,10 +62,11 @@ const LoginContainer = styled(Stack)(({ theme }) => ({
 
 export default function Login() {
   const navigate = useNavigate();
-  const [usernameError, setUsernameError] = React.useState(false);
-  const [usernameErrorMessage, setUsernameErrorMessage] = React.useState('');
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
+  const [usernameError, setUsernameError] = useState(false);
+  const [usernameErrorMessage, setUsernameErrorMessage] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
+  const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
+  const [loading, setLoading] = useState(false);
   // const [open, setOpen] = React.useState(false);
 
   // const handleClickOpen = () => {
@@ -83,6 +84,7 @@ export default function Login() {
     }
     const data = new FormData(event.currentTarget);
     try {
+      setLoading(true);
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/auth/login`,
         {
@@ -95,6 +97,7 @@ export default function Login() {
           },
         },
       );
+      setLoading(false);
       const { token } = response.data;
       localStorage.setItem('token', token); // Store the token for future requests
       navigate('/home'); // Navigate to dashboard
@@ -171,6 +174,7 @@ export default function Login() {
               variant="outlined"
               color={usernameError ? 'error' : 'primary'}
               sx={{ ariaLabel: 'username' }}
+              disabled={loading}
             />
           </FormControl>
           <FormControl>
@@ -198,6 +202,7 @@ export default function Login() {
               fullWidth
               variant="outlined"
               color={passwordError ? 'error' : 'primary'}
+              disabled={loading}
             />
           </FormControl>
           {/* <FormControlLabel
@@ -210,6 +215,7 @@ export default function Login() {
             fullWidth
             variant="contained"
             onClick={validateInputs}
+            disabled={loading}
           >
             Log in
           </Button>

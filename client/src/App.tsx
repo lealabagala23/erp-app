@@ -3,13 +3,13 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Login from './components/auth/Login';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Signup from './components/auth/Signup';
-import Dashboard from './components/layout/Dashboard';
+import MainWrapper from './components/wrappers/MainWrapper';
 
 const App = () => {
   return (
     <Routes>
       <Route path="/" element={<ProtectedRoute />}>
-        <Route path="*" element={<Dashboard />} />
+        <Route path="*" element={<MainWrapper />} />
       </Route>
       <Route path="/log-in" element={<Login />} />
       <Route path="/sign-up" element={<Signup />} />

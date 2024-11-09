@@ -7,7 +7,7 @@ interface IProps {
   children: React.ReactChild;
 }
 
-export default function PageContainer({ children }: IProps) {
+export default function PageWrapper({ children }: IProps) {
   return (
     <Box
       component="main"

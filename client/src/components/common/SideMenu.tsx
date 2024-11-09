@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useContext } from 'react';
 import { styled } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
 import MuiDrawer, { drawerClasses } from '@mui/material/Drawer';
@@ -10,6 +10,7 @@ import SelectContent from './SelectContent';
 import MenuContent from './MenuContent';
 // import CardAlert from './CardAlert';
 import OptionsMenu from './OptionsMenu';
+import AuthContext from '../auth/AuthContext';
 
 const drawerWidth = 240;
 
@@ -30,11 +31,9 @@ export type UserInfo = {
   user_name: string;
 };
 
-interface IProps {
-  userInfo: UserInfo;
-}
+export default function SideMenu() {
+  const { userInfo } = useContext(AuthContext);
 
-export default function SideMenu({ userInfo }: IProps) {
   return (
     <Drawer
       variant="permanent"

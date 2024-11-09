@@ -1,17 +1,17 @@
 import * as React from 'react';
 import AppNavbar from '../common/AppNavbar';
 import Header from '../common/Header';
-import PageContainer from '../layout/PageContainer';
+import PageWrapper from '../wrappers/PageWrapper';
 
 export default function Inventory() {
   return (
     <>
       <AppNavbar title={'Inventory'} />
-      <PageContainer>
+      <PageWrapper>
         <>
           <Header title={'Inventory'} />
         </>
-      </PageContainer>
+      </PageWrapper>
     </>
   );
 }

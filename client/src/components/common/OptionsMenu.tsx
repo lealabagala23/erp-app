@@ -28,7 +28,7 @@ export default function OptionsMenu() {
   };
   const handleLogout = () => {
     localStorage.removeItem('token');
-    navigate('/login');
+    navigate('/log-in');
   };
 
   return (

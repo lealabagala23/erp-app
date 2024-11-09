@@ -1,17 +1,17 @@
 import * as React from 'react';
 import AppNavbar from '../common/AppNavbar';
 import Header from '../common/Header';
-import PageContainer from '../layout/PageContainer';
+import PageWrapper from '../wrappers/PageWrapper';
 
 export default function Orders() {
   return (
     <>
       <AppNavbar title={'Orders'} />
-      <PageContainer>
+      <PageWrapper>
         <>
           <Header title={'Orders'} />
         </>
-      </PageContainer>
+      </PageWrapper>
     </>
   );
 }
