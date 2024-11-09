@@ -14,8 +14,6 @@ services:
       context: ./server
     ports:
       - "5001:5001"
-    environment:
-      - MONGODB_URI=mongodb+srv://Cluster40804:zd4r2uM5Wag1CDge@inventorycluster.tmp76v1.mongodb.net/inventoryDB
     depends_on:
       - mongodb
 
@@ -25,8 +23,6 @@ services:
       context: ./client
     ports:
       - "80:80"
-    environment:
-      - REACT_APP_API_URL=https://server-791870014761.asia-southeast1.run.app
 
 volumes:
   mongodb-data:
