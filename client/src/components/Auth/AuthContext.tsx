@@ -1,7 +1,8 @@
 import React, { createContext, useState, useEffect } from 'react';
 
 import { IAuthContext, UserInfo } from './types';
-import axios from 'axios';
+import { useMutation } from '@tanstack/react-query';
+import { fetchUserInfo } from './apis';
 
 const DEFAULT_CONTEXT = {
   userInfo: null,
@@ -16,32 +17,22 @@ interface IProps {
 
 export const AuthProvider = ({ children }: IProps) => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [fetchingUserInfo, setFetchingUserInfo] = useState(true);
+
+  const { mutateAsync, isLoading } = useMutation({
+    mutationFn: fetchUserInfo,
+    onSuccess: (data) => {
+      setUserInfo(data);
+    },
+  });
+
+  const getUserInfo = async () => mutateAsync();
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/auth/me`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-          },
-        );
-        setUserInfo(response?.data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setFetchingUserInfo(false);
-      }
-    };
-
-    fetchUserInfo();
+    getUserInfo();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ userInfo, fetchingUserInfo }}>
+    <AuthContext.Provider value={{ userInfo, fetchingUserInfo: isLoading }}>
       {children}
     </AuthContext.Provider>
   );

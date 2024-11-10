@@ -15,8 +15,10 @@ import { styled } from '@mui/material/styles';
 // import ForgotPassword from './ForgotPassword';
 import { SitemarkIcon } from '../../CustomIcons';
 import ColorModeSelect from '../../theme/ColorModeSelect';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { CircularProgress } from '@mui/material';
+import { fetchLogin } from './apis';
+import { useMutation } from '@tanstack/react-query';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -66,7 +68,6 @@ export default function Login() {
   const [usernameErrorMessage, setUsernameErrorMessage] = useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
-  const [loading, setLoading] = useState(false);
   // const [open, setOpen] = React.useState(false);
 
   // const handleClickOpen = () => {
@@ -77,36 +78,31 @@ export default function Login() {
   //   setOpen(false);
   // };
 
+  const { isLoading, mutateAsync: mutateLoginAsync } = useMutation({
+    mutationFn: fetchLogin,
+    onSuccess: ({ token }) => {
+      localStorage.setItem('token', token);
+      navigate('/home'); // Navigate to dashboard
+    },
+    onError: (err) => {
+      console.error(err);
+      setPasswordErrorMessage(
+        'Failed to log in. Please check your credentials.',
+      );
+    },
+  });
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (usernameError || passwordError) {
       return;
     }
     const data = new FormData(event.currentTarget);
-    try {
-      setLoading(true);
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/auth/login`,
-        {
-          username: data.get('username'),
-          password: data.get('password'),
-        },
-        {
-          headers: {
-            'Content-type': 'application/json; charset=UTF-8',
-          },
-        },
-      );
-      setLoading(false);
-      const { token } = response.data;
-      localStorage.setItem('token', token); // Store the token for future requests
-      navigate('/home'); // Navigate to dashboard
-    } catch (err) {
-      console.error(err);
-      setPasswordErrorMessage(
-        'Failed to log in. Please check your credentials.',
-      );
-    }
+
+    await mutateLoginAsync({
+      username: data.get('username') as string,
+      password: data.get('password') as string,
+    });
   };
 
   const validateInputs = () => {
@@ -174,7 +170,7 @@ export default function Login() {
               variant="outlined"
               color={usernameError ? 'error' : 'primary'}
               sx={{ ariaLabel: 'username' }}
-              disabled={loading}
+              disabled={isLoading}
             />
           </FormControl>
           <FormControl>
@@ -202,7 +198,7 @@ export default function Login() {
               fullWidth
               variant="outlined"
               color={passwordError ? 'error' : 'primary'}
-              disabled={loading}
+              disabled={isLoading}
             />
           </FormControl>
           {/* <FormControlLabel
@@ -215,9 +211,13 @@ export default function Login() {
             fullWidth
             variant="contained"
             onClick={validateInputs}
-            disabled={loading}
+            endIcon={
+              isLoading ? (
+                <CircularProgress size={16} color="inherit" />
+              ) : undefined
+            }
           >
-            Log in
+            {isLoading ? 'Logging in...' : 'Log in'}
           </Button>
           <Typography sx={{ textAlign: 'center' }}>
             Don&apos;t have an account?{' '}

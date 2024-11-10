@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -11,7 +11,7 @@ import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import { MoneyRounded } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 // import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material';
 // import { GridExpandMoreIcon } from '@mui/x-data-grid';
 
@@ -32,13 +32,14 @@ const secondaryListItems = [
 ];
 
 export default function MenuContent() {
+  const { pathname } = useLocation();
   const navigate = useNavigate();
-  const [expanded, setExpanded] = useState<string | boolean>(false);
+  // const [expanded, setExpanded] = useState<string | boolean>(false);
 
-  const handleAccordionChange =
-    (panel: string) => (e: React.SyntheticEvent, isExpanded: boolean) => {
-      setExpanded(isExpanded ? panel : false);
-    };
+  // const handleAccordionChange =
+  //   (panel: string) => (e: React.SyntheticEvent, isExpanded: boolean) => {
+  //     setExpanded(isExpanded ? panel : false);
+  //   };
 
   return (
     <Stack sx={{ flexGrow: 1, p: 1, justifyContent: 'space-between' }}>
@@ -46,7 +47,7 @@ export default function MenuContent() {
         {mainListItems.map((item, index) => (
           <ListItem key={index} disablePadding sx={{ display: 'block' }}>
             <ListItemButton
-              selected={index === 0}
+              selected={pathname.includes(item.route)}
               onClick={() => navigate(item.route)}
             >
               <ListItemIcon>{item.icon}</ListItemIcon>

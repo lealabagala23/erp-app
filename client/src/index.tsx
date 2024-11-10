@@ -23,6 +23,7 @@ import {
   datePickersCustomizations,
   treeViewCustomizations,
 } from './theme/customizations';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const xThemeComponents = {
   ...chartsCustomizations,
@@ -34,15 +35,18 @@ const xThemeComponents = {
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
 );
+const queryClient = new QueryClient();
 
 root.render(
   <React.StrictMode>
     <StyledEngineProvider injectFirst>
       <AppTheme themeComponents={xThemeComponents}>
         <CssBaseline enableColorScheme />
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </QueryClientProvider>
       </AppTheme>
     </StyledEngineProvider>
   </React.StrictMode>,

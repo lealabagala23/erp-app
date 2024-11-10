@@ -12,9 +12,11 @@ import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import { SitemarkIcon } from '../../CustomIcons';
 import ColorModeSelect from '../../theme/ColorModeSelect';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import SuccessSnackbar from '../common/SuccessSnackbar';
+import { useMutation } from '@tanstack/react-query';
+import { signUp } from './apis';
+import { CircularProgress } from '@mui/material';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -66,36 +68,31 @@ export default function Signup() {
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [open, setOpen] = React.useState(false);
 
+  const { isLoading, mutateAsync: mutateSignupAsync } = useMutation({
+    mutationFn: signUp,
+    onSuccess: () => {
+      setOpen(true);
+      setTimeout(() => navigate('/log-in'), 2000); // Navigate to login
+    },
+    onError: (err) => {
+      console.error(err);
+      setPasswordErrorMessage('Failed to register. Please try again.');
+    },
+  });
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (usernameError || passwordError) {
       return;
     }
     const data = new FormData(event.currentTarget);
-    try {
-      await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/auth/register`,
-        {
-          first_name: data.get('firstName'),
-          last_name: data.get('lastName'),
-          username: data.get('username'),
-          password: data.get('password'),
-        },
-        {
-          headers: {
-            'Content-type': 'application/json; charset=UTF-8',
-          },
-        },
-      );
 
-      setOpen(true);
-      setTimeout(() => navigate('/log-in'), 2000); // Navigate to login
-    } catch (err) {
-      console.error(err);
-      setPasswordErrorMessage(
-        'Failed to log in. Please check your credentials.',
-      );
-    }
+    await mutateSignupAsync({
+      first_name: data.get('firstName') as string,
+      last_name: data.get('lastName') as string,
+      username: data.get('username') as string,
+      password: data.get('password') as string,
+    });
   };
 
   const validateInputs = () => {
@@ -214,8 +211,13 @@ export default function Signup() {
             fullWidth
             variant="contained"
             onClick={validateInputs}
+            endIcon={
+              isLoading ? (
+                <CircularProgress size={16} color="inherit" />
+              ) : undefined
+            }
           >
-            Sign up
+            {isLoading ? 'Signing up...' : 'Sign up'}
           </Button>
           <Typography sx={{ textAlign: 'center' }}>
             Already have an account?{' '}
