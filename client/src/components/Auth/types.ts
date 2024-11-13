@@ -1,10 +1,23 @@
 export type UserInfo = {
-    first_name: string;
-    last_name: string;
-    user_name: string;
-  };
+  first_name: string;
+  last_name: string;
+  user_name: string;
+};
+
+export type Company = {
+  _id: string;
+  company_name: string;
+  company_display_name: string;
+  company_addres: string;
+  tin: string;
+  contact_info: string;
+  company_description: string;
+  company_logo: string;
+};
 
 export interface IAuthContext {
   userInfo: UserInfo | null;
   fetchingUserInfo: boolean;
+  companies: Company[];
+  fetchingCompanies: boolean;
 }

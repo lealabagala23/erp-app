@@ -1,6 +1,7 @@
 import axiosConfig from '../../utils/axiosConfig';
 
 const AUTH_API = '/api/auth';
+const COMPANIES_API = '/api/companies'
 
 export const fetchLogin = async ({
   username,
@@ -39,10 +40,12 @@ export const signUp = async ({
 };
 
 export const fetchUserInfo = async () => {
-  const response = await axiosConfig.get(`${AUTH_API}/me`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-  });
+  const response = await axiosConfig.get(`${AUTH_API}/me`);
   return response?.data;
 };
+
+export const fetchCompanies = async () => {
+    const response = await axiosConfig.get(`${COMPANIES_API}`);
+    return response?.data;
+  };
+  

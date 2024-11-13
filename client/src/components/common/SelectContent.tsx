@@ -1,17 +1,18 @@
-import * as React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import MuiAvatar from '@mui/material/Avatar';
 import MuiListItemAvatar from '@mui/material/ListItemAvatar';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
-import ListItemIcon from '@mui/material/ListItemIcon';
+// import ListItemIcon from '@mui/material/ListItemIcon';
 import ListSubheader from '@mui/material/ListSubheader';
 import Select, { SelectChangeEvent, selectClasses } from '@mui/material/Select';
-import Divider from '@mui/material/Divider';
+// import Divider from '@mui/material/Divider';
 import { styled } from '@mui/material/styles';
-import AddRoundedIcon from '@mui/icons-material/AddRounded';
+// import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import DevicesRoundedIcon from '@mui/icons-material/DevicesRounded';
-import SmartphoneRoundedIcon from '@mui/icons-material/SmartphoneRounded';
-import ConstructionRoundedIcon from '@mui/icons-material/ConstructionRounded';
+// import SmartphoneRoundedIcon from '@mui/icons-material/SmartphoneRounded';
+import AuthContext from '../auth/AuthContext';
+// import ConstructionRoundedIcon from '@mui/icons-material/ConstructionRounded';
 
 const Avatar = styled(MuiAvatar)(({ theme }) => ({
   width: 28,
@@ -27,17 +28,24 @@ const ListItemAvatar = styled(MuiListItemAvatar)({
 });
 
 export default function SelectContent() {
-  const [company, setCompany] = React.useState('');
+  const { companies } = useContext(AuthContext);
+  const [company, setCompany] = useState<string | null>(null);
 
   const handleChange = (event: SelectChangeEvent) => {
     setCompany(event.target.value as string);
   };
 
+  useEffect(() => {
+    if (companies.length > 0) {
+      setCompany(companies[0].company_display_name);
+    }
+  }, [companies]);
+
   return (
     <Select
       labelId="company-select"
       id="company-simple-select"
-      value={company}
+      value={company as string}
       onChange={handleChange}
       displayEmpty
       inputProps={{ 'aria-label': 'Select company' }}
@@ -54,26 +62,39 @@ export default function SelectContent() {
           gap: '2px',
           pl: 1,
         },
+        '.MuiSelect-select': {
+          paddingLeft: 0,
+        },
+        '.MuiListItemText-secondary': {
+          textOverflow: 'ellipsis',
+          width: '130px',
+          overflow: 'hidden',
+        },
       }}
     >
-      <ListSubheader sx={{ pt: 0 }}>Production</ListSubheader>
-      <MenuItem value="">
-        <ListItemAvatar>
-          <Avatar alt="Sitemark web">
-            <DevicesRoundedIcon sx={{ fontSize: '1rem' }} />
-          </Avatar>
-        </ListItemAvatar>
-        <ListItemText primary="Sitemark-web" secondary="Web app" />
-      </MenuItem>
-      <MenuItem value={10}>
+      <ListSubheader sx={{ pt: 0 }}>Company</ListSubheader>
+      {companies.map((c) => (
+        <MenuItem key={c._id} value={c.company_display_name}>
+          <ListItemAvatar>
+            <Avatar alt={c.company_display_name}>
+              <DevicesRoundedIcon sx={{ fontSize: '1rem' }} />
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText
+            primary={c.company_display_name}
+            secondary={c.company_name}
+          />
+        </MenuItem>
+      ))}
+      {/* <MenuItem value={10}>
         <ListItemAvatar>
           <Avatar alt="Sitemark App">
             <SmartphoneRoundedIcon sx={{ fontSize: '1rem' }} />
           </Avatar>
         </ListItemAvatar>
         <ListItemText primary="Sitemark-app" secondary="Mobile application" />
-      </MenuItem>
-      <MenuItem value={20}>
+      </MenuItem> */}
+      {/* <MenuItem value={20}>
         <ListItemAvatar>
           <Avatar alt="Sitemark Store">
             <DevicesRoundedIcon sx={{ fontSize: '1rem' }} />
@@ -96,7 +117,7 @@ export default function SelectContent() {
           <AddRoundedIcon />
         </ListItemIcon>
         <ListItemText primary="Add product" secondary="Web app" />
-      </MenuItem>
+      </MenuItem> */}
     </Select>
   );
 }
