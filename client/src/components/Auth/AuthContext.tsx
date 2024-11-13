@@ -9,6 +9,8 @@ const DEFAULT_CONTEXT = {
   fetchingUserInfo: false,
   companies: [],
   fetchingCompanies: false,
+  activeCompany: null,
+  setActiveCompany: () => {},
 };
 
 const AuthContext = createContext<IAuthContext>(DEFAULT_CONTEXT);
@@ -20,6 +22,7 @@ interface IProps {
 export const AuthProvider = ({ children }: IProps) => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [companies, setCompanies] = useState<Company[]>([]);
+  const [activeCompany, setActiveCompany] = useState<Company | null>(null);
 
   const { mutateAsync: mutateGetUserInfo, isLoading: fetchingUserInfo } =
     useMutation({
@@ -44,7 +47,14 @@ export const AuthProvider = ({ children }: IProps) => {
 
   return (
     <AuthContext.Provider
-      value={{ userInfo, fetchingUserInfo, companies, fetchingCompanies }}
+      value={{
+        userInfo,
+        fetchingUserInfo,
+        companies,
+        fetchingCompanies,
+        activeCompany,
+        setActiveCompany,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from "react";
+
 export type UserInfo = {
   first_name: string;
   last_name: string;
@@ -20,4 +22,6 @@ export interface IAuthContext {
   fetchingUserInfo: boolean;
   companies: Company[];
   fetchingCompanies: boolean;
+  activeCompany: Company | null;
+  setActiveCompany: Dispatch<SetStateAction<Company | null>>;
 }

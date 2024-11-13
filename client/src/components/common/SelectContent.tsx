@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import MuiAvatar from '@mui/material/Avatar';
 import MuiListItemAvatar from '@mui/material/ListItemAvatar';
 import MenuItem from '@mui/material/MenuItem';
@@ -12,6 +12,7 @@ import { styled } from '@mui/material/styles';
 import DevicesRoundedIcon from '@mui/icons-material/DevicesRounded';
 // import SmartphoneRoundedIcon from '@mui/icons-material/SmartphoneRounded';
 import AuthContext from '../auth/AuthContext';
+import { Company } from '../auth/types';
 // import ConstructionRoundedIcon from '@mui/icons-material/ConstructionRounded';
 
 const Avatar = styled(MuiAvatar)(({ theme }) => ({
@@ -28,16 +29,19 @@ const ListItemAvatar = styled(MuiListItemAvatar)({
 });
 
 export default function SelectContent() {
-  const { companies } = useContext(AuthContext);
-  const [company, setCompany] = useState<string | null>(null);
+  const { companies, activeCompany, setActiveCompany } =
+    useContext(AuthContext);
 
   const handleChange = (event: SelectChangeEvent) => {
-    setCompany(event.target.value as string);
+    const company = companies.find(
+      (c) => c.company_display_name === event.target.value,
+    );
+    setActiveCompany(company as Company);
   };
 
   useEffect(() => {
     if (companies.length > 0) {
-      setCompany(companies[0].company_display_name);
+      setActiveCompany(companies[0]);
     }
   }, [companies]);
 
@@ -45,7 +49,7 @@ export default function SelectContent() {
     <Select
       labelId="company-select"
       id="company-simple-select"
-      value={company as string}
+      value={activeCompany?.company_display_name}
       onChange={handleChange}
       displayEmpty
       inputProps={{ 'aria-label': 'Select company' }}
