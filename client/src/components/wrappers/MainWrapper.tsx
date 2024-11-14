@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 import SideMenu from '../common/SideMenu';
 import { Route, Routes } from 'react-router-dom';
 import Home from '../pages/Home';
-import Inventory from '../pages/Inventory';
+import Inventory from '../pages/inventory/Inventory';
 import GenerateSales from '../pages/GenerateSales';
 import Orders from '../pages/Orders';
 import Accounts from '../pages/Accounts';

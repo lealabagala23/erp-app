@@ -4,7 +4,7 @@ import ItemList from './ItemList';
 import axios from 'axios';
 import { Button } from '@mui/material';
 
-function Inventory() {
+function InventoryOld() {
   const [items, setItems] = useState([]);
 
   const fetchItems = async () => {
@@ -24,4 +24,4 @@ function Inventory() {
   );
 }
 
-export default Inventory;
+export default InventoryOld;
