@@ -8,7 +8,7 @@ interface IProps {
   message: string;
 }
 
-export default function SuccessSnackbar({
+export default function ErrorSnackbar({
   open,
   toggleSnackbar,
   message,
@@ -18,7 +18,7 @@ export default function SuccessSnackbar({
       <Snackbar open={open} autoHideDuration={6000} onClose={toggleSnackbar}>
         <Alert
           onClose={toggleSnackbar}
-          severity="success"
+          severity="error"
           variant="filled"
           sx={{ width: '100%' }}
         >

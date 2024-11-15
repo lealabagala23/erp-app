@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Box } from '@mui/material';
 import { Product } from './types';
-import { useMutation } from '@tanstack/react-query';
-import { fetchProducts } from './apis';
 
 const columns: GridColDef<Product>[] = [
   {
@@ -60,31 +58,27 @@ const columns: GridColDef<Product>[] = [
     field: 'created_at',
     headerName: 'Created at',
     valueGetter: (value, row) =>
-      `${new Date(row.created_at).toLocaleDateString('en-US')}`,
+      `${new Date(row.created_at || '').toLocaleDateString('en-US')}`,
     flex: 1,
   },
 ];
 
 interface IProps {
   searchText: string;
+  products: Product[];
+  isLoading: boolean;
 }
 
-export default function InventoryTable({ searchText }: IProps) {
-  const [products, setProducts] = useState<Product[]>([]);
-
-  const { mutateAsync: mutateGetProducts } = useMutation({
-    mutationFn: fetchProducts,
-    onSuccess: (data) => setProducts(data),
-  });
-
-  useEffect(() => {
-    mutateGetProducts();
-  }, []);
-
+export default function InventoryTable({
+  searchText,
+  isLoading,
+  products,
+}: IProps) {
   return (
-    <Box style={{ height: '100%', width: '100%' }}>
+    <Box style={{ height: '100%', width: '100%', maxWidth: '1700px' }}>
       <DataGrid
         checkboxSelection={false}
+        loading={isLoading}
         rows={
           searchText !== ''
             ? products?.filter((p) =>
@@ -95,7 +89,7 @@ export default function InventoryTable({ searchText }: IProps) {
             : products
         }
         columns={columns}
-        getRowId={(row) => row._id}
+        getRowId={(row) => row._id || 0}
         getRowClassName={(params) =>
           params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
         }
@@ -109,6 +103,10 @@ export default function InventoryTable({ searchText }: IProps) {
         disableColumnResize
         density="compact"
         slotProps={{
+          loadingOverlay: {
+            variant: 'skeleton',
+            noRowsVariant: 'skeleton',
+          },
           filterPanel: {
             filterFormProps: {
               logicOperatorInputProps: {

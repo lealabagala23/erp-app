@@ -80,6 +80,10 @@ export default function Signup() {
     },
   });
 
+  const toggleSnackbar = () => {
+    setOpen((v) => !v);
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (usernameError || passwordError) {
@@ -231,7 +235,7 @@ export default function Signup() {
       </Card>
       <SuccessSnackbar
         open={open}
-        setOpen={setOpen}
+        toggleSnackbar={toggleSnackbar}
         message="User created successfully."
       />
     </SignupContainer>

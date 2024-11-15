@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const ProductSchema = new mongoose.Schema({
   barcode: {
     type: String,
-    unique: true,
   },
   product_name: {
     type: String,
