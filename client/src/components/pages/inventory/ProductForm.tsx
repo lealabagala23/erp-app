@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   Button,
@@ -29,21 +29,41 @@ const PRODUCT_UNIT_OPTIONS = [
 interface IProps {
   onFormSubmit: (d: Product) => void;
   isLoading: boolean;
+  initialData: Product | null;
+  onCancel: () => void;
 }
 
-export default function ProductForm({ onFormSubmit, isLoading }: IProps) {
+export default function ProductForm({
+  onFormSubmit,
+  isLoading,
+  initialData,
+  onCancel,
+}: IProps) {
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
     reset,
+    setValue,
   } = useForm();
+  const [prodUnit, setProdUnit] = useState('');
 
   const onSubmit = (data: unknown) => {
-    console.log('Form Data:', data);
     onFormSubmit(data as Product);
     reset();
   };
+
+  const handleCancel = () => {
+    onCancel();
+  };
+
+  useEffect(() => {
+    if (initialData) {
+      reset(initialData);
+      setProdUnit(initialData.product_unit);
+      setValue('product_unit', initialData.product_unit);
+    }
+  }, [initialData]);
 
   return (
     <Stack
@@ -97,17 +117,19 @@ export default function ProductForm({ onFormSubmit, isLoading }: IProps) {
         >
           <FormLabel>Product Unit</FormLabel>
           <TextField
-            {...register('product_unit', {
-              required: 'Product Unit is required',
-            })}
             select
+            value={prodUnit}
+            onChange={(e) => {
+              setProdUnit(e.target.value);
+              setValue('product_unit', e.target.value);
+            }}
             variant="outlined"
             fullWidth
             error={Boolean(errors.product_unit)}
             helperText={<>{errors.product_unit?.message}</>}
           >
-            {PRODUCT_UNIT_OPTIONS.map((unit, key) => (
-              <MenuItem key={`unit-${key}`} value={unit}>
+            {PRODUCT_UNIT_OPTIONS.map((unit) => (
+              <MenuItem key={unit} value={unit}>
                 {unit}
               </MenuItem>
             ))}
@@ -225,7 +247,12 @@ export default function ProductForm({ onFormSubmit, isLoading }: IProps) {
       <Box>
         <Divider />
         <Stack direction={'row'} gap={2} justifyContent={'center'} padding={2}>
-          <Button variant="outlined" color="primary" sx={{ width: 100 }}>
+          <Button
+            variant="outlined"
+            color="primary"
+            sx={{ width: 100 }}
+            onClick={handleCancel}
+          >
             Cancel
           </Button>
           <Tooltip

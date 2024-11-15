@@ -3,25 +3,26 @@ import AppNavbar from '../../common/AppNavbar';
 import Header from './Header';
 import PageWrapper from '../../wrappers/PageWrapper';
 import InventoryTable from './InventoryTable';
-import { Button, Stack } from '@mui/material';
+import { AlertColor, Button, Stack } from '@mui/material';
 import SearchBar from './SearchBar';
 import FormDrawer from '../../common/FormDrawer';
 import ProductForm from './ProductForm';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createProduct, fetchProducts } from './apis';
+import { createProduct, fetchProducts, updateProduct } from './apis';
 import { Product } from './types';
-import SuccessSnackbar from '../../common/SuccessSnackbar';
-import ErrorSnackbar from '../../common/ErrorSnackbar';
 import { FETCH_PRODUCTS_QUERY_KEY } from './constants';
+import AlertSnackbar from '../../common/AlertSnackbar';
 
 export default function Inventory() {
   const queryClient = useQueryClient();
   const [searchText, setSearchText] = useState('');
   const [openDrawer, setOpenDrawer] = useState(false);
-  const [createProdRes, setCreateProdRes] = useState({
-    success: false,
-    error: false,
-  });
+  const [snackbarProps, setSnackbarProps] = useState<{
+    open: boolean;
+    message: string;
+    type: AlertColor;
+  }>({ open: false, message: '', type: 'success' });
+  const [selectedRow, setSelectedRow] = useState<Product | null>(null);
 
   const { data = [], isLoading: isLoadingProducts } = useQuery(
     [FETCH_PRODUCTS_QUERY_KEY],
@@ -36,13 +37,43 @@ export default function Inventory() {
     useMutation({
       mutationFn: createProduct,
       onSuccess: () => {
-        setCreateProdRes({ success: true, error: false });
+        setSnackbarProps({
+          open: true,
+          message: 'Added new product successfully.',
+          type: 'success',
+        });
         toggleDrawer();
         queryClient.invalidateQueries([FETCH_PRODUCTS_QUERY_KEY]);
       },
       onError: (err) => {
         console.error(err);
-        setCreateProdRes({ success: false, error: true });
+        setSnackbarProps({
+          open: true,
+          message: 'Add new product was not successful.',
+          type: 'error',
+        });
+      },
+    });
+
+  const { mutateAsync: mutateUpdateProduct, isLoading: isLoadingUpdate } =
+    useMutation({
+      mutationFn: updateProduct,
+      onSuccess: () => {
+        setSnackbarProps({
+          open: true,
+          message: 'Updated product successfully.',
+          type: 'success',
+        });
+        toggleDrawer();
+        queryClient.invalidateQueries([FETCH_PRODUCTS_QUERY_KEY]);
+      },
+      onError: (err) => {
+        console.error(err);
+        setSnackbarProps({
+          open: true,
+          message: 'Update product was not successful.',
+          type: 'error',
+        });
       },
     });
 
@@ -50,12 +81,30 @@ export default function Inventory() {
     setOpenDrawer(!openDrawer);
   };
 
-  const toggleSnackbar = (status: 'success' | 'error') => () => {
-    setCreateProdRes((v) => ({ ...v, [status]: !v[status] }));
+  const toggleSnackbar = () => {
+    setSnackbarProps((v) => ({ open: !v.open, type: 'success', message: '' }));
   };
 
   const handleSaveProduct = async (product: Product) => {
-    await mutateCreateProduct(product);
+    if (product._id) {
+      await mutateUpdateProduct(product);
+    } else {
+      await mutateCreateProduct(product);
+    }
+  };
+
+  const onActionClick = (action: string) => {
+    switch (action) {
+      case 'Edit':
+        toggleDrawer();
+        break;
+      default:
+    }
+  };
+
+  const onCancel = () => {
+    toggleDrawer();
+    setSelectedRow(null);
   };
 
   return (
@@ -83,11 +132,13 @@ export default function Inventory() {
             <FormDrawer
               open={openDrawer}
               toggleDrawer={toggleDrawer}
-              title={'Add New Product'}
+              title={selectedRow ? 'Edit Product' : 'Add New Product'}
             >
               <ProductForm
                 onFormSubmit={handleSaveProduct}
-                isLoading={isLoadingCreate}
+                isLoading={isLoadingCreate || isLoadingUpdate}
+                initialData={selectedRow}
+                onCancel={onCancel}
               />
             </FormDrawer>
           </Stack>
@@ -95,18 +146,14 @@ export default function Inventory() {
             searchText={searchText}
             products={data}
             isLoading={isLoadingProducts}
+            setSelectedRow={setSelectedRow}
+            onActionClick={onActionClick}
           />
-          <SuccessSnackbar
-            open={createProdRes.success}
-            toggleSnackbar={toggleSnackbar('success')}
-            message={'Added new product successfully.'}
-          />
-          <ErrorSnackbar
-            open={createProdRes.error}
-            toggleSnackbar={toggleSnackbar('error')}
-            message={
-              'Add new product was not successful. Please try again later.'
-            }
+          <AlertSnackbar
+            open={snackbarProps.open}
+            type={snackbarProps.type}
+            toggleSnackbar={toggleSnackbar}
+            message={snackbarProps.message}
           />
         </>
       </PageWrapper>

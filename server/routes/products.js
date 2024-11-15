@@ -22,20 +22,21 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
-// router.put("/:id", authenticateToken, async (req, res) => {
-//   try {
-//     const updatedProduct = await Product.findByIdAndUpdate(
-//       req.params.id,
-//       req.body,
-//       {
-//         new: true,
-//       }
-//     );
-//     res.status(200).json(updatedProduct);
-//   } catch (err) {
-//     res.status(500).json(err);
-//   }
-// });
+router.put("/:id", authenticateToken, async (req, res) => {
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+      }
+    );
+    res.status(200).json(updatedProduct);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 // router.delete("/:id", authenticateToken, async (req, res) => {
 //   try {
 //     await Product.findByIdAndDelete(req.params.id);

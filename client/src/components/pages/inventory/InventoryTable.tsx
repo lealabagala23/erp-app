@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { Box } from '@mui/material';
+import { Box, IconButton, Menu, MenuItem } from '@mui/material';
 import { Product } from './types';
+import { MoreHoriz } from '@mui/icons-material';
 
-const columns: GridColDef<Product>[] = [
+const COLUMNS: GridColDef<Product>[] = [
   {
     field: 'product_name',
     headerName: 'Product Name',
@@ -67,13 +68,60 @@ interface IProps {
   searchText: string;
   products: Product[];
   isLoading: boolean;
+  setSelectedRow: Dispatch<SetStateAction<Product | null>>;
+  onActionClick: (action: string) => void;
 }
 
 export default function InventoryTable({
   searchText,
   isLoading,
   products,
+  setSelectedRow,
+  onActionClick,
 }: IProps) {
+  const [anchorEl, setAnchorEl] = useState<
+    (EventTarget & HTMLButtonElement) | null
+  >(null);
+
+  const columns = [
+    ...COLUMNS,
+    {
+      field: 'actions',
+      headerName: '',
+      width: 50,
+      // eslint-disable-next-line
+      renderCell: ({ row }: any) => (
+        <IconButton
+          onClick={(event) => handleMenuOpen(event, row)}
+          sx={{
+            width: '30px',
+            height: '20px',
+            border: 0,
+          }}
+        >
+          <MoreHoriz />
+        </IconButton>
+      ),
+    },
+  ];
+
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    row: unknown,
+  ) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedRow(row as Product);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleActionClick = (action: string) => {
+    onActionClick(action);
+    handleMenuClose();
+  };
+
   return (
     <Box style={{ height: '100%', width: '100%', maxWidth: '1700px' }}>
       <DataGrid
@@ -133,6 +181,14 @@ export default function InventoryTable({
           },
         }}
       />
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        <MenuItem onClick={() => handleActionClick('Edit')}>Edit</MenuItem>
+        <MenuItem onClick={() => handleActionClick('Delete')}>Delete</MenuItem>
+      </Menu>
     </Box>
   );
 }
