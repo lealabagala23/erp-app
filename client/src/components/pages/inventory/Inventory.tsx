@@ -8,10 +8,16 @@ import SearchBar from './SearchBar';
 import FormDrawer from '../../common/FormDrawer';
 import ProductForm from './ProductForm';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createProduct, fetchProducts, updateProduct } from './apis';
+import {
+  createProduct,
+  deleteProduct,
+  fetchProducts,
+  updateProduct,
+} from './apis';
 import { Product } from './types';
 import { FETCH_PRODUCTS_QUERY_KEY } from './constants';
 import AlertSnackbar from '../../common/AlertSnackbar';
+import AlertDialog from '../../common/AlertDialog';
 
 export default function Inventory() {
   const queryClient = useQueryClient();
@@ -22,6 +28,11 @@ export default function Inventory() {
     message: string;
     type: AlertColor;
   }>({ open: false, message: '', type: 'success' });
+  const [dialogProps, setDialogProps] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+  }>({ open: false, title: '', message: '' });
   const [selectedRow, setSelectedRow] = useState<Product | null>(null);
 
   const { data = [], isLoading: isLoadingProducts } = useQuery(
@@ -77,6 +88,27 @@ export default function Inventory() {
       },
     });
 
+  const { mutateAsync: mutateDeleteProduct, isLoading: isLoadingDelete } =
+    useMutation({
+      mutationFn: deleteProduct,
+      onSuccess: () => {
+        setSnackbarProps({
+          open: true,
+          message: 'Deleted product successfully.',
+          type: 'success',
+        });
+        queryClient.invalidateQueries([FETCH_PRODUCTS_QUERY_KEY]);
+      },
+      onError: (err) => {
+        console.error(err);
+        setSnackbarProps({
+          open: true,
+          message: 'Delete product was not successful.',
+          type: 'error',
+        });
+      },
+    });
+
   const toggleDrawer = () => {
     setOpenDrawer(!openDrawer);
   };
@@ -98,13 +130,25 @@ export default function Inventory() {
       case 'Edit':
         toggleDrawer();
         break;
+      case 'Delete':
+        setDialogProps({
+          open: true,
+          title: 'Delete Product',
+          message:
+            'Are you sure you want to delete this product? (Note: This action cannot be reversed.)',
+        });
+        break;
       default:
     }
   };
 
-  const onCancel = () => {
+  const onCancelForm = () => {
     toggleDrawer();
     setSelectedRow(null);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogProps((v) => ({ ...v, open: false }));
   };
 
   return (
@@ -138,14 +182,14 @@ export default function Inventory() {
                 onFormSubmit={handleSaveProduct}
                 isLoading={isLoadingCreate || isLoadingUpdate}
                 initialData={selectedRow}
-                onCancel={onCancel}
+                onCancel={onCancelForm}
               />
             </FormDrawer>
           </Stack>
           <InventoryTable
             searchText={searchText}
             products={data}
-            isLoading={isLoadingProducts}
+            isLoading={isLoadingProducts || isLoadingDelete}
             setSelectedRow={setSelectedRow}
             onActionClick={onActionClick}
           />
@@ -154,6 +198,21 @@ export default function Inventory() {
             type={snackbarProps.type}
             toggleSnackbar={toggleSnackbar}
             message={snackbarProps.message}
+          />
+          <AlertDialog
+            open={dialogProps.open}
+            handleClose={handleCloseDialog}
+            title={dialogProps.title}
+            message={dialogProps.message}
+            cancelBtnProps={{
+              label: 'Cancel',
+              action: () => handleCloseDialog(),
+            }}
+            proceedBtnProps={{
+              label: 'Delete',
+              action: () => mutateDeleteProduct(selectedRow as Product),
+              danger: true,
+            }}
           />
         </>
       </PageWrapper>

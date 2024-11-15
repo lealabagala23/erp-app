@@ -45,3 +45,9 @@ export const updateProduct = async (product: Product) => {
 
   return response?.data;
 };
+
+export const deleteProduct = async (product: Product) => {
+  const response = await axiosConfig.delete(`${PRODUCTS_API}/${product._id}`);
+
+  return response?.data;
+};

@@ -37,13 +37,13 @@ router.put("/:id", authenticateToken, async (req, res) => {
   }
 });
 
-// router.delete("/:id", authenticateToken, async (req, res) => {
-//   try {
-//     await Product.findByIdAndDelete(req.params.id);
-//     res.status(200).json("Product deleted");
-//   } catch (err) {
-//     res.status(500).json(err);
-//   }
-// });
+router.delete("/:id", authenticateToken, async (req, res) => {
+  try {
+    await Product.findByIdAndDelete(req.params.id);
+    res.status(200).json("Product deleted");
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 
 module.exports = router;

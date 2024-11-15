@@ -13,10 +13,10 @@ import { styled } from '@mui/material/styles';
 import { SitemarkIcon } from '../../CustomIcons';
 import ColorModeSelect from '../../theme/ColorModeSelect';
 import { useNavigate } from 'react-router-dom';
-import SuccessSnackbar from '../common/SuccessSnackbar';
 import { useMutation } from '@tanstack/react-query';
 import { signUp } from './apis';
 import { CircularProgress } from '@mui/material';
+import AlertSnackbar from '../common/AlertSnackbar';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -233,9 +233,10 @@ export default function Signup() {
           </Typography>
         </Box>
       </Card>
-      <SuccessSnackbar
+      <AlertSnackbar
         open={open}
         toggleSnackbar={toggleSnackbar}
+        type="success"
         message="User created successfully."
       />
     </SignupContainer>
