@@ -2,7 +2,13 @@ import React, { Dispatch, SetStateAction, useState } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Box, IconButton, Menu, MenuItem } from '@mui/material';
 import { Product } from './types';
-import { MoreHoriz } from '@mui/icons-material';
+import { DeleteOutline, EditOutlined, MoreHoriz } from '@mui/icons-material';
+
+const formatCurrency = (v: number) =>
+  v
+    .toFixed(2)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
 const COLUMNS: GridColDef<Product>[] = [
   {
@@ -36,24 +42,28 @@ const COLUMNS: GridColDef<Product>[] = [
     headerName: 'Purchase Price',
     editable: true,
     flex: 1,
+    valueGetter: formatCurrency,
   },
   {
     field: 'patient_price',
     headerName: 'Patient Price',
     editable: true,
     flex: 1,
+    valueGetter: formatCurrency,
   },
   {
     field: 'doctor_price',
     headerName: 'Doctor Price',
     editable: true,
     flex: 1,
+    valueGetter: formatCurrency,
   },
   {
     field: 'agency_price',
     headerName: 'Agency Price',
     editable: true,
     flex: 1,
+    valueGetter: formatCurrency,
   },
   {
     field: 'created_at',
@@ -186,8 +196,17 @@ export default function InventoryTable({
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={() => handleActionClick('Edit')}>Edit</MenuItem>
-        <MenuItem onClick={() => handleActionClick('Delete')}>Delete</MenuItem>
+        <MenuItem onClick={() => handleActionClick('Edit')}>
+          <EditOutlined sx={{ width: 20, height: 20, marginRight: '8px' }} />{' '}
+          Edit
+        </MenuItem>
+        <MenuItem
+          onClick={() => handleActionClick('Delete')}
+          sx={{ color: 'var(--template-palette-error-main)' }}
+        >
+          <DeleteOutline sx={{ width: 20, height: 20, marginRight: '8px' }} />{' '}
+          Delete
+        </MenuItem>
       </Menu>
     </Box>
   );
