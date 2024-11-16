@@ -9,10 +9,6 @@ const InventorySchema = new mongoose.Schema({
   stock_arrival_date: {
     type: Date,
   },
-  unit_of_measure: {
-    type: String,
-    required: true,
-  },
   quantity_on_hand: {
     type: Number,
     required: true,
