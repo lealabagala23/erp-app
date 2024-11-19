@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import AppNavbar from '../../common/AppNavbar';
 import Header from './Header';
 import PageWrapper from '../../wrappers/PageWrapper';
-import InventoryTable from './InventoryTable';
+import InventoryTable from './ProductTable';
 import { AlertColor, Button, Stack } from '@mui/material';
 import SearchBar from './SearchBar';
 import FormDrawer from '../../common/FormDrawer';
@@ -18,6 +18,8 @@ import { Product } from './types';
 import { FETCH_PRODUCTS_QUERY_KEY } from './constants';
 import AlertSnackbar from '../../common/AlertSnackbar';
 import AlertDialog from '../../common/AlertDialog';
+import { InfoOutlined, ListAlt } from '@mui/icons-material';
+import ProductInventory from './ProductInventory';
 
 export default function Inventory() {
   const queryClient = useQueryClient();
@@ -153,10 +155,10 @@ export default function Inventory() {
 
   return (
     <>
-      <AppNavbar title={'Inventory'} />
+      <AppNavbar title={'Product Inventory'} />
       <PageWrapper>
         <>
-          <Header title={'Inventory'} />
+          <Header title={'Product Inventory'} />
           <Stack
             direction="row"
             sx={{
@@ -177,14 +179,29 @@ export default function Inventory() {
               open={openDrawer}
               toggleDrawer={toggleDrawer}
               title={selectedRow ? 'Edit Product' : 'Add New Product'}
-            >
-              <ProductForm
-                onFormSubmit={handleSaveProduct}
-                isLoading={isLoadingCreate || isLoadingUpdate}
-                initialData={selectedRow}
-                onCancel={onCancelForm}
-              />
-            </FormDrawer>
+              tabs={[
+                {
+                  label: 'Info',
+                  icon: <InfoOutlined />,
+                  content: (
+                    <ProductForm
+                      onFormSubmit={handleSaveProduct}
+                      isLoading={isLoadingCreate || isLoadingUpdate}
+                      initialData={selectedRow}
+                      onCancel={onCancelForm}
+                    />
+                  ),
+                },
+                {
+                  label: 'Inventory',
+                  icon: <ListAlt />,
+                  content: (
+                    <ProductInventory product_id={selectedRow?._id as string} />
+                  ),
+                  hidden: !selectedRow,
+                },
+              ]}
+            />
           </Stack>
           <InventoryTable
             searchText={searchText}

@@ -1,30 +1,39 @@
-import React from 'react';
-import {
-  Drawer,
-  Box,
-  Typography,
-  Stack,
-  IconButton,
-  Divider,
-} from '@mui/material';
-import {
-  CloseOutlined as CloseIcon,
-  InfoOutlined as InfoIcon,
-} from '@mui/icons-material';
+import React, { useState } from 'react';
+import { Drawer, Typography, Stack, IconButton, Divider } from '@mui/material';
+import { CloseOutlined as CloseIcon } from '@mui/icons-material';
+
+type FormDrawerTab = {
+  label: string;
+  icon: React.ReactNode;
+  content: React.ReactNode;
+  hidden?: boolean;
+};
 
 interface IProps {
   open: boolean;
   toggleDrawer: () => void;
-  children: React.ReactChild;
   title: string;
+  tabs: FormDrawerTab[];
 }
 
 export default function FormDrawer({
   open,
   toggleDrawer,
-  children,
   title,
+  tabs,
 }: IProps) {
+  const [selectedTab, setSelectedTab] = useState(tabs[0].label);
+
+  const selectedStyles = {
+    backgroundColor: 'hsl(220, 30%, 94%)',
+    borderColor: 'hsl(220, 20%, 80%)',
+  };
+
+  const renderContent = () => {
+    const tab = tabs.find((t) => t.label === selectedTab);
+    return tab?.content;
+  };
+
   return (
     <Drawer anchor="right" open={open} onClose={toggleDrawer}>
       <Stack direction={'row'}>
@@ -45,11 +54,24 @@ export default function FormDrawer({
       <Divider />
 
       <Stack direction={'row'} sx={{ width: 500, height: '100%' }}>
-        <Box width={56}>
-          <InfoIcon sx={{ margin: 2 }} />
-        </Box>
+        <Stack direction={'column'} width={56}>
+          {tabs.map(({ label, icon, hidden }) => (
+            <IconButton
+              key={label}
+              sx={{
+                margin: 1,
+                border: 0,
+                ...(selectedTab === label ? selectedStyles : {}),
+                display: hidden ? 'none' : undefined,
+              }}
+              onClick={() => setSelectedTab(label)}
+            >
+              {icon}
+            </IconButton>
+          ))}
+        </Stack>
         <Divider orientation="vertical" />
-        {children}
+        {renderContent()}
       </Stack>
       <Divider />
     </Drawer>

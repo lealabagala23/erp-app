@@ -82,7 +82,7 @@ interface IProps {
   onActionClick: (action: string) => void;
 }
 
-export default function InventoryTable({
+export default function ProductTable({
   searchText,
   isLoading,
   products,

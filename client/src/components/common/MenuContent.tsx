@@ -23,7 +23,11 @@ const mainListItems = [
     route: '/generate-sales',
   },
   { text: 'Orders', icon: <MoneyRounded />, route: '/orders' },
-  { text: 'Inventory', icon: <AssignmentRoundedIcon />, route: '/inventory' },
+  {
+    text: 'Product Inventory',
+    icon: <AssignmentRoundedIcon />,
+    route: '/inventory',
+  },
   { text: 'Accounts', icon: <PeopleRoundedIcon />, route: '/accounts' },
 ];
 

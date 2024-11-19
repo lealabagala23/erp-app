@@ -11,3 +11,18 @@ export type Product = {
   agency_price: number;
   created_at?: string;
 };
+
+export type Inventory = {
+  _id?: string;
+  product_id?: string
+  stock_arrival_date: string;
+  quantity_on_hand?: number;
+  quantity_on_order: number;
+  expiry_date: string;
+  status: string;
+  company_id?: string;
+  supplier_id: {
+    _id: string;
+    supplier_name: string;
+  } | string;
+}

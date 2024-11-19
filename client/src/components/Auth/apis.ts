@@ -1,7 +1,9 @@
 import axiosConfig from '../../utils/axiosConfig';
 
 const AUTH_API = '/api/auth';
-const COMPANIES_API = '/api/companies'
+const COMPANIES_API = '/api/companies';
+
+const SUPPLIERS_API = '/api/suppliers';
 
 export const fetchLogin = async ({
   username,
@@ -45,7 +47,11 @@ export const fetchUserInfo = async () => {
 };
 
 export const fetchCompanies = async () => {
-    const response = await axiosConfig.get(`${COMPANIES_API}`);
-    return response?.data;
-  };
-  
+  const response = await axiosConfig.get(`${COMPANIES_API}`);
+  return response?.data;
+};
+
+export const fetchSuppliers = async () => {
+  const response = await axiosConfig.get(`${SUPPLIERS_API}`);
+  return response?.data;
+};

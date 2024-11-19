@@ -1,8 +1,8 @@
 import React, { createContext, useState, useEffect } from 'react';
 
-import { Company, IAuthContext, UserInfo } from './types';
+import { Company, IAuthContext, Supplier, UserInfo } from './types';
 import { useMutation } from '@tanstack/react-query';
-import { fetchCompanies, fetchUserInfo } from './apis';
+import { fetchCompanies, fetchSuppliers, fetchUserInfo } from './apis';
 
 const DEFAULT_CONTEXT = {
   userInfo: null,
@@ -11,6 +11,8 @@ const DEFAULT_CONTEXT = {
   fetchingCompanies: false,
   activeCompany: null,
   setActiveCompany: () => {},
+  suppliers: [],
+  fetchingSuppliers: false,
 };
 
 const AuthContext = createContext<IAuthContext>(DEFAULT_CONTEXT);
@@ -22,6 +24,7 @@ interface IProps {
 export const AuthProvider = ({ children }: IProps) => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [companies, setCompanies] = useState<Company[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [activeCompany, setActiveCompany] = useState<Company | null>(null);
 
   const { mutateAsync: mutateGetUserInfo, isLoading: fetchingUserInfo } =
@@ -40,9 +43,18 @@ export const AuthProvider = ({ children }: IProps) => {
       },
     });
 
+  const { mutateAsync: mutateGetSuppliers, isLoading: fetchingSuppliers } =
+    useMutation({
+      mutationFn: fetchSuppliers,
+      onSuccess: (data) => {
+        setSuppliers(data);
+      },
+    });
+
   useEffect(() => {
     mutateGetUserInfo();
     mutateGetCompanies();
+    mutateGetSuppliers();
   }, []);
 
   return (
@@ -54,6 +66,8 @@ export const AuthProvider = ({ children }: IProps) => {
         fetchingCompanies,
         activeCompany,
         setActiveCompany,
+        suppliers,
+        fetchingSuppliers,
       }}
     >
       {children}

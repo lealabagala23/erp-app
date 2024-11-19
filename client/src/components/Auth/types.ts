@@ -10,11 +10,18 @@ export type Company = {
   _id: string;
   company_name: string;
   company_display_name: string;
-  company_addres: string;
+  company_address: string;
   tin: string;
   contact_info: string;
   company_description: string;
   company_logo: string;
+};
+
+export type Supplier = {
+  _id: string;
+  supplier_name: string;
+  contact_info: string;
+  address: string;
 };
 
 export interface IAuthContext {
@@ -24,4 +31,6 @@ export interface IAuthContext {
   fetchingCompanies: boolean;
   activeCompany: Company | null;
   setActiveCompany: Dispatch<SetStateAction<Company | null>>;
+  suppliers: Supplier[];
+  fetchingSuppliers: boolean;
 }

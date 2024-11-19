@@ -1,5 +1,5 @@
 import axiosConfig from '../../../utils/axiosConfig';
-import { Product } from './types';
+import { Inventory, Product } from './types';
 import pick from 'lodash/pick';
 
 const PRODUCTS_API = '/api/products';
@@ -20,8 +20,8 @@ const generatePayload = (product: Product) => {
   return {
     ...payload,
     barcode: barcode === '' ? undefined : barcode,
-  }
-}
+  };
+};
 
 export const fetchProducts = async () => {
   const response = await axiosConfig.get(`${PRODUCTS_API}`);
@@ -29,7 +29,7 @@ export const fetchProducts = async () => {
 };
 
 export const createProduct = async (product: Product) => {
-  const payload = generatePayload(product)
+  const payload = generatePayload(product);
   const response = await axiosConfig.post(`${PRODUCTS_API}`, {
     ...payload,
   });
@@ -38,7 +38,7 @@ export const createProduct = async (product: Product) => {
 };
 
 export const updateProduct = async (product: Product) => {
-  const payload = generatePayload(product)
+  const payload = generatePayload(product);
   const response = await axiosConfig.put(`${PRODUCTS_API}/${product._id}`, {
     ...payload,
   });
@@ -49,5 +49,42 @@ export const updateProduct = async (product: Product) => {
 export const deleteProduct = async (product: Product) => {
   const response = await axiosConfig.delete(`${PRODUCTS_API}/${product._id}`);
 
+  return response?.data;
+};
+
+export const fetchProductInventory = async ({
+  product_id,
+  company_id,
+}: {
+  product_id: string;
+  company_id: string;
+}) => {
+  const response = await axiosConfig.get(
+    `${PRODUCTS_API}/${product_id}/inventory?company_id=${company_id}`,
+  );
+  return response?.data;
+};
+
+export const createProductInventory = async (inventory: Inventory) => {
+  const { product_id, stock_arrival_date, expiry_date, quantity_on_order, ...payload } = pick(inventory, [
+    'product_id',
+    'stock_arrival_date',
+    'quantity_on_order',
+    'expiry_date',
+    'status',
+    'company_id',
+    'supplier_id',
+  ]);
+
+  const response = await axiosConfig.post(
+    `${PRODUCTS_API}/${product_id}/inventory`,
+    {
+      ...payload,
+      stock_arrival_date: new Date(stock_arrival_date).toLocaleDateString('en-US'),
+      expiry_date: new Date(expiry_date).toLocaleDateString('en-US'),
+      quantity_on_hand: quantity_on_order,
+      quantity_on_order,
+    },
+  );
   return response?.data;
 };
