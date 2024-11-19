@@ -83,19 +83,24 @@ export default function ProductInventory({ product_id }: IProps) {
       </Typography>
       {isLoading ? (
         <CircularProgress color="inherit" sx={{ margin: '0 auto' }} />
-      ) : addInventory ? (
-        <AddInventoryForm
-          onFormSubmit={onFormSubmit}
-          isLoading={isLoadingCreate}
-        />
       ) : data.length === 0 ? (
-        <Typography align="center" marginBottom={'12px'}>
-          No inventory data recorded.
-        </Typography>
+        addInventory ? (
+          <></>
+        ) : (
+          <Typography align="center" marginBottom={'12px'}>
+            No inventory data recorded.
+          </Typography>
+        )
       ) : (
         <CollapsibleTable data={data} />
       )}
-      {!addInventory && (
+      {addInventory ? (
+        <AddInventoryForm
+          onFormSubmit={onFormSubmit}
+          isLoading={isLoadingCreate}
+          onCancel={() => setAddInventory(false)}
+        />
+      ) : (
         <Button
           variant="contained"
           sx={{

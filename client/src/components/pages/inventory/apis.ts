@@ -65,10 +65,17 @@ export const fetchProductInventory = async ({
   return response?.data;
 };
 
-export const createProductInventory = async (inventory: Inventory) => {
-  const { product_id, stock_arrival_date, expiry_date, quantity_on_order, ...payload } = pick(inventory, [
+const generateInventoryPayload = (inventory: Inventory) => {
+  const {
+    stock_arrival_date,
+    expiry_date,
+    quantity_on_hand,
+    quantity_on_order,
+    ...payload
+  } = pick(inventory, [
     'product_id',
     'stock_arrival_date',
+    'quantity_on_hand',
     'quantity_on_order',
     'expiry_date',
     'status',
@@ -76,14 +83,36 @@ export const createProductInventory = async (inventory: Inventory) => {
     'supplier_id',
   ]);
 
+  return {
+    ...payload,
+    stock_arrival_date: new Date(stock_arrival_date).toLocaleDateString(
+      'en-US',
+    ),
+    expiry_date: new Date(expiry_date).toLocaleDateString('en-US'),
+    quantity_on_hand: quantity_on_hand || quantity_on_order,
+    quantity_on_order,
+  };
+};
+
+export const createProductInventory = async (inventory: Inventory) => {
+  const payload = generateInventoryPayload(inventory)
+
   const response = await axiosConfig.post(
-    `${PRODUCTS_API}/${product_id}/inventory`,
+    `${PRODUCTS_API}/${inventory.product_id}/inventory`,
     {
       ...payload,
-      stock_arrival_date: new Date(stock_arrival_date).toLocaleDateString('en-US'),
-      expiry_date: new Date(expiry_date).toLocaleDateString('en-US'),
-      quantity_on_hand: quantity_on_order,
-      quantity_on_order,
+    },
+  );
+  return response?.data;
+};
+
+export const updateProductInventory = async (inventory: Inventory) => {
+  const payload = generateInventoryPayload(inventory)
+
+  const response = await axiosConfig.put(
+    `${PRODUCTS_API}/${inventory.product_id}/inventory/${inventory._id}`,
+    {
+      ...payload,
     },
   );
   return response?.data;

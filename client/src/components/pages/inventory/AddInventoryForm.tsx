@@ -19,11 +19,14 @@ import { Inventory } from './types';
 interface IProps {
   onFormSubmit: (d: Inventory) => void;
   isLoading: boolean;
-  //   initialData: Inventory | null;
-  //   onCancel: () => void;
+  onCancel: () => void;
 }
 
-export default function AddInventoryForm({ onFormSubmit, isLoading }: IProps) {
+export default function AddInventoryForm({
+  onFormSubmit,
+  isLoading,
+  onCancel,
+}: IProps) {
   const { suppliers } = useContext(AuthContext);
   const {
     control,
@@ -33,15 +36,14 @@ export default function AddInventoryForm({ onFormSubmit, isLoading }: IProps) {
     reset,
     setValue,
   } = useForm();
-  console.log('errors', errors);
+
   const onSubmit = (data: unknown) => {
-    console.log('submit', data);
     onFormSubmit(data as Inventory);
     reset();
   };
 
   return (
-    <Box component={Card}>
+    <Box component={Card} marginTop="8px">
       <Stack component="form" onSubmit={handleSubmit(onSubmit)}>
         <FormControl fullWidth>
           <FormLabel>Arrival Date</FormLabel>
@@ -51,13 +53,12 @@ export default function AddInventoryForm({ onFormSubmit, isLoading }: IProps) {
             rules={{ required: 'Arrival Date is required' }}
             render={({ field: { onChange, ...restField } }) => (
               <DatePicker
-                onChange={(event) => {
-                  onChange(event);
-                }}
+                onChange={onChange}
                 slots={{
                   textField: (textFieldProps) => (
                     <TextField
                       {...textFieldProps}
+                      autoFocus
                       error={Boolean(errors.stock_arrival_date)}
                       helperText={<>{errors.stock_arrival_date?.message}</>}
                     />
@@ -84,9 +85,7 @@ export default function AddInventoryForm({ onFormSubmit, isLoading }: IProps) {
             rules={{ required: 'Expiry Date is required' }}
             render={({ field: { onChange, ...restField } }) => (
               <DatePicker
-                onChange={(event) => {
-                  onChange(event);
-                }}
+                onChange={onChange}
                 slots={{
                   textField: (textFieldProps) => (
                     <TextField
@@ -131,9 +130,7 @@ export default function AddInventoryForm({ onFormSubmit, isLoading }: IProps) {
             {...register('supplier_id', {
               required: 'Supplier is required',
             })}
-            // value={prodUnit}
             onChange={(e) => {
-              //   setProdUnit(e.target.value);
               setValue('supplier_id', e.target.value);
             }}
             placeholder="Select Supplier"
@@ -157,9 +154,7 @@ export default function AddInventoryForm({ onFormSubmit, isLoading }: IProps) {
             {...register('status', {
               required: 'Status is required',
             })}
-            // value={prodUnit}
             onChange={(e) => {
-              //   setProdUnit(e.target.value);
               setValue('status', e.target.value);
             }}
             defaultValue={'active'}
@@ -175,26 +170,27 @@ export default function AddInventoryForm({ onFormSubmit, isLoading }: IProps) {
           </TextField>
         </FormControl>
 
-        <Tooltip
-          title={!isValid ? 'Please fill the required fields' : undefined}
-        >
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            sx={{
-              width: '100%',
-              marginTop: '8px',
-            }}
-            endIcon={
-              isLoading ? (
-                <CircularProgress size={16} color="inherit" />
-              ) : undefined
-            }
-          >
-            {isLoading ? 'Saving...' : 'Save'}
+        <Stack direction={'row'} gap={2} justifyContent={'center'} padding={2}>
+          <Button variant="outlined" color="primary" onClick={onCancel}>
+            Cancel
           </Button>
-        </Tooltip>
+          <Tooltip
+            title={!isValid ? 'Please fill the required fields' : undefined}
+          >
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              endIcon={
+                isLoading ? (
+                  <CircularProgress size={16} color="inherit" />
+                ) : undefined
+              }
+            >
+              {isLoading ? 'Saving...' : 'Save'}
+            </Button>
+          </Tooltip>
+        </Stack>
       </Stack>
     </Box>
   );

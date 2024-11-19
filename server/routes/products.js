@@ -76,4 +76,30 @@ router.get("/:id/inventory", authenticateToken, async (req, res) => {
   }
 });
 
+router.put(
+  "/:id/inventory/:inventory_id",
+  authenticateToken,
+  async (req, res) => {
+    const { stock_arrival_date, expiry_date, ...rest } = req.body;
+    const updatedInventory = await Inventory.findByIdAndUpdate(
+      req.params.inventory_id,
+      {
+        product_id: req.params.id,
+        stock_arrival_date: new Date(stock_arrival_date),
+        expiry_date: new Date(expiry_date),
+        ...rest,
+      },
+      {
+        new: true,
+      }
+    );
+    try {
+      const savedInventory = await updatedInventory.save();
+      res.status(201).json(savedInventory);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  }
+);
+
 module.exports = router;

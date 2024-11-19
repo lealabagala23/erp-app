@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useContext, useState } from 'react';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
@@ -14,15 +14,37 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Inventory } from './types';
 import { MenuItem, Stack, TextField } from '@mui/material';
-import { EditOutlined } from '@mui/icons-material';
+import { CheckOutlined, EditOutlined } from '@mui/icons-material';
 import { DatePicker } from '@mui/x-date-pickers';
 import AuthContext from '../../auth/AuthContext';
+import dayjs from 'dayjs';
+import { updateProductInventory } from './apis';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { FETCH_INVENTORY_QUERY_KEY } from './constants';
 
 function Row(props: { row: Inventory }) {
-  const { suppliers } = React.useContext(AuthContext);
+  const queryClient = useQueryClient();
+  const { suppliers } = useContext(AuthContext);
   const { row } = props;
-  const [open, setOpen] = React.useState(false);
-  const [editable, setEditable] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [editable, setEditable] = useState(false);
+  const [formValues, setFormValues] = useState<Inventory>({ ...row });
+
+  const { mutateAsync: mutateUpdate, isLoading: isLoading } = useMutation({
+    mutationFn: updateProductInventory,
+    onSuccess: () => {
+      setEditable(false);
+      queryClient.invalidateQueries([FETCH_INVENTORY_QUERY_KEY]);
+    },
+    // eslint-disable-next-line
+    onError: (err: any) => {
+      console.error(err);
+    },
+  });
+
+  const handleSave = async () => {
+    await mutateUpdate(formValues);
+  };
 
   return (
     <React.Fragment>
@@ -62,10 +84,12 @@ function Row(props: { row: Inventory }) {
                 <IconButton
                   aria-label="expand row"
                   size="small"
-                  onClick={() => setEditable(!editable)}
-                  sx={{ border: 0 }}
+                  onClick={() =>
+                    editable ? handleSave() : setEditable(!editable)
+                  }
+                  disabled={isLoading}
                 >
-                  <EditOutlined />
+                  {editable ? <CheckOutlined /> : <EditOutlined />}
                 </IconButton>
               </Stack>
               <Table size="small" aria-label="purchases">
@@ -80,7 +104,18 @@ function Row(props: { row: Inventory }) {
                     </TableCell>
                     <TableCell>
                       {editable ? (
-                        <TextField fullWidth />
+                        <TextField
+                          fullWidth
+                          type="number"
+                          value={formValues.quantity_on_hand}
+                          onChange={(e) =>
+                            setFormValues((v) => ({
+                              ...v,
+                              quantity_on_hand: e.target
+                                .value as unknown as number,
+                            }))
+                          }
+                        />
                       ) : (
                         row.quantity_on_hand
                       )}
@@ -96,7 +131,23 @@ function Row(props: { row: Inventory }) {
                     </TableCell>
                     <TableCell>
                       {editable ? (
-                        <DatePicker />
+                        <DatePicker
+                          value={dayjs(formValues.expiry_date)}
+                          onChange={(value) =>
+                            setFormValues((v) => ({
+                              ...v,
+                              // eslint-disable-next-line
+                              expiry_date: (value as any)?.format('MM-DD-YYYY'),
+                            }))
+                          }
+                          sx={{
+                            '.MuiIconButton-root': {
+                              border: 0,
+                              width: '38px',
+                              height: '38px',
+                            },
+                          }}
+                        />
                       ) : (
                         `${new Date(row.expiry_date || '').toLocaleDateString('en-US')}`
                       )}
@@ -112,7 +163,18 @@ function Row(props: { row: Inventory }) {
                     </TableCell>
                     <TableCell>
                       {editable ? (
-                        <TextField select fullWidth>
+                        <TextField
+                          select
+                          fullWidth
+                          // eslint-disable-next-line
+                          value={(formValues.supplier_id as any)?._id}
+                          onChange={(e) =>
+                            setFormValues((v) => ({
+                              ...v,
+                              supplier_id: e.target.value,
+                            }))
+                          }
+                        >
                           {suppliers.map((s) => (
                             <MenuItem key={s._id} value={s._id}>
                               {s.supplier_name}
@@ -135,7 +197,17 @@ function Row(props: { row: Inventory }) {
                     </TableCell>
                     <TableCell>
                       {editable ? (
-                        <TextField select fullWidth>
+                        <TextField
+                          select
+                          fullWidth
+                          value={formValues.status}
+                          onChange={(e) =>
+                            setFormValues((v) => ({
+                              ...v,
+                              status: e.target.value,
+                            }))
+                          }
+                        >
                           <MenuItem value={'active'}>ACTIVE</MenuItem>
                           <MenuItem value={'out_of_stock'}>
                             OUT OF STOCK
