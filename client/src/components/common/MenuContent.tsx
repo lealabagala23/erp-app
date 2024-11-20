@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -10,12 +10,16 @@ import AnalyticsRoundedIcon from '@mui/icons-material/AnalyticsRounded';
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
-import { MoneyRounded } from '@mui/icons-material';
+import { ExpandLess, MoneyRounded } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
-// import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material';
-// import { GridExpandMoreIcon } from '@mui/x-data-grid';
+import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material';
+import { GridExpandMoreIcon } from '@mui/x-data-grid';
 
-const mainListItems = [
+const secondaryListItems = [
+  { text: 'Settings', icon: <SettingsRoundedIcon />, route: '/settings' },
+];
+
+const nestedMainItems = [
   { text: 'Home', icon: <HomeRoundedIcon />, route: '/home' },
   {
     text: 'Generate Sales',
@@ -24,100 +28,125 @@ const mainListItems = [
   },
   { text: 'Orders', icon: <MoneyRounded />, route: '/orders' },
   {
-    text: 'Product Inventory',
+    text: 'Inventory',
     icon: <AssignmentRoundedIcon />,
-    route: '/inventory',
+    route: null,
+    children: [
+      {
+        text: 'Products',
+        route: '/products',
+      },
+      {
+        text: 'Stocks',
+        route: '/stocks',
+      },
+    ],
   },
   { text: 'Accounts', icon: <PeopleRoundedIcon />, route: '/accounts' },
-];
-
-const secondaryListItems = [
-  { text: 'Settings', icon: <SettingsRoundedIcon />, route: '/settings' },
 ];
 
 export default function MenuContent() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  // const [expanded, setExpanded] = useState<string | boolean>(false);
+  const [expanded, setExpanded] = useState<string | boolean>(false);
 
-  // const handleAccordionChange =
-  //   (panel: string) => (e: React.SyntheticEvent, isExpanded: boolean) => {
-  //     setExpanded(isExpanded ? panel : false);
-  //   };
+  const handleAccordionChange =
+    (panel: string) => (e: React.SyntheticEvent, isExpanded: boolean) => {
+      setExpanded(isExpanded ? panel : false);
+    };
 
   return (
     <Stack sx={{ flexGrow: 1, p: 1, justifyContent: 'space-between' }}>
-      <List dense>
-        {mainListItems.map((item, index) => (
-          <ListItem key={index} disablePadding sx={{ display: 'block' }}>
-            <ListItemButton
-              selected={pathname.includes(item.route)}
-              onClick={() => navigate(item.route)}
-            >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-        {/* <ListItem
-          key={mainListItems.length}
-          disablePadding
-          sx={{ display: 'block' }}
-        >
-          <Accordion
-            expanded={expanded === 'panel1'}
-            onChange={handleAccordionChange('panel1')}
-            disableGutters
-            elevation={0}
-            sx={{
-              boxShadow: 'none', // Remove shadow
-              backgroundColor: 'transparent', // Remove background color
-              border: 'none', // Remove border
-              padding: 0,
-              '& .MuiAccordionSummary-root': {
-                minHeight: 'unset',
-                padding: 0,
-              },
-            }}
+      <List>
+        {nestedMainItems.map((item, index) => (
+          <ListItem
+            key={index}
+            disablePadding
+            sx={{ display: 'block', marginBottom: '4px' }}
           >
-            <AccordionSummary
-              aria-controls="panel1-content"
-              id="panel1-header"
+            <Accordion
+              expanded={expanded === item.text}
+              onChange={handleAccordionChange(item.text)}
+              disableGutters
+              elevation={0}
               sx={{
-                margin: 0,
-                '> .MuiAccordionSummary-content': { margin: 0 },
-                '.MuiListItemButton-root': { opacity: 1 },
+                boxShadow: 'none', // Remove shadow
+                backgroundColor: 'transparent', // Remove background color
+                border: 'none', // Remove border
+                padding: 0,
+                '& .MuiAccordionSummary-root': {
+                  minHeight: 'unset',
+                  padding: 0,
+                },
+                '.MuiButtonBase-root': { opacity: 1 },
               }}
             >
-              <ListItemButton
-                selected={mainListItems.length === 0}
-                onClick={() => navigate('/inventory')}
-                sx={{ padding: 0 }}
+              <AccordionSummary
+                aria-controls={`${item.text}-content`}
+                id={`${item.text}-header`}
+                sx={{
+                  margin: 0,
+                  '> .MuiAccordionSummary-content': { margin: 0 },
+                  '.MuiListItemButton-root': { opacity: 1 },
+                }}
               >
-                <ListItemIcon>
-                  <AssignmentRoundedIcon />
-                </ListItemIcon>
-                <ListItemText primary={'Inventory'} />
-              </ListItemButton>
-            </AccordionSummary>
-            <AccordionDetails sx={{ paddingTop: 0, paddingBottom: 0 }}>
-              <List sx={{ paddingTop: 0, paddingBottom: 0 }}>
-                <ListItem
-                  key={mainListItems.length + 1}
-                  disablePadding
-                  sx={{ display: 'block' }}
+                <ListItemButton
+                  selected={
+                    item.route
+                      ? pathname.includes(item.route)
+                      : item.children?.some((subItem) =>
+                          pathname.includes(subItem.route),
+                        )
+                  }
+                  onClick={() => (item.route ? navigate(item.route) : null)}
+                  sx={{ padding: 0 }}
                 >
-                  <ListItemButton
-                    selected={mainListItems.length + 1 === 0}
-                    onClick={() => navigate('/orders')}
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
+                  {item.children &&
+                    (expanded === item.text ? (
+                      <ExpandLess />
+                    ) : (
+                      <GridExpandMoreIcon />
+                    ))}
+                </ListItemButton>
+              </AccordionSummary>
+              {item.children && (
+                <AccordionDetails sx={{ paddingTop: 0, paddingBottom: 0 }}>
+                  <List
+                    sx={{
+                      paddingTop: 0,
+                      paddingBottom: 0,
+                      '.Mui-selected': {
+                        backgroundColor: 'transparent !important',
+                      },
+                      '.MuiListItemButton-root:hover': {
+                        backgroundColor: 'transparent !important',
+                      },
+                    }}
                   >
-                    <ListItemText primary={'Orders'} />
-                  </ListItemButton>
-                </ListItem>
-              </List>
-            </AccordionDetails>
-          </Accordion>
-        </ListItem> */}
+                    {item.children.map((subItem, idx) => (
+                      <ListItem
+                        key={idx}
+                        disablePadding
+                        sx={{
+                          display: 'block',
+                        }}
+                      >
+                        <ListItemButton
+                          selected={pathname.includes(subItem.route)}
+                          onClick={() => navigate(subItem.route)}
+                        >
+                          <ListItemText primary={subItem.text} />
+                        </ListItemButton>
+                      </ListItem>
+                    ))}
+                  </List>
+                </AccordionDetails>
+              )}
+            </Accordion>
+          </ListItem>
+        ))}
       </List>
 
       <List dense>
