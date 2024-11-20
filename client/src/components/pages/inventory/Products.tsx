@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import AppNavbar from '../../common/AppNavbar';
 import Header from './Header';
 import PageWrapper from '../../wrappers/PageWrapper';
-import InventoryTable from './ProductTable';
+import ProductTable from './ProductTable';
 import { AlertColor, Button, Stack } from '@mui/material';
 import SearchBar from './SearchBar';
 import FormDrawer from '../../common/FormDrawer';
@@ -21,7 +21,7 @@ import AlertDialog from '../../common/AlertDialog';
 import { InfoOutlined, ListAlt } from '@mui/icons-material';
 import ProductInventory from './ProductInventory';
 
-export default function Inventory() {
+export default function Products() {
   const queryClient = useQueryClient();
   const [searchText, setSearchText] = useState('');
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -155,7 +155,7 @@ export default function Inventory() {
 
   return (
     <>
-      <AppNavbar title={'Product Inventory'} />
+      <AppNavbar title={'Products List'} />
       <PageWrapper>
         <>
           <Header />
@@ -203,7 +203,7 @@ export default function Inventory() {
               ]}
             />
           </Stack>
-          <InventoryTable
+          <ProductTable
             searchText={searchText}
             products={data}
             isLoading={isLoadingProducts || isLoadingDelete}

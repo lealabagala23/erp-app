@@ -20,7 +20,7 @@ import AuthContext from '../../auth/AuthContext';
 import dayjs from 'dayjs';
 import { updateProductInventory } from './apis';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { FETCH_INVENTORY_QUERY_KEY } from './constants';
+import { FETCH_PRODUCT_INVENTORY_QUERY_KEY } from './constants';
 
 function Row(props: { row: Inventory }) {
   const queryClient = useQueryClient();
@@ -34,7 +34,7 @@ function Row(props: { row: Inventory }) {
     mutationFn: updateProductInventory,
     onSuccess: () => {
       setEditable(false);
-      queryClient.invalidateQueries([FETCH_INVENTORY_QUERY_KEY]);
+      queryClient.invalidateQueries([FETCH_PRODUCT_INVENTORY_QUERY_KEY]);
     },
     // eslint-disable-next-line
     onError: (err: any) => {

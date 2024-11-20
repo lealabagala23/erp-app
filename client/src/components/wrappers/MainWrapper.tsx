@@ -7,11 +7,12 @@ import Box from '@mui/material/Box';
 import SideMenu from '../common/SideMenu';
 import { Route, Routes } from 'react-router-dom';
 import Home from '../pages/Home';
-import Inventory from '../pages/inventory/Inventory';
+import Products from '../pages/inventory/Products';
 import GenerateSales from '../pages/GenerateSales';
 import Orders from '../pages/Orders';
 import Accounts from '../pages/Accounts';
 import { AuthProvider } from '../auth/AuthContext';
+import Stocks from '../pages/inventory/stocks/Stocks';
 
 export default function MainWrapper() {
   return (
@@ -22,8 +23,8 @@ export default function MainWrapper() {
           <Route path="/home" element={<Home />} />
           <Route path="/generate-sales" element={<GenerateSales />} />
           <Route path="/orders" element={<Orders />} />
-          <Route path="/products" element={<Inventory />} />
-          <Route path="/stocks" element={<Inventory />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/stocks" element={<Stocks />} />
           <Route path="/accounts" element={<Accounts />} />
         </Routes>
       </Box>

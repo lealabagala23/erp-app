@@ -1,4 +1,5 @@
 import axiosConfig from '../../../utils/axiosConfig';
+import { generateInventoryPayload } from './stocks/apis';
 import { Inventory, Product } from './types';
 import pick from 'lodash/pick';
 
@@ -65,34 +66,6 @@ export const fetchProductInventory = async ({
   return response?.data;
 };
 
-const generateInventoryPayload = (inventory: Inventory) => {
-  const {
-    stock_arrival_date,
-    expiry_date,
-    quantity_on_hand,
-    quantity_on_order,
-    ...payload
-  } = pick(inventory, [
-    'product_id',
-    'stock_arrival_date',
-    'quantity_on_hand',
-    'quantity_on_order',
-    'expiry_date',
-    'status',
-    'company_id',
-    'supplier_id',
-  ]);
-
-  return {
-    ...payload,
-    stock_arrival_date: new Date(stock_arrival_date).toLocaleDateString(
-      'en-US',
-    ),
-    expiry_date: new Date(expiry_date).toLocaleDateString('en-US'),
-    quantity_on_hand: quantity_on_hand || quantity_on_order,
-    quantity_on_order,
-  };
-};
 
 export const createProductInventory = async (inventory: Inventory) => {
   const payload = generateInventoryPayload(inventory)

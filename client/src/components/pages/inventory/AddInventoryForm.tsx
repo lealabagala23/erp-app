@@ -11,21 +11,27 @@ import {
   Tooltip,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import AuthContext from '../../auth/AuthContext';
-import { Inventory } from './types';
+import { Inventory, Product } from './types';
+import dayjs from 'dayjs';
+import { useQuery } from '@tanstack/react-query';
+import { FETCH_PRODUCTS_QUERY_KEY } from './constants';
+import { fetchProducts } from './apis';
 
 interface IProps {
   onFormSubmit: (d: Inventory) => void;
   isLoading: boolean;
   onCancel: () => void;
+  initialData?: Inventory | null;
 }
 
 export default function AddInventoryForm({
   onFormSubmit,
   isLoading,
   onCancel,
+  initialData,
 }: IProps) {
   const { suppliers } = useContext(AuthContext);
   const {
@@ -36,14 +42,58 @@ export default function AddInventoryForm({
     reset,
     setValue,
   } = useForm();
+  const [productId, setProductId] = useState('');
+  const [supplierId, setSupplierId] = useState('');
+
+  const { data: products = [], isLoading: isLoadingProducts } = useQuery(
+    [FETCH_PRODUCTS_QUERY_KEY],
+    () => fetchProducts(),
+    {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  );
 
   const onSubmit = (data: unknown) => {
-    onFormSubmit(data as Inventory);
+    onFormSubmit({
+      ...(data as Inventory),
+      product_id: productId,
+      supplier_id: supplierId,
+    });
     reset();
   };
 
+  useEffect(() => {
+    if (initialData) {
+      const {
+        _id,
+        product_id,
+        stock_arrival_date,
+        expiry_date,
+        quantity_on_order,
+        supplier_id,
+        status,
+      } = initialData;
+      reset({
+        _id,
+        // eslint-disable-next-line
+        product_id: (product_id as any)?._id,
+        stock_arrival_date: dayjs(stock_arrival_date),
+        expiry_date: dayjs(expiry_date),
+        quantity_on_order,
+        // eslint-disable-next-line
+        supplier_id: (supplier_id as any)?._id,
+        status,
+      });
+      // eslint-disable-next-line
+      setProductId((product_id as any)?._id);
+      // eslint-disable-next-line
+      setSupplierId((supplier_id as any)?._id);
+    }
+  }, [initialData]);
+
   return (
-    <Box component={Card} marginTop="8px">
+    <Box component={Card} width={'100%'}>
       <Stack component="form" onSubmit={handleSubmit(onSubmit)}>
         <FormControl fullWidth>
           <FormLabel>Arrival Date</FormLabel>
@@ -76,6 +126,36 @@ export default function AddInventoryForm({
             )}
           />
         </FormControl>
+
+        {!initialData?._id && (
+          <FormControl fullWidth margin="dense">
+            <FormLabel>Product</FormLabel>
+            <TextField
+              select
+              {...register('product_id', {
+                required: 'Product is required',
+              })}
+              value={productId}
+              onChange={(e) => {
+                setProductId(e.target.value);
+                setValue('product_id', e.target.value);
+              }}
+              placeholder={
+                isLoadingProducts ? 'Loading Products...' : 'Select Product'
+              }
+              variant="outlined"
+              fullWidth
+              error={Boolean(errors.product_id)}
+              helperText={<>{errors.product_id?.message}</>}
+            >
+              {products.map((s: Product) => (
+                <MenuItem key={s._id} value={s._id}>
+                  {s.product_name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </FormControl>
+        )}
 
         <FormControl fullWidth margin="dense">
           <FormLabel>Expiry Date</FormLabel>
@@ -130,7 +210,9 @@ export default function AddInventoryForm({
             {...register('supplier_id', {
               required: 'Supplier is required',
             })}
+            value={supplierId}
             onChange={(e) => {
+              setSupplierId(e.target.value);
               setValue('supplier_id', e.target.value);
             }}
             placeholder="Select Supplier"

@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import React, { useContext, useState } from 'react';
 import CollapsibleTable from './CollapsibleTable';
-import { FETCH_INVENTORY_QUERY_KEY } from './constants';
+import { FETCH_PRODUCT_INVENTORY_QUERY_KEY } from './constants';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createProductInventory, fetchProductInventory } from './apis';
 import AuthContext from '../../auth/AuthContext';
@@ -32,7 +32,7 @@ export default function ProductInventory({ product_id }: IProps) {
   }>({ open: false, message: '', type: 'success' });
 
   const { data = [], isLoading } = useQuery(
-    [FETCH_INVENTORY_QUERY_KEY, product_id],
+    [FETCH_PRODUCT_INVENTORY_QUERY_KEY, product_id],
     () =>
       fetchProductInventory({
         product_id,
@@ -54,7 +54,7 @@ export default function ProductInventory({ product_id }: IProps) {
           message: 'Added new product successfully.',
           type: 'success',
         });
-        queryClient.invalidateQueries([FETCH_INVENTORY_QUERY_KEY]);
+        queryClient.invalidateQueries([FETCH_PRODUCT_INVENTORY_QUERY_KEY]);
       },
       onError: (err) => {
         console.error(err);
