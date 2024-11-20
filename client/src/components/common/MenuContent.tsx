@@ -55,6 +55,11 @@ export default function MenuContent() {
       setExpanded(isExpanded ? panel : false);
     };
 
+  const isSelected = (item: (typeof nestedMainItems)[2]) =>
+    item.route
+      ? pathname.includes(item.route)
+      : item.children?.some((subItem) => pathname.includes(subItem.route));
+
   return (
     <Stack sx={{ flexGrow: 1, p: 1, justifyContent: 'space-between' }}>
       <List>
@@ -87,17 +92,13 @@ export default function MenuContent() {
                 sx={{
                   margin: 0,
                   '> .MuiAccordionSummary-content': { margin: 0 },
-                  '.MuiListItemButton-root': { opacity: 1 },
+                  '.MuiListItemButton-root': {
+                    opacity: isSelected(item) ? 1 : 0.7,
+                  },
                 }}
               >
                 <ListItemButton
-                  selected={
-                    item.route
-                      ? pathname.includes(item.route)
-                      : item.children?.some((subItem) =>
-                          pathname.includes(subItem.route),
-                        )
-                  }
+                  selected={isSelected(item)}
                   onClick={() => (item.route ? navigate(item.route) : null)}
                   sx={{ padding: 0 }}
                 >
@@ -112,7 +113,15 @@ export default function MenuContent() {
                 </ListItemButton>
               </AccordionSummary>
               {item.children && (
-                <AccordionDetails sx={{ paddingTop: 0, paddingBottom: 0 }}>
+                <AccordionDetails
+                  sx={{
+                    paddingTop: 0,
+                    paddingBottom: 0,
+                    '.MuiListItemButton-root': {
+                      opacity: 0.7,
+                    },
+                  }}
+                >
                   <List
                     sx={{
                       paddingTop: 0,
