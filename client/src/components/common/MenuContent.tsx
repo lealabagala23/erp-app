@@ -131,6 +131,7 @@ export default function MenuContent() {
                       },
                       '.MuiListItemButton-root:hover': {
                         backgroundColor: 'transparent !important',
+                        opacity: 1,
                       },
                     }}
                   >

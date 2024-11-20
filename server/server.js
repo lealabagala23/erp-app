@@ -1,6 +1,5 @@
 const express = require("express");
 const cors = require("cors");
-const itemRoutes = require("./routes/items");
 const productRoutes = require("./routes/products");
 const supplierRoutes = require("./routes/suppliers");
 const companyRoutes = require("./routes/companies");
@@ -21,7 +20,6 @@ app.use(bodyParser.json());
 
 connectDB();
 
-app.use("/api/items", itemRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/suppliers", supplierRoutes);
 app.use("/api/companies", companyRoutes);

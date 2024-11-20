@@ -9,7 +9,7 @@ export default function Orders() {
       <AppNavbar title={'Orders'} />
       <PageWrapper>
         <>
-          <Header title={'Orders'} />
+          <Header />
         </>
       </PageWrapper>
     </>

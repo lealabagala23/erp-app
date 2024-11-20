@@ -10,7 +10,7 @@ export default function Home() {
       <AppNavbar title={'Home'} />
       <PageWrapper>
         <>
-          <Header title={'Home'} />
+          <Header />
           <MainGrid />
         </>
       </PageWrapper>

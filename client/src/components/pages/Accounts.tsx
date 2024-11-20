@@ -9,7 +9,7 @@ export default function Accounts() {
       <AppNavbar title={'Accounts'} />
       <PageWrapper>
         <>
-          <Header title={'Accounts'} />
+          <Header />
         </>
       </PageWrapper>
     </>

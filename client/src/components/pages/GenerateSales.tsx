@@ -9,7 +9,7 @@ export default function GenerateSales() {
       <AppNavbar title={'Generate Sales'} />
       <PageWrapper>
         <>
-          <Header title={'Generate Sales'} />
+          <Header />
         </>
       </PageWrapper>
     </>

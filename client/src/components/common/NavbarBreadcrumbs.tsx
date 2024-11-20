@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Breadcrumbs, { breadcrumbsClasses } from '@mui/material/Breadcrumbs';
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
+import { useLocation } from 'react-router-dom';
 
 const StyledBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
   margin: theme.spacing(1, 0),
@@ -15,22 +16,44 @@ const StyledBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
   },
 }));
 
-interface IProps {
-  title: string;
-}
+const labelRouteMapping = {
+  '/home': {
+    primary: 'Dashboard',
+  },
+  '/generate-sales': {
+    primary: 'Dashboard',
+  },
+  '/orders': {
+    primary: 'Dashboard',
+  },
+  '/products': {
+    primary: 'Inventory',
+    secondary: 'Products',
+  },
+  '/stocks': {
+    primary: 'Inventory',
+    secondary: 'Stocks',
+  },
+  '/accounts': {
+    primary: 'Dashboard',
+  },
+};
 
-export default function NavbarBreadcrumbs({ title }: IProps) {
+export default function NavbarBreadcrumbs() {
+  const { pathname } = useLocation();
+  // eslint-disable-next-line
+  const mapping = (labelRouteMapping as any)[pathname];
   return (
     <StyledBreadcrumbs
       aria-label="breadcrumb"
       separator={<NavigateNextRoundedIcon fontSize="small" />}
     >
-      <Typography variant="body1">Dashboard</Typography>
+      <Typography variant="body1">{mapping.primary}</Typography>
       <Typography
         variant="body1"
         sx={{ color: 'text.primary', fontWeight: 600 }}
       >
-        {title}
+        {mapping.secondary}
       </Typography>
     </StyledBreadcrumbs>
   );

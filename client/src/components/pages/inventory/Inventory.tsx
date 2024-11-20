@@ -158,7 +158,7 @@ export default function Inventory() {
       <AppNavbar title={'Product Inventory'} />
       <PageWrapper>
         <>
-          <Header title={'Product Inventory'} />
+          <Header />
           <Stack
             direction="row"
             sx={{
