@@ -21,10 +21,12 @@ const labelRouteMapping = {
     primary: 'Dashboard',
   },
   '/generate-sales': {
-    primary: 'Dashboard',
+    primary: 'Sales',
+    secondary: 'Generate Sales Invoice',
   },
   '/orders': {
-    primary: 'Dashboard',
+    primary: 'Orders',
+    secondary: 'List of Orders',
   },
   '/products': {
     primary: 'Inventory',
@@ -35,7 +37,11 @@ const labelRouteMapping = {
     secondary: 'Stocks',
   },
   '/accounts': {
-    primary: 'Dashboard',
+    primary: 'Accounts',
+  },
+  '/settings': {
+    primary: 'Settings',
+    secondary: 'Change Password',
   },
 };
 

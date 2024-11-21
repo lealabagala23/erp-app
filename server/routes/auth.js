@@ -54,4 +54,29 @@ router.get("/me", authenticateToken, async (req, res) => {
   res.json(user);
 });
 
+router.post("/change-password", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    const match = await bcrypt.compare(req.body.oldPassword, user?.password);
+    if (!match) {
+      res.status(500).send("Incorrect password");
+      return;
+    }
+
+    const newPassword = await bcrypt.hash(req.body.newPassword, 10);
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { password: newPassword },
+      {
+        new: true,
+      }
+    );
+    await updatedUser.save();
+    res.status(201).send("User registered successfully");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error registering user");
+  }
+});
+
 module.exports = router;

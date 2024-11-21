@@ -13,6 +13,7 @@ import Orders from '../pages/Orders';
 import Accounts from '../pages/Accounts';
 import { AuthProvider } from '../auth/AuthContext';
 import Stocks from '../pages/inventory/stocks/Stocks';
+import ChangePassword from '../settings/ChangePassword';
 
 export default function MainWrapper() {
   return (
@@ -26,6 +27,7 @@ export default function MainWrapper() {
           <Route path="/products" element={<Products />} />
           <Route path="/stocks" element={<Stocks />} />
           <Route path="/accounts" element={<Accounts />} />
+          <Route path="/settings" element={<ChangePassword />} />
         </Routes>
       </Box>
     </AuthProvider>
