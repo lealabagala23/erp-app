@@ -23,6 +23,32 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
+router.post("/bulk", authenticateToken, async (req, res) => {
+  try {
+    const data = req.body; // Assuming JSON data from the client
+    const existingProducts = await Product.find();
+    const dataWithCreatedAt = data
+      .filter((d) => {
+        const { product_name, product_description } = d;
+        const existing = existingProducts.some(
+          (e) =>
+            e.product_name.includes(product_name) &&
+            e.product_description.includes(product_description)
+        );
+        return !existing;
+      })
+      .map((d) => ({
+        ...d,
+        created_at: new Date(),
+      }));
+    await Product.insertMany(dataWithCreatedAt); // Insert multiple records
+    res.status(200).send("Data uploaded successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error uploading data");
+  }
+});
+
 router.put("/:id", authenticateToken, async (req, res) => {
   try {
     const updatedProduct = await Product.findByIdAndUpdate(

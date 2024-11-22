@@ -18,7 +18,6 @@ const COLUMNS: GridColDef<Product>[] = [
     minWidth: 300,
     flex: 1,
   },
-  { field: 'barcode', headerName: 'Barcode', flex: 1 },
   {
     field: 'product_description',
     headerName: 'Description',
@@ -65,6 +64,7 @@ const COLUMNS: GridColDef<Product>[] = [
     flex: 1,
     valueGetter: formatCurrency,
   },
+  { field: 'barcode', headerName: 'Barcode', flex: 1 },
   {
     field: 'created_at',
     headerName: 'Created at',

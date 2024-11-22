@@ -18,8 +18,14 @@ import { Product } from './types';
 import { FETCH_PRODUCTS_QUERY_KEY } from './constants';
 import AlertSnackbar from '../../common/AlertSnackbar';
 import AlertDialog from '../../common/AlertDialog';
-import { InfoOutlined, ListAlt } from '@mui/icons-material';
+import {
+  AddBoxOutlined,
+  InfoOutlined,
+  ListAlt,
+  Upload,
+} from '@mui/icons-material';
 import ProductInventory from './ProductInventory';
+import CSVUploader from './CSVUploader';
 
 export default function Products() {
   const queryClient = useQueryClient();
@@ -35,6 +41,7 @@ export default function Products() {
     title: string;
     message: string;
   }>({ open: false, title: '', message: '' });
+  const [openCSVUploader, setOpenCSVUploader] = useState(false);
   const [selectedRow, setSelectedRow] = useState<Product | null>(null);
 
   const { data = [], isLoading: isLoadingProducts } = useQuery(
@@ -172,9 +179,24 @@ export default function Products() {
             spacing={2}
           >
             <SearchBar searchText={searchText} setSearchText={setSearchText} />
-            <Button size="small" variant="contained" onClick={toggleDrawer}>
-              Add New Product
-            </Button>
+            <Stack direction={'row'} gap={2}>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => setOpenCSVUploader(true)}
+                startIcon={<Upload />}
+              >
+                Upload CSV
+              </Button>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={toggleDrawer}
+                startIcon={<AddBoxOutlined />}
+              >
+                Add New Product
+              </Button>
+            </Stack>
             <FormDrawer
               open={openDrawer}
               toggleDrawer={toggleDrawer}
@@ -209,6 +231,19 @@ export default function Products() {
             isLoading={isLoadingProducts || isLoadingDelete}
             setSelectedRow={setSelectedRow}
             onActionClick={onActionClick}
+          />
+          <CSVUploader
+            open={openCSVUploader}
+            handleClose={(isSubmit: boolean) => {
+              if (isSubmit) {
+                setSnackbarProps({
+                  open: true,
+                  message: 'Uploaded CSV successfully.',
+                  type: 'success',
+                });
+              }
+              setOpenCSVUploader((v) => !v);
+            }}
           />
           <AlertSnackbar
             open={snackbarProps.open}

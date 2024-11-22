@@ -38,6 +38,15 @@ export const createProduct = async (product: Product) => {
   return response?.data;
 };
 
+// eslint-disable-next-line
+export const uploadProductsCSV = async (payload: any) => {
+  const response = await axiosConfig.post(`${PRODUCTS_API}/bulk`, 
+    JSON.stringify(payload)
+  );
+
+  return response?.data;
+};
+
 export const updateProduct = async (product: Product) => {
   const payload = generatePayload(product);
   const response = await axiosConfig.put(`${PRODUCTS_API}/${product._id}`, {
