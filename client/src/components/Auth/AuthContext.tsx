@@ -57,6 +57,13 @@ export const AuthProvider = ({ children }: IProps) => {
     mutateGetSuppliers();
   }, []);
 
+  useEffect(() => {
+    if (companies.length > 0) {
+      console.log('here', companies[0]);
+      setActiveCompany(companies[0]);
+    }
+  }, [companies]);
+
   return (
     <AuthContext.Provider
       value={{

@@ -9,7 +9,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Inventory } from '../types';
 import { FETCH_INVENTORY_QUERY_KEY } from '../constants';
 import AlertSnackbar from '../../../common/AlertSnackbar';
-import { InfoOutlined } from '@mui/icons-material';
+import { AddBoxOutlined, InfoOutlined } from '@mui/icons-material';
 import { createInventory, fetchInventory, updateInventory } from './apis';
 import AuthContext from '../../../auth/AuthContext';
 import AddInventoryForm from '../AddInventoryForm';
@@ -90,7 +90,6 @@ export default function Stocks() {
   };
 
   const handleSaveInventory = async (inventory: Inventory) => {
-    console.log('sad', inventory);
     if (inventory._id) {
       await mutateUpdateInventory({
         product_id: selectedRow?.product_id,
@@ -141,7 +140,12 @@ export default function Stocks() {
             spacing={2}
           >
             <SearchBar searchText={searchText} setSearchText={setSearchText} />
-            <Button size="small" variant="contained" onClick={toggleDrawer}>
+            <Button
+              size="small"
+              variant="contained"
+              onClick={toggleDrawer}
+              startIcon={<AddBoxOutlined />}
+            >
               Add New Stocks
             </Button>
             <FormDrawer

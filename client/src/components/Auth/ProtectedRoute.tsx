@@ -4,7 +4,7 @@ import { isTokenValid } from '../../utils/auth';
 
 const ProtectedRoute = () => {
   const token = localStorage.getItem('token');
-  const isAuthenticated = isTokenValid(token);
+  const isAuthenticated = isTokenValid(token as string);
 
   return isAuthenticated ? <Outlet /> : <Navigate to="/log-in" />;
 };

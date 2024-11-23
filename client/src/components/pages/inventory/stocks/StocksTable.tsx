@@ -1,15 +1,56 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { Box, IconButton, Menu, MenuItem } from '@mui/material';
+import {
+  Box,
+  IconButton,
+  Menu,
+  MenuItem,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { Inventory } from '../types';
 import { EditOutlined, MoreHoriz, SearchOutlined } from '@mui/icons-material';
+import { dateDiffInDays, dateSortComparator } from '../../../../utils/auth';
+import dayjs from 'dayjs';
 
 const COLUMNS: GridColDef<Inventory>[] = [
+  {
+    field: 'expiry_date',
+    headerName: 'Expiry Date',
+    valueGetter: (value, row) =>
+      `${new Date(row.expiry_date || '').toLocaleDateString('en-US')}`,
+    renderCell: ({ row }) => {
+      const diffDays = dateDiffInDays(row.expiry_date);
+      return (
+        <Tooltip
+          title={
+            diffDays < 0
+              ? 'Stock is expired'
+              : diffDays < 30 * 6
+                ? 'Stock is nearly expired'
+                : undefined
+          }
+        >
+          <Typography
+            color={diffDays < 30 * 6 ? 'error' : 'textPrimary'}
+            lineHeight={'unset'}
+            fontWeight={diffDays < 0 ? 600 : 500}
+          >
+            {dayjs(row.expiry_date).format('MM/DD/YYYY')}
+          </Typography>
+        </Tooltip>
+      );
+    },
+    sortComparator: dateSortComparator,
+    flex: 1,
+    minWidth: 150,
+  },
   {
     field: 'stock_arrival_date',
     headerName: 'Arrival Date',
     valueGetter: (value, row) =>
       `${new Date(row.stock_arrival_date || '').toLocaleDateString('en-US')}`,
+    sortComparator: dateSortComparator,
     flex: 1,
     minWidth: 150,
   },
@@ -26,19 +67,14 @@ const COLUMNS: GridColDef<Inventory>[] = [
     field: 'quantity_on_hand',
     headerName: 'Quantity on Hand',
     minWidth: 150,
+    align: 'center',
     flex: 1,
   },
   {
     field: 'quantity_on_order',
     headerName: 'Quantity on Order',
     minWidth: 150,
-    flex: 1,
-  },
-  {
-    field: 'expiry_date',
-    headerName: 'Expiry Date',
-    valueGetter: (value, row) =>
-      `${new Date(row.expiry_date || '').toLocaleDateString('en-US')}`,
+    align: 'center',
     flex: 1,
   },
   {
@@ -144,7 +180,7 @@ export default function StocksTable({
         initialState={{
           pagination: { paginationModel: { pageSize: 20 } },
           sorting: {
-            sortModel: [{ field: 'stock_arrival_date', sort: 'desc' }],
+            sortModel: [{ field: 'expiry_date', sort: 'desc' }],
           },
         }}
         pageSizeOptions={[10, 20, 50]}

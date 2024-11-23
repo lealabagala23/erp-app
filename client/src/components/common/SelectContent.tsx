@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useContext } from 'react';
 import MuiAvatar from '@mui/material/Avatar';
 import MuiListItemAvatar from '@mui/material/ListItemAvatar';
 import MenuItem from '@mui/material/MenuItem';
@@ -13,6 +13,7 @@ import DevicesRoundedIcon from '@mui/icons-material/DevicesRounded';
 // import SmartphoneRoundedIcon from '@mui/icons-material/SmartphoneRounded';
 import AuthContext from '../auth/AuthContext';
 import { Company } from '../auth/types';
+import { Box, CircularProgress } from '@mui/material';
 // import ConstructionRoundedIcon from '@mui/icons-material/ConstructionRounded';
 
 const Avatar = styled(MuiAvatar)(({ theme }) => ({
@@ -38,12 +39,14 @@ export default function SelectContent() {
     );
     setActiveCompany(company as Company);
   };
-
-  useEffect(() => {
-    if (companies.length > 0) {
-      setActiveCompany(companies[0]);
-    }
-  }, [companies]);
+  console.log('activeCompany', activeCompany, companies);
+  if (!activeCompany || companies.length === 0) {
+    return (
+      <Box height={'56px'} margin={'auto'}>
+        <CircularProgress color="inherit" />
+      </Box>
+    );
+  }
 
   return (
     <Select
