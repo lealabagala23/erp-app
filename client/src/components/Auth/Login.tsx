@@ -19,6 +19,9 @@ import { useNavigate } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 import { fetchLogin } from './apis';
 import { useMutation } from '@tanstack/react-query';
+import lhctLogo from '../../assets/lhct.png';
+
+import lamorenetaLogo from '../../assets/la_moreneta.png';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -136,7 +139,11 @@ export default function Login() {
     <LoginContainer direction="column" justifyContent="space-between">
       <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
       <Card variant="outlined">
-        <SitemarkIcon />
+        {/* <SitemarkIcon /> */}
+        <Stack direction={'row'} gap={2}>
+          <img src={lamorenetaLogo} style={{ width: 250 }} />
+          <img src={lhctLogo} style={{ width: 100 }} />
+        </Stack>
         <Typography
           component="h1"
           variant="h4"

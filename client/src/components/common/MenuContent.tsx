@@ -42,7 +42,33 @@ const nestedMainItems = [
       },
     ],
   },
-  { text: 'Accounts', icon: <PeopleRoundedIcon />, route: '/accounts' },
+  {
+    text: 'Accounts',
+    icon: <PeopleRoundedIcon />,
+    route: null,
+    children: [
+      {
+        text: 'Customers',
+        route: '/accounts',
+      },
+      {
+        text: 'Patients',
+        route: '/patients',
+      },
+      {
+        text: 'Doctors',
+        route: '/doctors',
+      },
+      {
+        text: 'Agencies',
+        route: '/agencies',
+      },
+      {
+        text: 'Referrals',
+        route: '/referrals',
+      },
+    ],
+  },
 ];
 
 export default function MenuContent() {

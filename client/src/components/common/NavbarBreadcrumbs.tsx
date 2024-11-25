@@ -38,6 +38,23 @@ const labelRouteMapping = {
   },
   '/accounts': {
     primary: 'Accounts',
+    secondary: 'Customers',
+  },
+  '/patients': {
+    primary: 'Accounts',
+    secondary: 'Patients',
+  },
+  '/doctors': {
+    primary: 'Accounts',
+    secondary: 'Doctors',
+  },
+  '/agencies': {
+    primary: 'Accounts',
+    secondary: 'Agencies',
+  },
+  '/referrals': {
+    primary: 'Accounts',
+    secondary: 'Referrals',
   },
   '/settings': {
     primary: 'Settings',
