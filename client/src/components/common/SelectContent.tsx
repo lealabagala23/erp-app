@@ -9,7 +9,6 @@ import Select, { SelectChangeEvent, selectClasses } from '@mui/material/Select';
 // import Divider from '@mui/material/Divider';
 import { styled } from '@mui/material/styles';
 // import AddRoundedIcon from '@mui/icons-material/AddRounded';
-import DevicesRoundedIcon from '@mui/icons-material/DevicesRounded';
 // import SmartphoneRoundedIcon from '@mui/icons-material/SmartphoneRounded';
 import AuthContext from '../auth/AuthContext';
 import { Company } from '../auth/types';
@@ -92,8 +91,8 @@ export default function SelectContent() {
           <ListItemAvatar>
             <Avatar alt={c.company_display_name}>
               {/* <DevicesRoundedIcon sx={{ fontSize: '1rem' }} /> */}
-              {/* eslint-disable-next-line */}
               <img
+                // eslint-disable-next-line
                 src={(icons as any)[c.company_display_name]}
                 width={20}
                 height={20}

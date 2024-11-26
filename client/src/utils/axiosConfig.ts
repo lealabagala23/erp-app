@@ -21,6 +21,9 @@ instance.interceptors.request.use(
     return config; // Return the config so the request can continue
   },
   (error) => {
+    if (error?.response?.status === 403) {
+      window.location.href = '/log-in'
+    }
     return Promise.reject(error);
   }
 );
