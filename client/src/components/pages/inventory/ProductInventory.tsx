@@ -17,10 +17,10 @@ import AlertSnackbar from '../../common/AlertSnackbar';
 import { Inventory } from './types';
 
 interface IProps {
-  product_id: string;
+  item_id: string;
 }
 
-export default function ProductInventory({ product_id }: IProps) {
+export default function ProductInventory({ item_id }: IProps) {
   const queryClient = useQueryClient();
   const [addInventory, setAddInventory] = useState(false);
   const { activeCompany } = useContext(AuthContext);
@@ -32,14 +32,14 @@ export default function ProductInventory({ product_id }: IProps) {
   }>({ open: false, message: '', type: 'success' });
 
   const { data = [], isLoading } = useQuery(
-    [FETCH_PRODUCT_INVENTORY_QUERY_KEY, product_id],
+    [FETCH_PRODUCT_INVENTORY_QUERY_KEY, item_id],
     () =>
       fetchProductInventory({
-        product_id,
+        product_id: item_id,
         company_id: activeCompany?._id as string,
       }),
     {
-      enabled: !!product_id,
+      enabled: !!item_id,
       refetchOnWindowFocus: false,
       retry: 1,
     },
@@ -72,7 +72,11 @@ export default function ProductInventory({ product_id }: IProps) {
   };
 
   const onFormSubmit = async (data: Inventory) => {
-    await mutateCreate({ ...data, product_id, company_id: activeCompany?._id });
+    await mutateCreate({
+      ...data,
+      product_id: item_id,
+      company_id: activeCompany?._id,
+    });
     setAddInventory(false);
   };
 

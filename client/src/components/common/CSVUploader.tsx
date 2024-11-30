@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import Papa from 'papaparse';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { uploadProductsCSV } from './apis';
-import { FETCH_PRODUCTS_QUERY_KEY } from './constants';
+import { FETCH_PRODUCTS_QUERY_KEY } from '../pages/inventory/constants';
 import {
   Button,
   Card,
@@ -20,15 +19,17 @@ import { CloseRounded, Upload } from '@mui/icons-material';
 interface IProps {
   open: boolean;
   handleClose: (b: boolean) => void;
+  // eslint-disable-next-line
+  uploadAPI: (payload: any) => Promise<any>;
 }
 
-const CSVUploader = ({ open, handleClose }: IProps) => {
+const CSVUploader = ({ open, handleClose, uploadAPI }: IProps) => {
   const queryClient = useQueryClient();
   const [csvData, setCsvData] = useState(null);
   const [fileName, setFileName] = useState<string | null>(null);
 
   const { mutateAsync: mutateUploadCSV, isLoading } = useMutation({
-    mutationFn: uploadProductsCSV,
+    mutationFn: uploadAPI,
     onSuccess: () => {
       queryClient.invalidateQueries([FETCH_PRODUCTS_QUERY_KEY]);
     },
@@ -37,7 +38,7 @@ const CSVUploader = ({ open, handleClose }: IProps) => {
   const handleFileChange = (e: { target: { files: FileList | null } }) => {
     if (e.target.files === null) return;
     const file = e.target.files[0];
-    console.log('file', file);
+
     if (file) {
       setFileName(file.name);
       Papa.parse(file, {

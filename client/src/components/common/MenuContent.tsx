@@ -49,7 +49,7 @@ const nestedMainItems = [
     children: [
       {
         text: 'Customers',
-        route: '/accounts',
+        route: '/customers',
       },
       {
         text: 'Patients',

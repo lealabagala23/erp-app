@@ -5,17 +5,22 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 
 interface IProps {
+  itemName: string;
   searchText: string;
   setSearchText: Dispatch<SetStateAction<string>>;
 }
 
-export default function SearchBar({ searchText, setSearchText }: IProps) {
+export default function SearchBar({
+  itemName,
+  searchText,
+  setSearchText,
+}: IProps) {
   return (
     <FormControl sx={{ width: { xs: '100%', md: '35ch' } }} variant="outlined">
       <OutlinedInput
         size="small"
         id="search"
-        placeholder="Search product name…"
+        placeholder={`Search ${itemName} name…`}
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
         sx={{ flexGrow: 1 }}

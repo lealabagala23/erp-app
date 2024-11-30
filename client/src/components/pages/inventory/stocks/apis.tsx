@@ -62,3 +62,11 @@ export const updateInventory = async (inventory: Inventory) => {
 
   return response?.data;
 };
+
+export const deleteInventory = async (inventory: Inventory) => {
+  const response = await axiosConfig.delete(
+    `${INVENTORY_API}/${inventory._id}`,
+  );
+
+  return response?.data;
+};

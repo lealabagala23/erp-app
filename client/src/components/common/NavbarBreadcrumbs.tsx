@@ -36,7 +36,7 @@ const labelRouteMapping = {
     primary: 'Inventory',
     secondary: 'Stocks',
   },
-  '/accounts': {
+  '/customers': {
     primary: 'Accounts',
     secondary: 'Customers',
   },

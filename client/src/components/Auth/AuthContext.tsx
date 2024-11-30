@@ -59,7 +59,6 @@ export const AuthProvider = ({ children }: IProps) => {
 
   useEffect(() => {
     if (companies.length > 0) {
-      console.log('here', companies[0]);
       setActiveCompany(companies[0]);
     }
   }, [companies]);

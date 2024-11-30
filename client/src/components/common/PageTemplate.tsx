@@ -1,34 +1,60 @@
 import React, { useState } from 'react';
-import AppNavbar from '../../common/AppNavbar';
-import Header from '../../common/Header';
-import PageWrapper from '../../wrappers/PageWrapper';
-import ProductTable from './ProductTable';
+import AppNavbar from './AppNavbar';
+import Header from './Header';
+import PageWrapper from '../wrappers/PageWrapper';
 import { AlertColor, Button, Stack } from '@mui/material';
-import SearchBar from '../../common/SearchBar';
-import FormDrawer from '../../common/FormDrawer';
-import ProductForm from './ProductForm';
+import SearchBar from './SearchBar';
+import FormDrawer from './FormDrawer';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  createProduct,
-  deleteProduct,
-  fetchProducts,
-  updateProduct,
-  uploadProductsCSV,
-} from './apis';
-import { Product } from './types';
-import { FETCH_PRODUCTS_QUERY_KEY } from './constants';
-import AlertSnackbar from '../../common/AlertSnackbar';
-import AlertDialog from '../../common/AlertDialog';
-import {
-  AddBoxOutlined,
-  InfoOutlined,
-  ListAlt,
-  Upload,
-} from '@mui/icons-material';
-import ProductInventory from './ProductInventory';
-import CSVUploader from '../../common/CSVUploader';
+import AlertSnackbar from './AlertSnackbar';
+import AlertDialog from './AlertDialog';
+import { AddBoxOutlined, Upload } from '@mui/icons-material';
+import { capitalize } from 'lodash';
+import DataTable from './DataTable';
+import CSVUploader from './CSVUploader';
+import { GridColDef } from '@mui/x-data-grid';
 
-export default function Products() {
+interface IProps {
+  // eslint-disable-next-line
+  fetchAPI: () => Promise<any>;
+  // eslint-disable-next-line
+  createAPI: (p: any) => Promise<any>;
+  // eslint-disable-next-line
+  updateAPI: (p: any) => Promise<any>;
+  // eslint-disable-next-line
+  deleteAPI: (p: any) => Promise<any>;
+  // eslint-disable-next-line
+  uploadCSVAPI: (p: any) => Promise<any>;
+  drawerTabs: {
+    label: string;
+    icon: React.ReactNode;
+    // eslint-disable-next-line
+    Component: any;
+    // eslint-disable-next-line
+    componentProps?: any;
+    hidden?: boolean;
+  }[];
+  itemName: string;
+  queryKey: string;
+  searchAttr: string;
+  sortField: string;
+  // eslint-disable-next-line
+  columns: GridColDef<any>[];
+}
+
+export default function PageTemplate({
+  fetchAPI,
+  createAPI,
+  updateAPI,
+  deleteAPI,
+  uploadCSVAPI,
+  drawerTabs,
+  itemName,
+  queryKey,
+  searchAttr,
+  sortField,
+  columns,
+}: IProps) {
   const queryClient = useQueryClient();
   const [searchText, setSearchText] = useState('');
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -43,81 +69,85 @@ export default function Products() {
     message: string;
   }>({ open: false, title: '', message: '' });
   const [openCSVUploader, setOpenCSVUploader] = useState(false);
-  const [selectedRow, setSelectedRow] = useState<Product | null>(null);
+  // eslint-disable-next-line
+  const [selectedRow, setSelectedRow] = useState<any>(null);
 
-  const { data = [], isLoading: isLoadingProducts } = useQuery(
-    [FETCH_PRODUCTS_QUERY_KEY],
-    () => fetchProducts(),
+  const { data = [], isLoading: isLoadingFetch } = useQuery(
+    [queryKey],
+    () => fetchAPI(),
     {
       refetchOnWindowFocus: false,
       retry: 1,
     },
   );
 
-  const { mutateAsync: mutateCreateProduct, isLoading: isLoadingCreate } =
-    useMutation({
-      mutationFn: createProduct,
+  const { mutateAsync: mutateCreate, isLoading: isLoadingCreate } = useMutation(
+    {
+      mutationFn: createAPI,
       onSuccess: () => {
         setSnackbarProps({
           open: true,
-          message: 'Added new product successfully.',
+          message: `Added new ${itemName} successfully.`,
           type: 'success',
         });
         toggleDrawer();
-        queryClient.invalidateQueries([FETCH_PRODUCTS_QUERY_KEY]);
+        queryClient.invalidateQueries([queryKey]);
       },
       onError: (err) => {
         console.error(err);
         setSnackbarProps({
           open: true,
-          message: 'Add new product was not successful.',
+          message: `Add new ${itemName} was not successful.`,
           type: 'error',
         });
       },
-    });
+    },
+  );
 
-  const { mutateAsync: mutateUpdateProduct, isLoading: isLoadingUpdate } =
-    useMutation({
-      mutationFn: updateProduct,
+  const { mutateAsync: mutateUpdate, isLoading: isLoadingUpdate } = useMutation(
+    {
+      mutationFn: updateAPI,
       onSuccess: () => {
         setSnackbarProps({
           open: true,
-          message: 'Updated product successfully.',
+          message: `Updated ${itemName} successfully.`,
           type: 'success',
         });
         toggleDrawer();
-        queryClient.invalidateQueries([FETCH_PRODUCTS_QUERY_KEY]);
+        queryClient.invalidateQueries([queryKey]);
       },
       onError: (err) => {
         console.error(err);
         setSnackbarProps({
           open: true,
-          message: 'Update product was not successful.',
+          message: `Update ${itemName} was not successful.`,
           type: 'error',
         });
       },
-    });
+    },
+  );
 
-  const { mutateAsync: mutateDeleteProduct, isLoading: isLoadingDelete } =
-    useMutation({
-      mutationFn: deleteProduct,
+  const { mutateAsync: mutateDelete, isLoading: isLoadingDelete } = useMutation(
+    {
+      mutationFn: deleteAPI,
       onSuccess: () => {
         setSnackbarProps({
           open: true,
-          message: 'Deleted product successfully.',
+          message: `Deleted ${itemName} successfully.`,
           type: 'success',
         });
-        queryClient.invalidateQueries([FETCH_PRODUCTS_QUERY_KEY]);
+        queryClient.invalidateQueries([queryKey]);
       },
       onError: (err) => {
         console.error(err);
         setSnackbarProps({
           open: true,
-          message: 'Delete product was not successful.',
+          message: `Delete ${itemName} was not successful.`,
           type: 'error',
         });
       },
-    });
+    },
+  );
 
   const toggleDrawer = () => {
     setOpenDrawer(!openDrawer);
@@ -127,11 +157,12 @@ export default function Products() {
     setSnackbarProps((v) => ({ open: !v.open, type: 'success', message: '' }));
   };
 
-  const handleSaveProduct = async (product: Product) => {
-    if (product._id) {
-      await mutateUpdateProduct(product);
+  // eslint-disable-next-line
+  const handleSave = async (item: any) => {
+    if (item._id) {
+      await mutateUpdate(item);
     } else {
-      await mutateCreateProduct(product);
+      await mutateCreate(item);
     }
   };
 
@@ -143,9 +174,8 @@ export default function Products() {
       case 'Delete':
         setDialogProps({
           open: true,
-          title: 'Delete Product',
-          message:
-            'Are you sure you want to delete this product? (Note: This action cannot be reversed.)',
+          title: `Delete ${itemName}`,
+          message: `Are you sure you want to delete this ${itemName}? (Note: This action cannot be reversed.)`,
         });
         break;
       default:
@@ -163,7 +193,7 @@ export default function Products() {
 
   return (
     <>
-      <AppNavbar title={'Products List'} />
+      <AppNavbar title={`${capitalize(itemName)} List`} />
       <PageWrapper>
         <>
           <Header />
@@ -180,7 +210,7 @@ export default function Products() {
             spacing={2}
           >
             <SearchBar
-              itemName="product"
+              itemName={itemName}
               searchText={searchText}
               setSearchText={setSearchText}
             />
@@ -199,41 +229,38 @@ export default function Products() {
                 onClick={toggleDrawer}
                 startIcon={<AddBoxOutlined />}
               >
-                Add New Product
+                Add New {capitalize(itemName)}
               </Button>
             </Stack>
             <FormDrawer
               open={openDrawer}
               toggleDrawer={toggleDrawer}
-              title={selectedRow ? 'Edit Product' : 'Add New Product'}
-              tabs={[
-                {
-                  label: 'Info',
-                  icon: <InfoOutlined />,
-                  Component: ProductForm,
-                  componentProps: {
-                    onFormSubmit: handleSaveProduct,
-                    isLoading: isLoadingCreate || isLoadingUpdate,
-                    initialData: selectedRow,
-                    onCancel: onCancelForm,
-                  },
+              title={
+                selectedRow
+                  ? `Edit ${capitalize(itemName)}`
+                  : `Add New ${capitalize(itemName)}`
+              }
+              tabs={drawerTabs.map((tab) => ({
+                ...tab,
+                componentProps: {
+                  onFormSubmit: handleSave,
+                  isLoading: isLoadingCreate || isLoadingUpdate,
+                  initialData: selectedRow,
+                  onCancel: onCancelForm,
+                  item_id: selectedRow?._id as string,
                 },
-                {
-                  label: 'Inventory',
-                  icon: <ListAlt />,
-                  Component: ProductInventory,
-                  componentProps: { product_id: selectedRow?._id as string },
-                  hidden: !selectedRow,
-                },
-              ]}
+              }))}
             />
           </Stack>
-          <ProductTable
+          <DataTable
+            columns={columns}
             searchText={searchText}
-            products={data}
-            isLoading={isLoadingProducts || isLoadingDelete}
+            data={data}
+            isLoading={isLoadingFetch || isLoadingDelete}
             setSelectedRow={setSelectedRow}
             onActionClick={onActionClick}
+            searchAttr={searchAttr}
+            sortField={sortField}
           />
           <CSVUploader
             open={openCSVUploader}
@@ -247,7 +274,7 @@ export default function Products() {
               }
               setOpenCSVUploader((v) => !v);
             }}
-            uploadAPI={uploadProductsCSV}
+            uploadAPI={uploadCSVAPI}
           />
           <AlertSnackbar
             open={snackbarProps.open}
@@ -266,7 +293,8 @@ export default function Products() {
             }}
             proceedBtnProps={{
               label: 'Delete',
-              action: () => mutateDeleteProduct(selectedRow as Product),
+              // eslint-disable-next-line
+              action: () => mutateDelete(selectedRow as any),
               danger: true,
             }}
           />

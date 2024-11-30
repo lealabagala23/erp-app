@@ -5,7 +5,10 @@ import { CloseOutlined as CloseIcon } from '@mui/icons-material';
 type FormDrawerTab = {
   label: string;
   icon: React.ReactNode;
-  content: React.ReactNode;
+  // eslint-disable-next-line
+  Component: any;
+  // eslint-disable-next-line
+  componentProps: any;
   hidden?: boolean;
 };
 
@@ -31,7 +34,8 @@ export default function FormDrawer({
 
   const renderContent = () => {
     const tab = tabs.find((t) => t.label === selectedTab);
-    return tab?.content;
+    const { Component, componentProps } = tab as FormDrawerTab;
+    return <Component {...componentProps} />;
   };
 
   return (

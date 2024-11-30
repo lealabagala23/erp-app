@@ -1,9 +1,9 @@
 import React, { useContext, useState } from 'react';
 import AppNavbar from '../../../common/AppNavbar';
-import Header from '../Header';
+import Header from '../../../common/Header';
 import PageWrapper from '../../../wrappers/PageWrapper';
 import { AlertColor, Button, Stack } from '@mui/material';
-import SearchBar from '../SearchBar';
+import SearchBar from '../../../common/SearchBar';
 import FormDrawer from '../../../common/FormDrawer';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Inventory } from '../types';
@@ -139,7 +139,11 @@ export default function Stocks() {
             }}
             spacing={2}
           >
-            <SearchBar searchText={searchText} setSearchText={setSearchText} />
+            <SearchBar
+              itemName="product"
+              searchText={searchText}
+              setSearchText={setSearchText}
+            />
             <Button
               size="small"
               variant="contained"
@@ -156,14 +160,13 @@ export default function Stocks() {
                 {
                   label: 'Info',
                   icon: <InfoOutlined />,
-                  content: (
-                    <AddInventoryForm
-                      onFormSubmit={handleSaveInventory}
-                      isLoading={isLoadingCreate || isLoadingUpdate}
-                      onCancel={onCancelForm}
-                      initialData={selectedRow}
-                    />
-                  ),
+                  Component: AddInventoryForm,
+                  componentProps: {
+                    onFormSubmit: handleSaveInventory,
+                    isLoading: isLoadingCreate || isLoadingUpdate,
+                    onCancel: onCancelForm,
+                    initialData: selectedRow,
+                  },
                 },
               ]}
             />

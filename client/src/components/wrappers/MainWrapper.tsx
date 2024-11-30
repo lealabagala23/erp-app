@@ -10,7 +10,7 @@ import Home from '../pages/Home';
 import Products from '../pages/inventory/Products';
 import GenerateSales from '../pages/GenerateSales';
 import Orders from '../pages/Orders';
-import Accounts from '../pages/Accounts';
+import Customers from '../pages/accounts/Customers';
 import { AuthProvider } from '../auth/AuthContext';
 import Stocks from '../pages/inventory/stocks/Stocks';
 import ChangePassword from '../settings/ChangePassword';
@@ -26,7 +26,7 @@ export default function MainWrapper() {
           <Route path="/orders" element={<Orders />} />
           <Route path="/products" element={<Products />} />
           <Route path="/stocks" element={<Stocks />} />
-          <Route path="/accounts" element={<Accounts />} />
+          <Route path="/customers" element={<Customers />} />
           <Route path="/settings" element={<ChangePassword />} />
         </Routes>
       </Box>

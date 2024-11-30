@@ -1,0 +1,152 @@
+import React, { Dispatch, SetStateAction, useState } from 'react';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { Box, IconButton, Menu, MenuItem } from '@mui/material';
+import { DeleteOutline, EditOutlined, MoreHoriz } from '@mui/icons-material';
+
+interface IProps {
+  // eslint-disable-next-line
+  columns: GridColDef<any>[];
+  searchText: string;
+  // eslint-disable-next-line
+  data: any[];
+  isLoading: boolean;
+  // eslint-disable-next-line
+  setSelectedRow: Dispatch<SetStateAction<any | null>>;
+  onActionClick: (action: string) => void;
+  searchAttr: string;
+  sortField: string;
+}
+
+export default function DataTable({
+  columns,
+  searchText,
+  isLoading,
+  data,
+  setSelectedRow,
+  onActionClick,
+  searchAttr,
+  sortField,
+}: IProps) {
+  const [anchorEl, setAnchorEl] = useState<
+    (EventTarget & HTMLButtonElement) | null
+  >(null);
+  console.log('data', data);
+  const tableColumns = [
+    ...columns,
+    {
+      field: 'actions',
+      headerName: '',
+      width: 50,
+      // eslint-disable-next-line
+      renderCell: ({ row }: any) => (
+        <IconButton
+          onClick={(event) => handleMenuOpen(event, row)}
+          sx={{
+            width: '30px',
+            height: '20px',
+            border: 0,
+          }}
+        >
+          <MoreHoriz />
+        </IconButton>
+      ),
+    },
+  ];
+
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    row: unknown,
+  ) => {
+    setAnchorEl(event.currentTarget);
+    // eslint-disable-next-line
+    setSelectedRow(row as any);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleActionClick = (action: string) => {
+    onActionClick(action);
+    handleMenuClose();
+  };
+
+  return (
+    <Box style={{ height: '100%', width: '100%', maxWidth: '1700px' }}>
+      <DataGrid
+        checkboxSelection={false}
+        loading={isLoading}
+        rows={
+          searchText !== ''
+            ? data?.filter((p) =>
+                p[searchAttr]
+                  .toLowerCase()
+                  ?.includes(searchText?.toLowerCase()),
+              )
+            : data
+        }
+        columns={tableColumns}
+        getRowId={(row) => row._id || 0}
+        getRowClassName={(params) =>
+          params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
+        }
+        initialState={{
+          pagination: { paginationModel: { pageSize: 20 } },
+          sorting: {
+            sortModel: [{ field: sortField, sort: 'asc' }],
+          },
+        }}
+        pageSizeOptions={[10, 20, 50]}
+        disableColumnResize
+        density="compact"
+        slotProps={{
+          loadingOverlay: {
+            variant: 'skeleton',
+            noRowsVariant: 'skeleton',
+          },
+          filterPanel: {
+            filterFormProps: {
+              logicOperatorInputProps: {
+                variant: 'outlined',
+                size: 'small',
+              },
+              columnInputProps: {
+                variant: 'outlined',
+                size: 'small',
+                sx: { mt: 'auto' },
+              },
+              operatorInputProps: {
+                variant: 'outlined',
+                size: 'small',
+                sx: { mt: 'auto' },
+              },
+              valueInputProps: {
+                InputComponentProps: {
+                  variant: 'outlined',
+                  size: 'small',
+                },
+              },
+            },
+          },
+        }}
+      />
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        <MenuItem onClick={() => handleActionClick('Edit')}>
+          <EditOutlined sx={{ width: 20, height: 20, marginRight: '8px' }} />{' '}
+          Edit
+        </MenuItem>
+        <MenuItem
+          onClick={() => handleActionClick('Delete')}
+          sx={{ color: 'var(--template-palette-error-main)' }}
+        >
+          <DeleteOutline sx={{ width: 20, height: 20, marginRight: '8px' }} />{' '}
+          Delete
+        </MenuItem>
+      </Menu>
+    </Box>
+  );
+}

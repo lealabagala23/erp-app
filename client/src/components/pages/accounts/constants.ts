@@ -1,0 +1,1 @@
+export const FETCH_CUSTOMERS_QUERY_KEY = 'fetchCustomers'

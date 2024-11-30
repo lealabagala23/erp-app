@@ -45,7 +45,7 @@ export default function SelectContent() {
     );
     setActiveCompany(company as Company);
   };
-  console.log('activeCompany', activeCompany, companies);
+
   if (!activeCompany || companies.length === 0) {
     return (
       <Box height={'56px'} margin={'auto'}>

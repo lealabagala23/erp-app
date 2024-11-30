@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const productRoutes = require("./routes/products");
 const inventoryRoutes = require("./routes/inventory");
+const customerRoutes = require("./routes/customers");
 const supplierRoutes = require("./routes/suppliers");
 const companyRoutes = require("./routes/companies");
 const authRoutes = require("./routes/auth");
@@ -23,6 +24,7 @@ connectDB();
 
 app.use("/api/products", productRoutes);
 app.use("/api/inventory", inventoryRoutes);
+app.use("/api/customers", customerRoutes);
 app.use("/api/suppliers", supplierRoutes);
 app.use("/api/companies", companyRoutes);
 app.use("/api/auth", authRoutes);
