@@ -196,7 +196,10 @@ export default function Products() {
               <Button
                 size="small"
                 variant="contained"
-                onClick={toggleDrawer}
+                onClick={() => {
+                  setSelectedRow(null);
+                  toggleDrawer();
+                }}
                 startIcon={<AddBoxOutlined />}
               >
                 Add New Product
@@ -222,7 +225,7 @@ export default function Products() {
                   label: 'Inventory',
                   icon: <ListAlt />,
                   Component: ProductInventory,
-                  componentProps: { product_id: selectedRow?._id as string },
+                  componentProps: { item_id: selectedRow?._id as string },
                   hidden: !selectedRow,
                 },
               ]}

@@ -24,7 +24,7 @@ interface IProps {
   onFormSubmit: (d: Inventory) => void;
   isLoading: boolean;
   onCancel: () => void;
-  initialData?: Inventory | null;
+  initialData?: Inventory | { product_id?: string } | null;
 }
 
 export default function AddInventoryForm({
@@ -73,7 +73,7 @@ export default function AddInventoryForm({
         quantity_on_order,
         supplier_id,
         status,
-      } = initialData;
+      } = initialData as Inventory;
       reset({
         _id,
         // eslint-disable-next-line
@@ -127,7 +127,7 @@ export default function AddInventoryForm({
           />
         </FormControl>
 
-        {!initialData?._id && (
+        {!initialData?.product_id && (
           <FormControl fullWidth margin="dense">
             <FormLabel>Product</FormLabel>
             <TextField

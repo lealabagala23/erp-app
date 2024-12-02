@@ -30,7 +30,6 @@ export default function ProductInventory({ item_id }: IProps) {
     message: string;
     type: AlertColor;
   }>({ open: false, message: '', type: 'success' });
-
   const { data = [], isLoading } = useQuery(
     [FETCH_PRODUCT_INVENTORY_QUERY_KEY, item_id],
     () =>
@@ -88,21 +87,20 @@ export default function ProductInventory({ item_id }: IProps) {
       {isLoading ? (
         <CircularProgress color="inherit" sx={{ margin: '0 auto' }} />
       ) : data.length === 0 ? (
-        addInventory ? (
-          <></>
-        ) : (
-          <Typography align="center" marginBottom={'12px'}>
-            No inventory data recorded.
-          </Typography>
-        )
-      ) : (
+        <Typography align="center" marginBottom={'12px'}>
+          No inventory data recorded.
+        </Typography>
+      ) : !addInventory ? (
         <CollapsibleTable data={data} />
+      ) : (
+        <></>
       )}
       {addInventory ? (
         <AddInventoryForm
           onFormSubmit={onFormSubmit}
           isLoading={isLoadingCreate}
           onCancel={() => setAddInventory(false)}
+          initialData={{ product_id: item_id }}
         />
       ) : (
         <Button

@@ -30,7 +30,7 @@ export default function DataTable({
   const [anchorEl, setAnchorEl] = useState<
     (EventTarget & HTMLButtonElement) | null
   >(null);
-  console.log('data', data);
+
   const tableColumns = [
     ...columns,
     {
