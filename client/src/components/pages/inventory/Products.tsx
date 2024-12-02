@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import AppNavbar from '../../common/AppNavbar';
 import Header from '../../common/Header';
 import PageWrapper from '../../wrappers/PageWrapper';
@@ -27,6 +27,8 @@ import {
 } from '@mui/icons-material';
 import ProductInventory from './ProductInventory';
 import CSVUploader from '../../common/CSVUploader';
+import DownloadPDF from '../../common/DownloadPDF';
+import AuthContext from '../../auth/AuthContext';
 
 export default function Products() {
   const queryClient = useQueryClient();
@@ -44,6 +46,7 @@ export default function Products() {
   }>({ open: false, title: '', message: '' });
   const [openCSVUploader, setOpenCSVUploader] = useState(false);
   const [selectedRow, setSelectedRow] = useState<Product | null>(null);
+  const { activeCompany } = useContext(AuthContext);
 
   const { data = [], isLoading: isLoadingProducts } = useQuery(
     [FETCH_PRODUCTS_QUERY_KEY],
@@ -185,6 +188,21 @@ export default function Products() {
               setSearchText={setSearchText}
             />
             <Stack direction={'row'} gap={2}>
+              <DownloadPDF
+                data={data}
+                columns={[
+                  'product_name',
+                  'product_description',
+                  'product_unit',
+                  'generic_name',
+                  'purchase_price',
+                  'patient_price',
+                  'doctor_price',
+                  'agency_price',
+                  'created_at',
+                ]}
+                title={`${activeCompany?.company_name || ''} Complete Products List`}
+              />
               <Button
                 size="small"
                 variant="outlined"
