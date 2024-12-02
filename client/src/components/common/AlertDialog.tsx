@@ -5,12 +5,14 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { CloseOutlined as CloseIcon } from '@mui/icons-material';
+import { IconButton, Stack } from '@mui/material';
 
 interface IProps {
   open: boolean;
   handleClose: () => void;
-  title: string;
-  message: string;
+  title: string | React.ReactNode;
+  message: string | React.ReactNode;
   cancelBtnProps: {
     label: string;
     action: () => void;
@@ -19,6 +21,7 @@ interface IProps {
     label: string;
     action: () => void;
     danger?: boolean;
+    endIcon?: React.ReactNode;
   };
 }
 
@@ -37,7 +40,14 @@ export default function AlertDialog({
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
+      <DialogTitle id="alert-dialog-title">
+        <Stack direction={'row'} justifyContent={'space-between'}>
+          {title}
+          <IconButton sx={{ border: 0, margin: -1 }} onClick={handleClose}>
+            <CloseIcon />
+          </IconButton>
+        </Stack>
+      </DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
           {message}
@@ -53,6 +63,7 @@ export default function AlertDialog({
           {cancelBtnProps.label}
         </Button>
         <Button
+          variant="contained"
           onClick={() => {
             handleClose();
             proceedBtnProps.action();
@@ -63,6 +74,7 @@ export default function AlertDialog({
               ? 'var(--template-palette-error-main)'
               : undefined,
           }}
+          endIcon={proceedBtnProps.endIcon}
         >
           {proceedBtnProps.label}
         </Button>

@@ -16,8 +16,22 @@ router.post("/", authenticateToken, async (req, res) => {
 
 router.get("/", authenticateToken, async (req, res) => {
   try {
+    const expiring = req.query.expiring;
+    let expiringQuery = {};
+    if (expiring) {
+      const daysToExpire = 30 * 6; // 6 months
+      const today = new Date();
+      const expiryDateThreshold = new Date(today);
+      expiryDateThreshold.setDate(today.getDate() + daysToExpire);
+      expiringQuery = {
+        expiry_date: {
+          $lte: expiryDateThreshold, // Expiring within the next 6 months
+        },
+      };
+    }
     const inventory = await Inventory.find({
       company_id: req.query.company_id,
+      ...expiringQuery,
     })
       .populate("product_id", ["_id", "product_name"])
       .populate("supplier_id", ["_id", "supplier_name"]);

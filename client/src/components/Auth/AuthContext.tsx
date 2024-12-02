@@ -1,8 +1,13 @@
 import React, { createContext, useState, useEffect } from 'react';
 
 import { Company, IAuthContext, Supplier, UserInfo } from './types';
-import { useMutation } from '@tanstack/react-query';
-import { fetchCompanies, fetchSuppliers, fetchUserInfo } from './apis';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import {
+  fetchCompanies,
+  fetchExpiringStocks,
+  fetchSuppliers,
+  fetchUserInfo,
+} from './apis';
 
 const DEFAULT_CONTEXT = {
   userInfo: null,
@@ -13,6 +18,10 @@ const DEFAULT_CONTEXT = {
   setActiveCompany: () => {},
   suppliers: [],
   fetchingSuppliers: false,
+  expiringStocks: [],
+  fetchingExpiringStocks: false,
+  showExpiryWarning: false,
+  hideExpiryWarning: () => {},
 };
 
 const AuthContext = createContext<IAuthContext>(DEFAULT_CONTEXT);
@@ -26,6 +35,7 @@ export const AuthProvider = ({ children }: IProps) => {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [activeCompany, setActiveCompany] = useState<Company | null>(null);
+  const [showExpiryWarning, setShowExpiryWarning] = useState(false);
 
   const { mutateAsync: mutateGetUserInfo, isLoading: fetchingUserInfo } =
     useMutation({
@@ -51,6 +61,20 @@ export const AuthProvider = ({ children }: IProps) => {
       },
     });
 
+  const { data: expiringStocks = [], isLoading: fetchingExpiringStocks } =
+    useQuery(
+      ['fetchExpiringStocks', activeCompany?._id],
+      () =>
+        fetchExpiringStocks({
+          company_id: activeCompany?._id as string,
+        }),
+      {
+        enabled: !!activeCompany?._id,
+        refetchOnWindowFocus: false,
+        retry: 1,
+      },
+    );
+
   useEffect(() => {
     mutateGetUserInfo();
     mutateGetCompanies();
@@ -63,6 +87,14 @@ export const AuthProvider = ({ children }: IProps) => {
     }
   }, [companies]);
 
+  useEffect(() => {
+    if (!fetchingExpiringStocks && expiringStocks.length > 0) {
+      setShowExpiryWarning(true);
+    }
+  }, [expiringStocks]);
+
+  const hideExpiryWarning = () => setShowExpiryWarning(false);
+
   return (
     <AuthContext.Provider
       value={{
@@ -74,6 +106,10 @@ export const AuthProvider = ({ children }: IProps) => {
         setActiveCompany,
         suppliers,
         fetchingSuppliers,
+        expiringStocks,
+        fetchingExpiringStocks,
+        showExpiryWarning,
+        hideExpiryWarning,
       }}
     >
       {children}

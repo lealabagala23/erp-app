@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
+import { Inventory } from "../pages/inventory/types";
 
 export type UserInfo = {
   first_name: string;
@@ -33,4 +34,8 @@ export interface IAuthContext {
   setActiveCompany: Dispatch<SetStateAction<Company | null>>;
   suppliers: Supplier[];
   fetchingSuppliers: boolean;
+  expiringStocks: Inventory[];
+  fetchingExpiringStocks: boolean;
+  showExpiryWarning: boolean;
+  hideExpiryWarning: () => void;
 }
