@@ -1,7 +1,12 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Box, IconButton, Menu, MenuItem } from '@mui/material';
-import { DeleteOutline, EditOutlined, MoreHoriz } from '@mui/icons-material';
+import {
+  DeleteOutline,
+  EditOutlined,
+  MoreHoriz,
+  RemoveRedEye,
+} from '@mui/icons-material';
 
 interface IProps {
   // eslint-disable-next-line
@@ -15,6 +20,7 @@ interface IProps {
   onActionClick: (action: string) => void;
   searchAttr: string;
   sortField: string;
+  menuActions?: string[];
 }
 
 export default function DataTable({
@@ -26,6 +32,7 @@ export default function DataTable({
   onActionClick,
   searchAttr,
   sortField,
+  menuActions = ['Edit', 'Delete'],
 }: IProps) {
   const [anchorEl, setAnchorEl] = useState<
     (EventTarget & HTMLButtonElement) | null
@@ -135,17 +142,27 @@ export default function DataTable({
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={() => handleActionClick('Edit')}>
-          <EditOutlined sx={{ width: 20, height: 20, marginRight: '8px' }} />{' '}
-          Edit
-        </MenuItem>
-        <MenuItem
-          onClick={() => handleActionClick('Delete')}
-          sx={{ color: 'var(--template-palette-error-main)' }}
-        >
-          <DeleteOutline sx={{ width: 20, height: 20, marginRight: '8px' }} />{' '}
-          Delete
-        </MenuItem>
+        {menuActions?.includes('View') && (
+          <MenuItem onClick={() => handleActionClick('View')}>
+            <RemoveRedEye sx={{ width: 20, height: 20, marginRight: '8px' }} />{' '}
+            View
+          </MenuItem>
+        )}
+        {menuActions?.includes('Edit') && (
+          <MenuItem onClick={() => handleActionClick('Edit')}>
+            <EditOutlined sx={{ width: 20, height: 20, marginRight: '8px' }} />{' '}
+            Edit
+          </MenuItem>
+        )}
+        {menuActions?.includes('Delete') && (
+          <MenuItem
+            onClick={() => handleActionClick('Delete')}
+            sx={{ color: 'var(--template-palette-error-main)' }}
+          >
+            <DeleteOutline sx={{ width: 20, height: 20, marginRight: '8px' }} />{' '}
+            Delete
+          </MenuItem>
+        )}
       </Menu>
     </Box>
   );

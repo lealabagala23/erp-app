@@ -14,6 +14,9 @@ import Customers from '../pages/accounts/Customers';
 import { AuthProvider } from '../auth/AuthContext';
 import Stocks from '../pages/inventory/stocks/Stocks';
 import ChangePassword from '../settings/ChangePassword';
+import Patients from '../pages/accounts/Patients';
+import Doctors from '../pages/accounts/Doctors';
+import Agencies from '../pages/accounts/Agencies';
 
 export default function MainWrapper() {
   return (
@@ -27,6 +30,9 @@ export default function MainWrapper() {
           <Route path="/products" element={<Products />} />
           <Route path="/stocks" element={<Stocks />} />
           <Route path="/customers" element={<Customers />} />
+          <Route path="/patients" element={<Patients />} />
+          <Route path="/doctors" element={<Doctors />} />
+          <Route path="/agencies" element={<Agencies />} />
           <Route path="/settings" element={<ChangePassword />} />
         </Routes>
       </Box>

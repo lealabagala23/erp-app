@@ -12,6 +12,17 @@ export const fetchCustomers = async () => {
   return response?.data;
 };
 
+export const fetchCustomerType = async ({
+  customer_type,
+}: {
+  customer_type: string;
+}) => {
+  const response = await axiosConfig.get(
+    `${CUSTOMERS_API}/${customer_type}`,
+  );
+  return response?.data;
+};
+
 export const createCustomer = async (customer: Customer) => {
   const payload = generatePayload(customer);
   const response = await axiosConfig.post(`${CUSTOMERS_API}`, {
@@ -23,8 +34,9 @@ export const createCustomer = async (customer: Customer) => {
 
 // eslint-disable-next-line
 export const uploadCustomersCSV = async (payload: any) => {
-  const response = await axiosConfig.post(`${CUSTOMERS_API}/bulk`, 
-    JSON.stringify(payload)
+  const response = await axiosConfig.post(
+    `${CUSTOMERS_API}/bulk`,
+    JSON.stringify(payload),
   );
 
   return response?.data;

@@ -15,6 +15,7 @@ import {
 import { DatePicker } from '@mui/x-date-pickers';
 import { Customer } from './types';
 import pick from 'lodash/pick';
+import dayjs from 'dayjs';
 
 interface IProps {
   onCancel: () => void;
@@ -61,7 +62,11 @@ export default function CustomerForm({
   useEffect(() => {
     if (initialData) {
       const { customer_details, ...rest } = initialData;
-      reset({ ...rest, ...customer_details });
+      reset({
+        ...rest,
+        ...customer_details,
+        date_of_birth: dayjs(customer_details.date_of_birth || ''),
+      });
     }
   }, [initialData]);
 
@@ -190,7 +195,7 @@ export default function CustomerForm({
                     {...field}
                     slots={{
                       textField: (textFieldProps) => (
-                        <TextField {...textFieldProps} autoFocus />
+                        <TextField {...textFieldProps} />
                       ),
                     }}
                     sx={{

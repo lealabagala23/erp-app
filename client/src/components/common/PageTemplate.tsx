@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AppNavbar from './AppNavbar';
 import Header from './Header';
 import PageWrapper from '../wrappers/PageWrapper';
@@ -13,18 +13,21 @@ import { capitalize } from 'lodash';
 import DataTable from './DataTable';
 import CSVUploader from './CSVUploader';
 import { GridColDef } from '@mui/x-data-grid';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface IProps {
   // eslint-disable-next-line
   fetchAPI: () => Promise<any>;
   // eslint-disable-next-line
-  createAPI: (p: any) => Promise<any>;
+  createAPI?: (p: any) => Promise<any>;
   // eslint-disable-next-line
-  updateAPI: (p: any) => Promise<any>;
+  updateAPI?: (p: any) => Promise<any>;
   // eslint-disable-next-line
-  deleteAPI: (p: any) => Promise<any>;
+  deleteAPI?: (p: any) => Promise<any>;
   // eslint-disable-next-line
-  uploadCSVAPI: (p: any) => Promise<any>;
+  uploadCSVAPI?: (p: any) => Promise<any>;
+  // eslint-disable-next-line
+  viewItem?: (i: any) => void;
   drawerTabs: {
     label: string;
     icon: React.ReactNode;
@@ -40,6 +43,7 @@ interface IProps {
   sortField: string;
   // eslint-disable-next-line
   columns: GridColDef<any>[];
+  menuActions?: string[];
 }
 
 export default function PageTemplate({
@@ -48,13 +52,17 @@ export default function PageTemplate({
   updateAPI,
   deleteAPI,
   uploadCSVAPI,
+  viewItem,
   drawerTabs,
   itemName,
   queryKey,
   searchAttr,
   sortField,
   columns,
+  menuActions,
 }: IProps) {
+  const location = useLocation();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchText, setSearchText] = useState('');
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -168,6 +176,10 @@ export default function PageTemplate({
 
   const onActionClick = (action: string) => {
     switch (action) {
+      case 'View':
+        // eslint-disable-next-line
+        viewItem && viewItem(selectedRow);
+        break;
       case 'Edit':
         toggleDrawer();
         break;
@@ -190,6 +202,20 @@ export default function PageTemplate({
   const handleCloseDialog = () => {
     setDialogProps((v) => ({ ...v, open: false }));
   };
+
+  useEffect(() => {
+    if (location.search?.includes('id') && data.length > 0) {
+      const id = location.search.split('=')[1];
+      // eslint-disable-next-line
+      const selected = data.find(({ _id }: any) => _id === id);
+
+      if (selected) {
+        setSelectedRow(selected);
+        toggleDrawer();
+        navigate({ search: '' });
+      }
+    }
+  }, [location, data]);
 
   return (
     <>
@@ -215,22 +241,26 @@ export default function PageTemplate({
               setSearchText={setSearchText}
             />
             <Stack direction={'row'} gap={2}>
-              <Button
-                size="small"
-                variant="outlined"
-                onClick={() => setOpenCSVUploader(true)}
-                startIcon={<Upload />}
-              >
-                Upload CSV
-              </Button>
-              <Button
-                size="small"
-                variant="contained"
-                onClick={toggleDrawer}
-                startIcon={<AddBoxOutlined />}
-              >
-                Add New {capitalize(itemName)}
-              </Button>
+              {uploadCSVAPI && (
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={() => setOpenCSVUploader(true)}
+                  startIcon={<Upload />}
+                >
+                  Upload CSV
+                </Button>
+              )}
+              {createAPI && (
+                <Button
+                  size="small"
+                  variant="contained"
+                  onClick={toggleDrawer}
+                  startIcon={<AddBoxOutlined />}
+                >
+                  Add New {capitalize(itemName)}
+                </Button>
+              )}
             </Stack>
             <FormDrawer
               open={openDrawer}
@@ -261,21 +291,24 @@ export default function PageTemplate({
             onActionClick={onActionClick}
             searchAttr={searchAttr}
             sortField={sortField}
+            menuActions={menuActions}
           />
-          <CSVUploader
-            open={openCSVUploader}
-            handleClose={(isSubmit: boolean) => {
-              if (isSubmit) {
-                setSnackbarProps({
-                  open: true,
-                  message: 'Uploaded CSV successfully.',
-                  type: 'success',
-                });
-              }
-              setOpenCSVUploader((v) => !v);
-            }}
-            uploadAPI={uploadCSVAPI}
-          />
+          {uploadCSVAPI && (
+            <CSVUploader
+              open={openCSVUploader}
+              handleClose={(isSubmit: boolean) => {
+                if (isSubmit) {
+                  setSnackbarProps({
+                    open: true,
+                    message: 'Uploaded CSV successfully.',
+                    type: 'success',
+                  });
+                }
+                setOpenCSVUploader((v) => !v);
+              }}
+              uploadAPI={uploadCSVAPI}
+            />
+          )}
           <AlertSnackbar
             open={snackbarProps.open}
             type={snackbarProps.type}

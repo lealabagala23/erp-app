@@ -143,16 +143,36 @@ router.get("/", authenticateToken, async (req, res) => {
     ]);
     const formatted = customers.reduce((arr, obj) => {
       const { patients, doctors, agencies, ...rest } = obj;
-      const details =
+      const customer_details =
         rest.customer_type === "PATIENT"
           ? patients[0]
           : rest.customer_type === "DOCTOR"
           ? doctors[0]
           : agencies[0];
-      return [...arr, { ...rest, details }];
+      return [...arr, { ...rest, customer_details }];
     }, []);
 
     res.status(200).json(formatted);
+  } catch (err) {
+    console.log("err", err);
+    res.status(500).json(err);
+  }
+});
+
+router.get("/:customer_type", authenticateToken, async (req, res) => {
+  try {
+    const customer_type = req.params.customer_type;
+    const ItemModel =
+      customer_type === "PATIENT"
+        ? Patient
+        : customer_type === "DOCTOR"
+        ? Doctor
+        : Agency;
+    const result = await ItemModel.find().populate("customer_id", [
+      "_id",
+      "customer_name",
+    ]);
+    res.status(200).json(result);
   } catch (err) {
     console.log("err", err);
     res.status(500).json(err);
