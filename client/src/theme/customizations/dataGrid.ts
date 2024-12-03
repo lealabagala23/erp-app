@@ -11,8 +11,8 @@ import { gridClasses } from '@mui/x-data-grid';
 import { tablePaginationClasses } from '@mui/material/TablePagination';
 import { gray } from '../.././theme/themePrimitives';
 
-
-export const dataGridCustomizations: Partial<Theme> & DataGridComponents<Theme> = {
+export const dataGridCustomizations: Partial<Theme> &
+  DataGridComponents<Theme> = {
   MuiDataGrid: {
     styleOverrides: {
       root: ({ theme }: { theme: Theme }) => ({
@@ -42,8 +42,13 @@ export const dataGridCustomizations: Partial<Theme> & DataGridComponents<Theme> 
             },
           },
         },
+        '& .expired-column': {
+          backgroundColor: '#ef9a9a',
+        },
       }),
-      cell: ({ theme }: { theme: Theme }) => ({ borderTopColor: theme.palette.divider }),
+      cell: ({ theme }: { theme: Theme }) => ({
+        borderTopColor: theme.palette.divider,
+      }),
       menu: ({ theme }: { theme: Theme }) => ({
         borderRadius: theme.shape.borderRadius,
         backgroundImage: 'none',
@@ -64,7 +69,9 @@ export const dataGridCustomizations: Partial<Theme> & DataGridComponents<Theme> 
       }),
 
       row: ({ theme }: { theme: Theme }) => ({
-        '&:last-of-type': { borderBottom: `1px solid ${theme.palette.divider}` },
+        '&:last-of-type': {
+          borderBottom: `1px solid ${theme.palette.divider}`,
+        },
         '&:hover': {
           backgroundColor: theme.palette.action.hover,
         },

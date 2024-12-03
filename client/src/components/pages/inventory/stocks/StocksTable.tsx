@@ -9,9 +9,18 @@ import {
   Typography,
 } from '@mui/material';
 import { Inventory } from '../types';
-import { EditOutlined, MoreHoriz, SearchOutlined } from '@mui/icons-material';
+import {
+  CheckOutlined,
+  EditOutlined,
+  MoreHoriz,
+  SearchOutlined,
+} from '@mui/icons-material';
 import { dateDiffInDays, dateSortComparator } from '../../../../utils/auth';
 import dayjs from 'dayjs';
+
+// eslint-disable-next-line
+const cellClassName = (params: any) =>
+  dateDiffInDays(params.row.expiry_date) < 30 * 6 ? 'expired-column' : '';
 
 const COLUMNS: GridColDef<Inventory>[] = [
   {
@@ -32,7 +41,6 @@ const COLUMNS: GridColDef<Inventory>[] = [
           }
         >
           <Typography
-            color={diffDays < 30 * 6 ? 'error' : 'textPrimary'}
             lineHeight={'unset'}
             fontWeight={diffDays < 0 ? 600 : 500}
           >
@@ -41,6 +49,7 @@ const COLUMNS: GridColDef<Inventory>[] = [
         </Tooltip>
       );
     },
+    cellClassName,
     sortComparator: dateSortComparator,
     flex: 1,
     minWidth: 150,
@@ -50,6 +59,7 @@ const COLUMNS: GridColDef<Inventory>[] = [
     headerName: 'Arrival Date',
     valueGetter: (value, row) =>
       `${new Date(row.stock_arrival_date || '').toLocaleDateString('en-US')}`,
+    cellClassName,
     sortComparator: dateSortComparator,
     flex: 1,
     minWidth: 150,
@@ -62,10 +72,12 @@ const COLUMNS: GridColDef<Inventory>[] = [
     flex: 1,
     // eslint-disable-next-line
     valueGetter: (value, row) => (row as any).product_id.product_name,
+    cellClassName,
   },
   {
     field: 'quantity_on_hand',
     headerName: 'Quantity on Hand',
+    cellClassName,
     minWidth: 150,
     align: 'center',
     flex: 1,
@@ -73,6 +85,7 @@ const COLUMNS: GridColDef<Inventory>[] = [
   {
     field: 'quantity_on_order',
     headerName: 'Quantity on Order',
+    cellClassName,
     minWidth: 150,
     align: 'center',
     flex: 1,
@@ -82,6 +95,7 @@ const COLUMNS: GridColDef<Inventory>[] = [
     headerName: 'Status',
     flex: 1,
     valueGetter: (value) => (value as string).toUpperCase(),
+    cellClassName,
   },
   {
     field: 'supplier_id',
@@ -89,12 +103,14 @@ const COLUMNS: GridColDef<Inventory>[] = [
     flex: 1,
     // eslint-disable-next-line
     valueGetter: (value, row) => (row as any).supplier_id.supplier_name,
+    cellClassName,
   },
   {
     field: 'created_at',
     headerName: 'Created at',
     valueGetter: (value, row) =>
       `${new Date(row.created_at || '').toLocaleDateString('en-US')}`,
+    cellClassName,
     flex: 1,
   },
 ];
@@ -103,6 +119,7 @@ interface IProps {
   searchText: string;
   inventory: Inventory[];
   isLoading: boolean;
+  selectedRow: Inventory | null;
   setSelectedRow: Dispatch<SetStateAction<Inventory | null>>;
   onActionClick: (action: string) => void;
 }
@@ -111,6 +128,7 @@ export default function StocksTable({
   searchText,
   isLoading,
   inventory,
+  selectedRow,
   setSelectedRow,
   onActionClick,
 }: IProps) {
@@ -157,8 +175,20 @@ export default function StocksTable({
     handleMenuClose();
   };
 
+  const isExpired = () => {
+    if (!selectedRow?.expiry_date) return false;
+    const diffDays = dateDiffInDays(selectedRow?.expiry_date || '');
+    return diffDays < 30 * 6;
+  };
+
   return (
-    <Box style={{ height: '100%', width: '100%', maxWidth: '1700px' }}>
+    <Box
+      style={{
+        height: '100%',
+        width: '100%',
+        maxWidth: '1700px',
+      }}
+    >
       <DataGrid
         checkboxSelection={false}
         loading={isLoading}
@@ -222,11 +252,17 @@ export default function StocksTable({
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
+        {selectedRow?.status !== 'EXPIRED' && isExpired() && (
+          <MenuItem onClick={() => handleActionClick('Acknowledge')}>
+            <CheckOutlined sx={{ width: 20, height: 20, marginRight: '8px' }} />{' '}
+            Acknowledge Expiry
+          </MenuItem>
+        )}
         <MenuItem onClick={() => handleActionClick('Edit')}>
           <EditOutlined sx={{ width: 20, height: 20, marginRight: '8px' }} />{' '}
           Edit
         </MenuItem>
-        <MenuItem onClick={() => handleActionClick('View Inventory')}>
+        <MenuItem onClick={() => handleActionClick('View')}>
           <SearchOutlined sx={{ width: 20, height: 20, marginRight: '8px' }} />{' '}
           View Product
         </MenuItem>

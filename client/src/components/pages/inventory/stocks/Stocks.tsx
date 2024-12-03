@@ -14,8 +14,11 @@ import { createInventory, fetchInventory, updateInventory } from './apis';
 import AuthContext from '../../../auth/AuthContext';
 import AddInventoryForm from '../AddInventoryForm';
 import StocksTable from './StocksTable';
+import { useNavigate } from 'react-router-dom';
+import AlertDialog from '../../../common/AlertDialog';
 
 export default function Stocks() {
+  const navigate = useNavigate();
   const { activeCompany } = useContext(AuthContext);
   const queryClient = useQueryClient();
   const [searchText, setSearchText] = useState('');
@@ -25,6 +28,11 @@ export default function Stocks() {
     message: string;
     type: AlertColor;
   }>({ open: false, message: '', type: 'success' });
+  const [dialogProps, setDialogProps] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+  }>({ open: false, title: '', message: '' });
   const [selectedRow, setSelectedRow] = useState<Inventory | null>(null);
 
   const { data = [], isLoading: isLoadingInventory } = useQuery(
@@ -62,13 +70,14 @@ export default function Stocks() {
   const { mutateAsync: mutateUpdateInventory, isLoading: isLoadingUpdate } =
     useMutation({
       mutationFn: updateInventory,
-      onSuccess: () => {
+      onSuccess: ({ status }: Inventory) => {
         setSnackbarProps({
           open: true,
           message: 'Updated inventory successfully.',
           type: 'success',
         });
-        toggleDrawer();
+        // eslint-disable-next-line
+        status !== 'EXPIRED' && toggleDrawer();
         queryClient.invalidateQueries([FETCH_INVENTORY_QUERY_KEY]);
       },
       onError: (err) => {
@@ -104,13 +113,22 @@ export default function Stocks() {
     }
   };
 
-  const onActionClick = (action: string) => {
+  const onActionClick = async (action: string) => {
     switch (action) {
+      case 'Acknowledge':
+        setDialogProps({
+          open: true,
+          title: 'Acknowledge Stock Expiry',
+          message:
+            'Are you sure you want to remove this stock from the current inventory?',
+        });
+        break;
       case 'Edit':
         toggleDrawer();
         break;
-      case 'View Product':
-        // do something
+      case 'View':
+        // eslint-disable-next-line
+        navigate(`/products?id=${(selectedRow?.product_id as any)?._id}`);
         break;
       default:
     }
@@ -119,6 +137,10 @@ export default function Stocks() {
   const onCancelForm = () => {
     toggleDrawer();
     setSelectedRow(null);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogProps((v) => ({ ...v, open: false }));
   };
 
   return (
@@ -175,6 +197,7 @@ export default function Stocks() {
             searchText={searchText}
             inventory={data}
             isLoading={isLoadingInventory}
+            selectedRow={selectedRow}
             setSelectedRow={setSelectedRow}
             onActionClick={onActionClick}
           />
@@ -183,6 +206,26 @@ export default function Stocks() {
             type={snackbarProps.type}
             toggleSnackbar={toggleSnackbar}
             message={snackbarProps.message}
+          />
+          <AlertDialog
+            open={dialogProps.open}
+            handleClose={handleCloseDialog}
+            title={dialogProps.title}
+            message={dialogProps.message}
+            cancelBtnProps={{
+              label: 'Cancel',
+              action: () => handleCloseDialog(),
+            }}
+            proceedBtnProps={{
+              label: 'Set as Expired',
+              action: () =>
+                mutateUpdateInventory({
+                  ...selectedRow,
+                  product_id: selectedRow?.product_id,
+                  status: 'EXPIRED',
+                } as Inventory),
+              danger: true,
+            }}
           />
         </>
       </PageWrapper>

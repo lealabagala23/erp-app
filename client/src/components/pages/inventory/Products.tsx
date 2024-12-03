@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import AppNavbar from '../../common/AppNavbar';
 import Header from '../../common/Header';
 import PageWrapper from '../../wrappers/PageWrapper';
@@ -29,8 +29,10 @@ import ProductInventory from './ProductInventory';
 import CSVUploader from '../../common/CSVUploader';
 import DownloadPDF from '../../common/DownloadPDF';
 import AuthContext from '../../auth/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function Products() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchText, setSearchText] = useState('');
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -163,6 +165,20 @@ export default function Products() {
   const handleCloseDialog = () => {
     setDialogProps((v) => ({ ...v, open: false }));
   };
+
+  useEffect(() => {
+    if (location.search?.includes('id') && data.length > 0) {
+      const id = location.search.split('=')[1];
+      // eslint-disable-next-line
+      const selected = data.find(({ _id }: any) => _id === id);
+
+      if (selected) {
+        setSelectedRow(selected);
+        toggleDrawer();
+        navigate({ search: '' });
+      }
+    }
+  }, [location, data]);
 
   return (
     <>

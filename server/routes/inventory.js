@@ -33,7 +33,12 @@ router.get("/", authenticateToken, async (req, res) => {
       company_id: req.query.company_id,
       ...expiringQuery,
     })
-      .populate("product_id", ["_id", "product_name"])
+      .populate("product_id", [
+        "_id",
+        "product_name",
+        "product_description",
+        "product_unit",
+      ])
       .populate("supplier_id", ["_id", "supplier_name"]);
     res.status(200).json(inventory);
   } catch (err) {
