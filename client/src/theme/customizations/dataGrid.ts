@@ -45,6 +45,9 @@ export const dataGridCustomizations: Partial<Theme> &
         '& .expired-column': {
           backgroundColor: '#ef9a9a',
         },
+        '& .ack-expired-column': {
+          backgroundColor: '#bdbdbd',
+        },
       }),
       cell: ({ theme }: { theme: Theme }) => ({
         borderTopColor: theme.palette.divider,

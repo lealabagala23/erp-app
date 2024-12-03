@@ -20,7 +20,11 @@ import dayjs from 'dayjs';
 
 // eslint-disable-next-line
 const cellClassName = (params: any) =>
-  dateDiffInDays(params.row.expiry_date) < 30 * 6 ? 'expired-column' : '';
+  dateDiffInDays(params.row.expiry_date) < 30 * 6
+    ? params.row.status === 'EXPIRED'
+      ? 'ack-expired-column'
+      : 'expired-column'
+    : '';
 
 const COLUMNS: GridColDef<Inventory>[] = [
   {
