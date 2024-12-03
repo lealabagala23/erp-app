@@ -13,9 +13,11 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
-import { Customer } from './types';
+import { Customer, Doctor } from './types';
 import pick from 'lodash/pick';
 import dayjs from 'dayjs';
+import { fetchCustomerType } from './apis';
+import { useQuery } from '@tanstack/react-query';
 
 interface IProps {
   onCancel: () => void;
@@ -59,12 +61,25 @@ export default function CustomerForm({
 
   const customerType = watch('customer_type');
 
+  const { data: referringDoctors = [] } = useQuery(
+    ['fetchReferringDoctors'],
+    () =>
+      fetchCustomerType({
+        customer_type: 'DOCTOR',
+      }),
+    {
+      enabled: true,
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  );
+
   useEffect(() => {
     if (initialData) {
       const { customer_details, ...rest } = initialData;
       reset({
-        ...rest,
         ...customer_details,
+        ...rest,
         date_of_birth: dayjs(customer_details.date_of_birth || ''),
       });
     }
@@ -91,12 +106,13 @@ export default function CustomerForm({
       'industry_type',
       'contact_person_name',
     ]);
-    if (onFormSubmit)
+    if (onFormSubmit) {
       onFormSubmit({
         _id: (data as Customer)._id,
         ...payload,
         customer_details,
       } as Customer);
+    }
   };
 
   return (
@@ -241,14 +257,25 @@ export default function CustomerForm({
             </FormControl>
 
             <FormControl fullWidth margin="dense">
-              <FormLabel>Referring Doctor ID</FormLabel>
+              <FormLabel>Referring Doctor</FormLabel>
               <Controller
                 name="referring_doctor_id"
                 control={control}
                 render={({ field }) => (
                   <TextField select {...field} variant="outlined">
-                    {/* Add options dynamically if needed */}
-                    <MenuItem value="">None</MenuItem>
+                    {referringDoctors.map((doc: Doctor) => (
+                      <MenuItem
+                        // eslint-disable-next-line
+                        key={(doc.customer_id as any)?._id}
+                        // eslint-disable-next-line
+                        value={(doc.customer_id as any)?._id}
+                      >
+                        {
+                          // eslint-disable-next-line
+                          (doc.customer_id as any)?.customer_name
+                        }
+                      </MenuItem>
+                    ))}
                   </TextField>
                 )}
               />

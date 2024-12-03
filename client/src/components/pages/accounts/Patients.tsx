@@ -37,6 +37,15 @@ const COLUMNS: GridColDef<Patient>[] = [
     flex: 1,
   },
   {
+    field: 'referring_doctor_id',
+    headerName: 'Referring Doctor',
+    editable: true,
+    flex: 1,
+    valueGetter: (value, row) =>
+      // eslint-disable-next-line
+      (row?.referring_doctor_id as any)?.customer_name,
+  },
+  {
     field: 'status',
     headerName: 'Status',
     editable: true,

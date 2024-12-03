@@ -168,10 +168,9 @@ router.get("/:customer_type", authenticateToken, async (req, res) => {
         : customer_type === "DOCTOR"
         ? Doctor
         : Agency;
-    const result = await ItemModel.find().populate("customer_id", [
-      "_id",
-      "customer_name",
-    ]);
+    const result = await ItemModel.find()
+      .populate("customer_id", ["_id", "customer_name"])
+      .populate("referring_doctor_id", ["_id", "customer_name"]);
     res.status(200).json(result);
   } catch (err) {
     console.log("err", err);
@@ -183,44 +182,48 @@ router.get("/:customer_type", authenticateToken, async (req, res) => {
 router.put("/:id", authenticateToken, async (req, res) => {
   try {
     const { customer_details, ...rest } = req.body;
-    const updatedCustomer = await Customer.findByIdAndUpdate(
-      req.params.id,
+    const customer_id = req.params.id;
+    await Customer.findByIdAndUpdate(
+      customer_id,
       { ...rest },
       {
         new: true,
       }
     );
     if (customer_details) {
-      switch (updatedCustomer.customer_type) {
+      switch (rest.customer_type) {
         case "PATIENT":
-          const newPatient = await Patient.findOneAndUpdate(
-            { customer_id: updatedCustomer._id },
+          await Patient.findOneAndUpdate(
+            { customer_id },
             {
-              ...getPatientPayload(customer_details),
+              $set: {
+                ...getPatientPayload(customer_details),
+              },
             },
-            { new: true }
+            { new: true, useFindAndModify: false }
           );
-          await newPatient.save();
           break;
         case "DOCTOR":
-          const newDoctor = await Doctor.findOneAndUpdate(
-            { customer_id: updatedCustomer._id },
+          await Doctor.findOneAndUpdate(
+            { customer_id },
             {
-              ...getDoctorPayload(customer_details),
+              $set: {
+                ...getDoctorPayload(customer_details),
+              },
             },
-            { new: true }
+            { new: true, useFindAndModify: false }
           );
-          await newDoctor.save();
           break;
         default:
-          const newAgency = await Agency.findOneAndUpdate(
-            { customer_id: updatedCustomer._id },
+          await Agency.findOneAndUpdate(
+            { customer_id },
             {
-              ...getAgencyPayload(customer_details),
+              $set: {
+                ...getAgencyPayload(customer_details),
+              },
             },
-            { new: true }
+            { new: true, useFindAndModify: false }
           );
-          await newAgency.save();
           break;
       }
     }

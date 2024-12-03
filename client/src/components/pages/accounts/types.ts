@@ -15,8 +15,16 @@ export type Patient = {
   date_of_birth: string;
   discount_card: string;
   discount_card_number: string;
-  referring_doctor_id?: string;
+  referring_doctor_id?: string | { _id: string, customer_name: string };
   status: string;
+  created_at?: string;
+}
+
+export type Doctor = {
+  customer_id: string | { _id: string, customer_name: string }
+  specialization: string;
+  clinic_address: string;
+  license_number: string;
   created_at?: string;
 }
 
