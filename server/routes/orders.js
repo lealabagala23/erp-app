@@ -3,7 +3,7 @@ const router = express.Router();
 const Order = require("../models/Order");
 const authenticateToken = require("../middleware/auth");
 
-// Create a companies
+// Create a orders
 router.post("/", authenticateToken, async (req, res) => {
   const newOrder = new Order({ ...req.body, created_at: new Date() });
   try {
@@ -14,11 +14,18 @@ router.post("/", authenticateToken, async (req, res) => {
   }
 });
 
-// Get all companies
+// Get all orders
 router.get("/", authenticateToken, async (req, res) => {
   try {
-    const companies = await Order.find();
-    res.status(200).json(companies);
+    const orders = await Order.find({
+      company_id: req.query.company_id,
+    })
+      .populate("customer_id", ["_id", "customer_name"])
+      .populate("initiator_id", ["_id", "first_name", "last_name"])
+      .populate("company_id", ["_id", "company_name"])
+      .populate("approver_id", ["_id", "first_name", "last_name"])
+      .populate("referrer_id", ["_id", "customer_name"]);
+    res.status(200).json(orders);
   } catch (err) {
     res.status(500).json(err);
   }

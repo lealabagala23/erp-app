@@ -17,7 +17,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 interface IProps {
   // eslint-disable-next-line
-  fetchAPI: () => Promise<any>;
+  fetchAPI: (() => Promise<any>) | ((s: any) => Promise<any>);
+  // eslint-disable-next-line
+  fetchParams?: { [key: string]: any };
   // eslint-disable-next-line
   createAPI?: (p: any) => Promise<any>;
   // eslint-disable-next-line
@@ -60,6 +62,7 @@ export default function PageTemplate({
   sortField,
   columns,
   menuActions,
+  fetchParams,
 }: IProps) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -80,10 +83,15 @@ export default function PageTemplate({
   // eslint-disable-next-line
   const [selectedRow, setSelectedRow] = useState<any>(null);
 
+  const queryParams = fetchParams
+    ? [queryKey, ...Object.values(fetchParams)]
+    : [queryKey];
+
   const { data = [], isLoading: isLoadingFetch } = useQuery(
-    [queryKey],
-    () => fetchAPI(),
+    queryParams,
+    () => fetchAPI(fetchParams ? fetchParams : undefined),
     {
+      enabled: fetchParams ? Object.values(fetchParams).some((v) => !!v) : true,
       refetchOnWindowFocus: false,
       retry: 1,
     },
