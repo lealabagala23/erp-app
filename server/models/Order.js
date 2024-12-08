@@ -8,7 +8,10 @@ const OrderSchema = new mongoose.Schema({
   invoice_number: {
     type: Number,
   },
-  shipping_address: {
+  tin: {
+    type: String,
+  },
+  billing_address: {
     type: String,
   },
   total_amount: {

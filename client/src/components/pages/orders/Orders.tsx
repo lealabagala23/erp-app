@@ -13,7 +13,7 @@ export type Order = {
   initiator_id: string;
   company_id: string;
   invoice_number?: string;
-  shipping_address?: string;
+  billing_address?: string;
   total_amount?: number;
   payment_type?: string;
   payment_status?: string;
