@@ -105,6 +105,7 @@ export default function DataTable({
         }}
         pageSizeOptions={[10, 20, 50]}
         disableColumnResize
+        disableRowSelectionOnClick
         density="compact"
         slotProps={{
           loadingOverlay: {

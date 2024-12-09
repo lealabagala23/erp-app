@@ -12,7 +12,6 @@ const COLUMNS: GridColDef<Agency>[] = [
   {
     field: 'customer_name',
     headerName: 'Customer Name',
-    editable: true,
     minWidth: 300,
     flex: 1,
     // eslint-disable-next-line
@@ -21,19 +20,16 @@ const COLUMNS: GridColDef<Agency>[] = [
   {
     field: 'agency_address',
     headerName: 'Agency Address',
-    editable: true,
     flex: 1,
   },
   {
     field: 'industry_type',
     headerName: 'Industry Type',
-    editable: true,
     flex: 1,
   },
   {
     field: 'contact_person_name',
     headerName: 'Contact Person Name',
-    editable: true,
     flex: 1,
   },
   {

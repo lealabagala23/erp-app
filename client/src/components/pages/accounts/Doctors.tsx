@@ -12,7 +12,6 @@ const COLUMNS: GridColDef<Patient>[] = [
   {
     field: 'customer_name',
     headerName: 'Customer Name',
-    editable: true,
     minWidth: 300,
     flex: 1,
     // eslint-disable-next-line
@@ -21,19 +20,16 @@ const COLUMNS: GridColDef<Patient>[] = [
   {
     field: 'specialization',
     headerName: 'Specialization',
-    editable: true,
     flex: 1,
   },
   {
     field: 'license_number',
     headerName: 'License Number',
-    editable: true,
     flex: 1,
   },
   {
     field: 'clinic_address',
     headerName: 'Clinic Address',
-    editable: true,
     flex: 1,
   },
   {

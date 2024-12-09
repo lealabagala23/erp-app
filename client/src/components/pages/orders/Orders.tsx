@@ -26,7 +26,6 @@ const COLUMNS: GridColDef<Order>[] = [
   {
     field: 'customer_name',
     headerName: 'Customer Name',
-    editable: true,
     minWidth: 300,
     flex: 1,
     // eslint-disable-next-line
@@ -35,32 +34,27 @@ const COLUMNS: GridColDef<Order>[] = [
   {
     field: 'invoice_number',
     headerName: 'Invoice ID',
-    editable: true,
     flex: 1,
   },
   {
     field: 'total_amount',
     headerName: 'Total Amount',
-    editable: true,
     flex: 1,
   },
   {
     field: 'payment_type',
     headerName: 'Payment Type',
-    editable: true,
     flex: 1,
     valueGetter: (value) => ((value || '') as string).toUpperCase(),
   },
   {
     field: 'payment_status',
     headerName: 'Payment Status',
-    editable: true,
     flex: 1,
   },
   {
     field: 'initiator_id',
     headerName: 'Transacted By',
-    editable: true,
     flex: 1,
     valueGetter: (value, row) =>
       // eslint-disable-next-line

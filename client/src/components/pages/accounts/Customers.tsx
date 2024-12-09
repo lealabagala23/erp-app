@@ -17,32 +17,27 @@ const COLUMNS: GridColDef<Customer>[] = [
   {
     field: 'customer_name',
     headerName: 'Customer Name',
-    editable: true,
     minWidth: 300,
     flex: 1,
   },
   {
     field: 'customer_type',
     headerName: 'Customer Type',
-    editable: true,
     flex: 1,
   },
   {
     field: 'contact_info',
     headerName: 'Contact Info',
-    editable: true,
     flex: 1,
   },
   {
     field: 'tin',
     headerName: 'TIN',
-    editable: true,
     flex: 1,
   },
   {
     field: 'address',
     headerName: 'Address',
-    editable: true,
     flex: 1,
   },
   {

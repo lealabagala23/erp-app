@@ -8,7 +8,7 @@ import SideMenu from '../common/SideMenu';
 import { Route, Routes } from 'react-router-dom';
 import Home from '../pages/Home';
 import Products from '../pages/inventory/Products';
-import GenerateSales from '../pages/GenerateSales';
+import GenerateSales from '../pages/generate-sales/GenerateSales';
 import Orders from '../pages/orders/Orders';
 import Customers from '../pages/accounts/Customers';
 import { AuthProvider } from '../auth/AuthContext';

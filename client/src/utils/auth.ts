@@ -8,17 +8,22 @@ export const isTokenValid = (token: string) => {
   const currentTime = Date.now() / 1000; // Get current time in seconds
 
   // Check if the token is expired
-  return decodedToken?.exp as number > currentTime;
+  return (decodedToken?.exp as number) > currentTime;
 };
 
 export const dateSortComparator = (v1: string, v2: string) => {
   const date1 = dayjs(v1);
   const date2 = dayjs(v2);
   return date2.diff(date1);
-}
+};
 
 export const dateDiffInDays = (date: string) => {
   const date1 = dayjs();
   const date2 = dayjs(date);
   return date2.diff(date1, 'day');
-}
+};
+
+export const formatCurrency = (v: number | string) =>
+  (typeof v === 'string' ? Number(v) : v)
+    .toFixed(2)
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ',');

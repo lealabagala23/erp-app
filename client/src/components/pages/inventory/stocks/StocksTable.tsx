@@ -71,7 +71,6 @@ const COLUMNS: GridColDef<Inventory>[] = [
   {
     field: 'product_name',
     headerName: 'Product Name',
-    editable: true,
     minWidth: 300,
     flex: 1,
     // eslint-disable-next-line
@@ -219,6 +218,7 @@ export default function StocksTable({
         }}
         pageSizeOptions={[10, 20, 50]}
         disableColumnResize
+        disableRowSelectionOnClick
         density="compact"
         slotProps={{
           loadingOverlay: {

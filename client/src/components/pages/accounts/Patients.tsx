@@ -12,7 +12,6 @@ const COLUMNS: GridColDef<Patient>[] = [
   {
     field: 'customer_name',
     headerName: 'Customer Name',
-    editable: true,
     minWidth: 300,
     flex: 1,
     // eslint-disable-next-line
@@ -21,25 +20,21 @@ const COLUMNS: GridColDef<Patient>[] = [
   {
     field: 'date_of_birth',
     headerName: 'Date of Birth',
-    editable: true,
     flex: 1,
   },
   {
     field: 'discount_card',
     headerName: 'Discount Card',
-    editable: true,
     flex: 1,
   },
   {
     field: 'discount_card_number',
     headerName: 'Discount Card Number',
-    editable: true,
     flex: 1,
   },
   {
     field: 'referring_doctor_id',
     headerName: 'Referring Doctor',
-    editable: true,
     flex: 1,
     valueGetter: (value, row) =>
       // eslint-disable-next-line
@@ -48,7 +43,6 @@ const COLUMNS: GridColDef<Patient>[] = [
   {
     field: 'status',
     headerName: 'Status',
-    editable: true,
     flex: 1,
   },
   {

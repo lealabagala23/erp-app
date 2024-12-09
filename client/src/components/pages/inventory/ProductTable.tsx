@@ -3,64 +3,51 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Box, IconButton, Menu, MenuItem } from '@mui/material';
 import { Product } from './types';
 import { DeleteOutline, EditOutlined, MoreHoriz } from '@mui/icons-material';
-
-const formatCurrency = (v: number) =>
-  v
-    .toFixed(2)
-    .toString()
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+import { formatCurrency } from '../../../utils/auth';
 
 const COLUMNS: GridColDef<Product>[] = [
   {
     field: 'product_name',
     headerName: 'Product Name',
-    editable: true,
     minWidth: 300,
     flex: 1,
   },
   {
     field: 'product_description',
     headerName: 'Description',
-    editable: true,
     flex: 1,
   },
   {
     field: 'product_unit',
     headerName: 'Unit',
-    editable: true,
     flex: 1,
   },
   {
     field: 'generic_name',
     headerName: 'Generic Name',
-    editable: true,
     flex: 1,
   },
   {
     field: 'purchase_price',
     headerName: 'Purchase Price',
-    editable: true,
     flex: 1,
     valueGetter: formatCurrency,
   },
   {
     field: 'patient_price',
     headerName: 'Patient Price',
-    editable: true,
     flex: 1,
     valueGetter: formatCurrency,
   },
   {
     field: 'doctor_price',
     headerName: 'Doctor Price',
-    editable: true,
     flex: 1,
     valueGetter: formatCurrency,
   },
   {
     field: 'agency_price',
     headerName: 'Agency Price',
-    editable: true,
     flex: 1,
     valueGetter: formatCurrency,
   },
@@ -159,6 +146,7 @@ export default function ProductTable({
         }}
         pageSizeOptions={[10, 20, 50]}
         disableColumnResize
+        disableRowSelectionOnClick
         density="compact"
         slotProps={{
           loadingOverlay: {

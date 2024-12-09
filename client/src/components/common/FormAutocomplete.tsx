@@ -7,6 +7,8 @@ interface IProps {
   register: UseFormRegister<FieldValues>;
   options: { label: string; value: string }[];
   name: string;
+  autoFocus?: boolean;
+  placeholder?: string;
 }
 
 export default function FormAutocomplete({
@@ -14,6 +16,8 @@ export default function FormAutocomplete({
   register,
   options,
   name,
+  autoFocus,
+  placeholder,
 }: IProps) {
   const [inputValue, setInputValue] = useState('');
 
@@ -51,6 +55,8 @@ export default function FormAutocomplete({
         renderInput={(params) => (
           <TextField
             {...params}
+            autoFocus={autoFocus}
+            placeholder={placeholder}
             sx={{
               '.MuiButtonBase-root': {
                 border: 0,
