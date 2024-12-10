@@ -1,5 +1,4 @@
 export type OrderItem = {
-  item_number?: number;
   order_id: string;
   product_id: string | { _id: string; product_name: string };
   quantity: number;
@@ -18,4 +17,20 @@ export type TableItem = {
   custom_discount: number;
   total_price: number;
   _id?: string;
+};
+
+export type Order = {
+  _id?: string;
+  customer_id?: string | { _id: string; customer_name: string };
+  invoice_number?: string;
+  tin?: string;
+  billing_address?: string;
+  total_amount?: number;
+  payment_type?: string;
+  status?: string;
+  initiator_id: string | { _id: string; first_name: string; last_name: string };
+  company_id: string | { _id: string; company_name: string };
+  referrer_id?: string | { _id: string; referrer_name: string };
+  approver_id?: string | { _id: string; first_name: string; last_name: string };
+  order_items?: OrderItem[];
 };

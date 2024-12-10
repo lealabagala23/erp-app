@@ -20,7 +20,7 @@ const OrderSchema = new mongoose.Schema({
   payment_type: {
     type: String,
   },
-  payment_status: {
+  status: {
     type: String,
   },
   initiator_id: {

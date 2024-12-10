@@ -27,7 +27,8 @@ interface IProps {
   deleteOrderItem: (t: TableItem) => void;
   clearAllOrderItems: () => void;
   customerType?: string;
-  customerDiscount?: number;
+  getUnitPrice: (s: string) => number;
+  subtotal: number;
   disabled?: boolean;
 }
 
@@ -39,7 +40,8 @@ export default function ItemTable({
   deleteOrderItem,
   clearAllOrderItems,
   customerType,
-  customerDiscount,
+  getUnitPrice,
+  subtotal,
   disabled,
 }: IProps) {
   const [cellModesModel, setCellModesModel] =
@@ -121,30 +123,6 @@ export default function ItemTable({
     </Box>
   );
 
-  const getUnitPrice = (product_id: string) => {
-    const selectedProduct = products.find(({ _id }) => _id === product_id);
-    switch (customerType) {
-      case 'PATIENT':
-        return selectedProduct?.patient_price ?? 0;
-      case 'DOCTOR':
-        return selectedProduct?.doctor_price ?? 0;
-      case 'AGENCY':
-        return selectedProduct?.agency_price ?? 0;
-      default:
-        return 0;
-    }
-  };
-
-  const computeSubtotal = () =>
-    orderItems.reduce((accum, obj) => {
-      const totalPrice = getUnitPrice(obj.product_id as string) * obj.quantity;
-      const totalPriceWDisc =
-        totalPrice -
-        (customerDiscount ? totalPrice * (customerDiscount / 100) : 0) -
-        (obj.custom_discount ? totalPrice * (obj.custom_discount / 100) : 0);
-      return accum + totalPriceWDisc;
-    }, 0);
-
   const tableColumns: GridColDef<TableItem>[] = [
     {
       field: 'item_number',
@@ -208,15 +186,6 @@ export default function ItemTable({
         ),
     },
     {
-      field: 'discount',
-      headerName: 'Discount',
-      flex: 1,
-      align: 'right',
-      headerAlign: 'right',
-      valueGetter: () =>
-        `${customerDiscount === 0 ? '-' : `${customerDiscount}%`}`,
-    },
-    {
       field: 'custom_discount',
       headerName: 'Custom Discount',
       flex: 1,
@@ -238,9 +207,7 @@ export default function ItemTable({
         const totalPrice = getUnitPrice(row.product_id) * row.quantity;
         return renderPriceCell(
           'Unit Price x Quantity',
-          totalPrice -
-            totalPrice * ((customerDiscount || 0) / 100) -
-            totalPrice * ((row.custom_discount || 0) / 100),
+          totalPrice - totalPrice * ((row.custom_discount || 0) / 100),
         );
       },
     },
@@ -359,10 +326,8 @@ export default function ItemTable({
           </Button>
         </Stack>
         <Stack direction="row" gap={4} padding={1}>
-          <Typography variant={'h6'}>Subtotal</Typography>
-          <Typography variant={'h6'}>
-            ₱ {formatCurrency(computeSubtotal())}
-          </Typography>
+          <Typography variant={'h6'}>Total Sales</Typography>
+          <Typography variant={'h6'}>{formatCurrency(subtotal)}</Typography>
         </Stack>
       </Stack>
     </Box>
