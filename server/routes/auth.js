@@ -40,7 +40,7 @@ router.post("/login", async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).send("Invalid username or password");
 
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "6h" });
     res.status(200).json({ token });
   } catch (error) {
     console.error(error);

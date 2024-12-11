@@ -104,7 +104,6 @@ router.post("/bulk", authenticateToken, async (req, res) => {
         created_at: new Date(),
       }));
     const newCustomers = await Customer.insertMany(dataWithCreatedAt); // Insert multiple records
-    console.log("newCustomers", newCustomers);
     res.status(200).send("Data uploaded successfully");
   } catch (err) {
     console.error(err);
