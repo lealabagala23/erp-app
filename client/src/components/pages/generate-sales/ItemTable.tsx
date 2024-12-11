@@ -168,8 +168,28 @@ export default function ItemTable({
       align: 'right',
       headerAlign: 'right',
       editable: true,
-      type: 'singleSelect',
-      valueOptions: Array.from({ length: 20 }, (_, i) => i + 1),
+      type: 'number',
+      preProcessEditCellProps: (params) => {
+        const value = params.props.value;
+        const stockCount =
+          products.find(({ _id }) => _id === params.row.product_id)
+            ?.total_quantity_on_hand || 0;
+
+        const isValid = value <= stockCount;
+
+        if (stockCount === 0) {
+          alert(`This product is out of stock.`);
+        } else if (!isValid) {
+          alert(
+            `Quantity must be lower than the remaining stock count (${stockCount})`,
+          );
+        }
+
+        return {
+          ...params.props,
+          error: !isValid,
+        };
+      },
       cellClassName: 'editable-cell',
     },
     {
@@ -250,12 +270,16 @@ export default function ItemTable({
           pointerEvents: disabled ? 'none' : undefined,
           background: 'var(--template-palette-primary-light)',
         },
+        '.MuiInputBase-root.Mui-error': {
+          border: '2px solid var(--template-palette-error-main)',
+        },
       }}
     >
       <DataGrid
         disableRowSelectionOnClick={disabled}
         checkboxSelection={false}
         loading={false}
+        editMode="cell"
         rows={orderItems}
         columns={tableColumns}
         cellModesModel={cellModesModel}

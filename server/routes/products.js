@@ -16,8 +16,24 @@ router.post("/", authenticateToken, async (req, res) => {
 
 router.get("/", authenticateToken, async (req, res) => {
   try {
-    const products = await Product.find();
-    res.status(200).json(products);
+    const products = await Product.aggregate([
+      {
+        $lookup: {
+          from: "inventories",
+          localField: "_id",
+          foreignField: "product_id",
+          as: "stocks",
+        },
+      },
+    ]);
+    const productsWQty = products.map(({ stocks, ...rest }) => ({
+      ...rest,
+      total_quantity_on_hand: stocks.reduce(
+        (accum, { quantity_on_hand }) => accum + quantity_on_hand,
+        0
+      ),
+    }));
+    res.status(200).json(productsWQty);
   } catch (err) {
     res.status(500).json(err);
   }

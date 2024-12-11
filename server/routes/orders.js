@@ -157,12 +157,11 @@ router.get("/", authenticateToken, async (req, res) => {
       {
         $lookup: {
           from: "products",
-          localField: "order_items.product_id", // Field in comments referencing users
-          foreignField: "_id", // Field in users matching comments.author
-          as: "order_items.product_id", // Field to hold the joined user details
+          localField: "order_items.product_id",
+          foreignField: "_id",
+          as: "order_items.product_id",
         },
       },
-      // Optionally unwind author details if you expect only one user per author ID
       {
         $unwind: {
           path: "$order_items.product_id",
@@ -230,6 +229,8 @@ router.put("/:id", authenticateToken, async (req, res) => {
       if (newOrderItems.length > 0) {
         await OrderItem.insertMany(newOrderItems);
       }
+
+      // TODO: if status === 'approved', reduce quantity_on_hand on Product Inventory
     }
     res.status(200).json(updatedOrder);
   } catch (err) {
