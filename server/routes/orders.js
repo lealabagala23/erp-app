@@ -230,6 +230,19 @@ router.put("/:id", authenticateToken, async (req, res) => {
         new: true,
       }
     );
+    const dbOrderItems = await OrderItem.find({ order_id });
+    if (dbOrderItems.length > 0) {
+      const ids = order_items?.map((o) => o._id);
+      const deletedOrderItems = dbOrderItems.filter(
+        ({ _id }) => !ids.includes(_id.toString())
+      );
+      if (deletedOrderItems.length > 0) {
+        const idsToDelete = deletedOrderItems.map(
+          ({ _id }) => new mongoose.Types.ObjectId(_id)
+        );
+        await OrderItem.deleteMany({ _id: { $in: idsToDelete } });
+      }
+    }
     if (order_items?.length > 0 && order_id) {
       const existingOrderItems = order_items
         .filter(({ _id }) => !!_id)

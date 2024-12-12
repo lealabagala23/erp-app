@@ -123,6 +123,21 @@ export default function ItemTable({
     </Box>
   );
 
+  const formatTableItem = (item: TableItem) => {
+    const { product_id, quantity, custom_discount } = item;
+
+    if (!product_id) return item;
+
+    const unit_price = getUnitPrice(product_id);
+    const totalPrice = unit_price * quantity;
+
+    return {
+      ...item,
+      unit_price,
+      total_price: totalPrice - totalPrice * ((custom_discount || 0) / 100),
+    };
+  };
+
   const tableColumns: GridColDef<TableItem>[] = [
     {
       field: 'item_number',
@@ -287,10 +302,9 @@ export default function ItemTable({
           params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
         }
         processRowUpdate={(newRow) => {
-          // Update logic for inline editing
-          console.log('new row', newRow);
-          updateOrderItem(newRow);
-          return { ...newRow };
+          const updatedRow = formatTableItem(newRow);
+          updateOrderItem(updatedRow);
+          return { ...updatedRow };
         }}
         rowHeight={75}
         pageSizeOptions={[10, 20, 50]}

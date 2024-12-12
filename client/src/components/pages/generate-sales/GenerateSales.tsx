@@ -41,7 +41,6 @@ import { FETCH_CUSTOMERS_QUERY_KEY } from '../accounts/constants';
 import { createOrder, fetchOrderById, updateOrder } from './apis';
 import AuthContext from '../../auth/AuthContext';
 import { debounce } from 'lodash';
-import { Product } from '../inventory/types';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#fff',
@@ -136,24 +135,9 @@ export default function GenerateSales() {
     ]);
   };
 
-  const formatTableItem = (item: TableItem) => {
-    const { product_id, quantity, custom_discount } = item;
-
-    if (!product_id) return item;
-
-    const unit_price = getUnitPrice(product_id);
-    const totalPrice = unit_price * quantity;
-
-    return {
-      ...item,
-      unit_price,
-      total_price: totalPrice - totalPrice * ((custom_discount || 0) / 100),
-    };
-  };
-
   const updateOrderItem = (item: TableItem) => {
     const updated = orderItems.map((obj) =>
-      obj.item_number === item.item_number ? formatTableItem(item) : obj,
+      obj.item_number === item.item_number ? item : obj,
     );
     setOrderItems(updated);
   };
@@ -237,11 +221,12 @@ export default function GenerateSales() {
       setPaymentType(order.payment_type);
       console.log('order.order_items', order.order_items);
       setOrderItems(
-        (order.order_items || []).map((item: OrderItem) => ({
+        (order.order_items || []).map((item: OrderItem, key: number) => ({
           ...DEFAULT_ITEM,
           ...item,
           // eslint-disable-next-line
           product_id: (item.product_id as any)?._id,
+          item_number: key + 1,
         })),
       );
     }
@@ -462,8 +447,8 @@ export default function GenerateSales() {
                   updateOrderItem={updateOrderItem}
                   deleteOrderItem={deleteOrderItem}
                   clearAllOrderItems={clearAllOrderItems}
-                  subtotal={computeSubtotal()}
                   getUnitPrice={getUnitPrice}
+                  subtotal={computeSubtotal()}
                   disabled={!customer_id}
                 />
                 <Stack direction="column">
