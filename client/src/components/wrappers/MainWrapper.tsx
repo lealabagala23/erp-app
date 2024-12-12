@@ -26,7 +26,10 @@ export default function MainWrapper() {
         <Routes>
           <Route path="/home" element={<Home />} />
           <Route path="/generate-sales" element={<GenerateSales />} />
-          <Route path="/orders" element={<Orders />} />
+          <Route path="/orders">
+            <Route path="/orders/list" element={<Orders />} />
+            <Route path="/orders/:id" element={<GenerateSales />} />
+          </Route>
           <Route path="/products" element={<Products />} />
           <Route path="/stocks" element={<Stocks />} />
           <Route path="/customers" element={<Customers />} />

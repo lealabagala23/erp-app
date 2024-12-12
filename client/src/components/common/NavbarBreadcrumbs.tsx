@@ -21,12 +21,16 @@ const labelRouteMapping = {
     primary: 'Dashboard',
   },
   '/generate-sales': {
-    primary: 'Sales',
+    primary: 'Orders',
     secondary: 'Generate Sales Invoice',
   },
-  '/orders': {
+  '/orders/new': {
     primary: 'Orders',
-    secondary: 'List of Orders',
+    secondary: 'Generate Sales Invoice',
+  },
+  '/orders/list': {
+    primary: 'Orders',
+    secondary: 'Orders List',
   },
   '/products': {
     primary: 'Inventory',
@@ -64,8 +68,14 @@ const labelRouteMapping = {
 
 export default function NavbarBreadcrumbs() {
   const { pathname } = useLocation();
+  const path =
+    pathname.includes('/orders') &&
+    !pathname.includes('/new') &&
+    !pathname.includes('/list')
+      ? '/orders/new'
+      : pathname;
   // eslint-disable-next-line
-  const mapping = (labelRouteMapping as any)[pathname];
+  const mapping = (labelRouteMapping as any)[path];
   return (
     <StyledBreadcrumbs
       aria-label="breadcrumb"

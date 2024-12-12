@@ -49,6 +49,120 @@ const getOrderItemPayload = ({
   total_price,
 });
 
+const orderAggregateParams = [
+  {
+    $lookup: {
+      from: "customers",
+      localField: "customer_id",
+      foreignField: "_id",
+      as: "customer_id",
+    },
+  },
+  {
+    $lookup: {
+      from: "users",
+      localField: "initiator_id",
+      foreignField: "_id",
+      as: "initiator_id",
+    },
+  },
+  {
+    $lookup: {
+      from: "companies",
+      localField: "company_id",
+      foreignField: "_id",
+      as: "company_id",
+    },
+  },
+  {
+    $lookup: {
+      from: "users",
+      localField: "approver_id",
+      foreignField: "_id",
+      as: "approver_id",
+    },
+  },
+  {
+    $lookup: {
+      from: "referrers",
+      localField: "referrer_id",
+      foreignField: "_id",
+      as: "referrer_id",
+    },
+  },
+  {
+    $lookup: {
+      from: "orderitems",
+      localField: "_id",
+      foreignField: "order_id",
+      as: "order_items",
+    },
+  },
+  {
+    $unwind: {
+      path: "$customer_id",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $unwind: {
+      path: "$initiator_id",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $unwind: {
+      path: "$company_id",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $unwind: {
+      path: "$approver_id",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $unwind: {
+      path: "$referrer_id",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  { $unwind: { path: "$order_items", preserveNullAndEmptyArrays: true } },
+  {
+    $lookup: {
+      from: "products",
+      localField: "order_items.product_id",
+      foreignField: "_id",
+      as: "order_items.product_id",
+    },
+  },
+  {
+    $unwind: {
+      path: "$order_items.product_id",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $group: {
+      _id: "$_id",
+      invoice_number: { $first: "$invoice_number" },
+      tin: { $first: "$tin" },
+      billing_address: { $first: "$billing_address" },
+      total_amount: { $first: "$total_amount" },
+      payment_type: { $first: "$payment_type" },
+      status: { $first: "$status" },
+      initiator_id: { $first: "$initiator_id" },
+      customer_id: { $first: "$customer_id" },
+      company_id: { $first: "$company_id" },
+      referrer_id: { $first: "$referrer_id" },
+      approver_id: { $first: "$approver_id" },
+      created_at: { $first: "$created_at" },
+      order_items: { $push: "$order_items" },
+    },
+  },
+];
+
 // Create a orders
 router.post("/", authenticateToken, async (req, res) => {
   const payload = getOrderPayload(req.body);
@@ -75,120 +189,29 @@ router.get("/", authenticateToken, async (req, res) => {
           company_id: new mongoose.Types.ObjectId(req.query.company_id),
         },
       },
-      {
-        $lookup: {
-          from: "customers",
-          localField: "customer_id",
-          foreignField: "_id",
-          as: "customer_id",
-        },
-      },
-      {
-        $lookup: {
-          from: "users",
-          localField: "initiator_id",
-          foreignField: "_id",
-          as: "initiator_id",
-        },
-      },
-      {
-        $lookup: {
-          from: "companies",
-          localField: "company_id",
-          foreignField: "_id",
-          as: "company_id",
-        },
-      },
-      {
-        $lookup: {
-          from: "users",
-          localField: "approver_id",
-          foreignField: "_id",
-          as: "approver_id",
-        },
-      },
-      {
-        $lookup: {
-          from: "referrers",
-          localField: "referrer_id",
-          foreignField: "_id",
-          as: "referrer_id",
-        },
-      },
-      {
-        $lookup: {
-          from: "orderitems",
-          localField: "_id",
-          foreignField: "order_id",
-          as: "order_items",
-        },
-      },
-      {
-        $unwind: {
-          path: "$customer_id",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $unwind: {
-          path: "$initiator_id",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $unwind: {
-          path: "$company_id",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $unwind: {
-          path: "$approver_id",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $unwind: {
-          path: "$referrer_id",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      { $unwind: { path: "$order_items", preserveNullAndEmptyArrays: true } },
-      {
-        $lookup: {
-          from: "products",
-          localField: "order_items.product_id",
-          foreignField: "_id",
-          as: "order_items.product_id",
-        },
-      },
-      {
-        $unwind: {
-          path: "$order_items.product_id",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $group: {
-          _id: "$_id",
-          invoice_number: { $first: "$invoice_number" },
-          tin: { $first: "$tin" },
-          billing_address: { $first: "$billing_address" },
-          total_amount: { $first: "$total_amount" },
-          payment_type: { $first: "$payment_type" },
-          status: { $first: "$status" },
-          initiator_id: { $first: "$initiator_id" },
-          customer_id: { $first: "$customer_id" },
-          company_id: { $first: "$company_id" },
-          referrer_id: { $first: "$referrer_id" },
-          approver_id: { $first: "$approver_id" },
-          created_at: { $first: "$created_at" },
-          order_items: { $push: "$order_items" },
-        },
-      },
+      ...orderAggregateParams,
     ]);
 
     res.status(200).json(orders);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
+// Get order
+router.get("/:id", authenticateToken, async (req, res) => {
+  try {
+    const orders = await Order.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(req.params.id),
+        },
+      },
+      ...orderAggregateParams,
+    ]);
+
+    res.status(200).json(orders[0]);
   } catch (err) {
     console.log(err);
     res.status(500).json(err);

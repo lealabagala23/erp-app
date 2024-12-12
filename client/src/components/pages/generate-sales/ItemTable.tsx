@@ -202,7 +202,7 @@ export default function ItemTable({
       renderCell: ({ row }: any) =>
         renderPriceCell(
           `This is the ${customerType || ''} price set on Products page`,
-          getUnitPrice(row.product_id),
+          row.unit_price,
         ),
     },
     {
@@ -213,7 +213,8 @@ export default function ItemTable({
       headerAlign: 'right',
       editable: true,
       type: 'number',
-      valueFormatter: (value) => (value === 0 ? '-' : `${value}%`),
+      valueFormatter: (value) =>
+        value === 0 || value === undefined ? '-' : `${value}%`,
       cellClassName: 'editable-cell',
     },
     {
@@ -224,11 +225,7 @@ export default function ItemTable({
       headerAlign: 'right',
       // eslint-disable-next-line
       renderCell: ({ row }: any) => {
-        const totalPrice = getUnitPrice(row.product_id) * row.quantity;
-        return renderPriceCell(
-          'Unit Price x Quantity',
-          totalPrice - totalPrice * ((row.custom_discount || 0) / 100),
-        );
+        return renderPriceCell('Unit Price x Quantity', row.total_price);
       },
     },
     {

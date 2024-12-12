@@ -5,6 +5,7 @@ import AuthContext from '../../auth/AuthContext';
 import { GridColDef } from '@mui/x-data-grid';
 import { InfoOutlined } from '@mui/icons-material';
 import CustomerForm from '../accounts/CustomerForm';
+import { useNavigate } from 'react-router-dom';
 
 const FETCH_ORDERS_QUERY_KEY = 'fetchOrders';
 
@@ -71,6 +72,7 @@ const COLUMNS: GridColDef<Order>[] = [
 
 export default function Orders() {
   const { activeCompany } = useContext(AuthContext);
+  const navigate = useNavigate();
   return (
     <PageTemplate
       fetchAPI={fetchOrders}
@@ -79,11 +81,14 @@ export default function Orders() {
       // updateAPI={updateCustomer}
       // deleteAPI={deleteCustomer}
       // uploadCSVAPI={uploadCustomersCSV}
+      // eslint-disable-next-line
+      viewItem={(item: any) => navigate(`/orders/${item._id}`)}
       queryKey={FETCH_ORDERS_QUERY_KEY}
       itemName="order"
       searchAttr="invoice_id"
       sortField="invoice_id"
       columns={COLUMNS}
+      menuActions={['View']}
       drawerTabs={[
         {
           label: 'Info',

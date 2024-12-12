@@ -23,7 +23,13 @@ export const dateDiffInDays = (date: string) => {
   return date2.diff(date1, 'day');
 };
 
+export const convertNaNToZero = (v: number | string) => {
+  const value = (typeof v === 'string' ? Number(v) : v)
+  if (isNaN(value)) return 0;
+  return value
+}
+
 export const formatCurrency = (v: number | string) =>
-  (typeof v === 'string' ? Number(v) : v)
+  convertNaNToZero(v)
     .toFixed(2)
     .replace(/\B(?=(\d{3})+(?!\d))/g, ',');

@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { Inventory } from "../pages/inventory/types";
 
 export type UserInfo = {
+  _id?: string;
   first_name: string;
   last_name: string;
   user_name: string;

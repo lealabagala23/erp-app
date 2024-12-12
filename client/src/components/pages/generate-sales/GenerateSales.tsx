@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import AppNavbar from '../../common/AppNavbar';
 import Header from '../../common/Header';
 import PageWrapper from '../../wrappers/PageWrapper';
 import {
   Alert,
   Button,
+  CircularProgress,
   FormControl,
   FormLabel,
   Grid2 as Grid,
@@ -17,22 +18,30 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { fetchCustomers } from '../accounts/apis';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Customer } from '../accounts/types';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import FormAutocomplete from '../../common/FormAutocomplete';
 import ItemTable from './ItemTable';
-import { TableItem } from './types';
+import { Order, OrderItem, TableItem } from './types';
 import { fetchProducts } from '../inventory/apis';
 import dayjs from 'dayjs';
-import { formatCurrency } from '../../../utils/auth';
+import { convertNaNToZero, formatCurrency } from '../../../utils/auth';
 import {
   Approval,
+  Edit,
   EditNote,
   MoneyOutlined,
   Print,
   Send,
 } from '@mui/icons-material';
+import { useNavigate, useParams } from 'react-router-dom';
+import { FETCH_PRODUCTS_QUERY_KEY } from '../inventory/constants';
+import { FETCH_CUSTOMERS_QUERY_KEY } from '../accounts/constants';
+import { createOrder, fetchOrderById, updateOrder } from './apis';
+import AuthContext from '../../auth/AuthContext';
+import { debounce } from 'lodash';
+import { Product } from '../inventory/types';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#fff',
@@ -54,9 +63,25 @@ const DEFAULT_ITEM = {
 };
 
 export default function GenerateSales() {
-  const { register, setValue, watch } = useForm();
+  const { activeCompany, userInfo } = useContext(AuthContext);
+  const { id: orderId } = useParams();
+  const navigate = useNavigate();
+  const { register, setValue, reset, watch, control, getValues } = useForm();
+  const formValues = useWatch({ control });
+  const [paymentType, setPaymentType] = useState('');
+
+  const { data: order = {}, isLoading: isLoadingOrder } = useQuery(
+    ['fetchOrderById', orderId],
+    () => fetchOrderById({ id: orderId as string }),
+    {
+      enabled: !!orderId && orderId !== 'new',
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  );
+
   const { data: customers = [] } = useQuery(
-    ['fetchCustomers'],
+    [FETCH_CUSTOMERS_QUERY_KEY],
     () => fetchCustomers(),
     {
       refetchOnWindowFocus: false,
@@ -65,13 +90,35 @@ export default function GenerateSales() {
   );
 
   const { data: products = [] } = useQuery(
-    ['fetchProducts'],
+    [FETCH_PRODUCTS_QUERY_KEY],
     () => fetchProducts(),
     {
       refetchOnWindowFocus: false,
       retry: 1,
     },
   );
+
+  const { mutateAsync: mutateCreateOrder, isLoading: isLoadingCreate } =
+    useMutation({
+      mutationFn: createOrder,
+      onSuccess: ({ _id }) => {
+        navigate(`/orders/${_id}`);
+      },
+      onError: (err) => {
+        console.error(err);
+      },
+    });
+
+  const { mutateAsync: mutateUpdateOrder, isLoading: isLoadingUpdate } =
+    useMutation({
+      mutationFn: updateOrder,
+      onSuccess: () => {
+        // Do something
+      },
+      onError: (err) => {
+        console.error(err);
+      },
+    });
 
   const { customer_id, invoice_number, discount, discount_type } = watch();
 
@@ -89,9 +136,24 @@ export default function GenerateSales() {
     ]);
   };
 
+  const formatTableItem = (item: TableItem) => {
+    const { product_id, quantity, custom_discount } = item;
+
+    if (!product_id) return item;
+
+    const unit_price = getUnitPrice(product_id);
+    const totalPrice = unit_price * quantity;
+
+    return {
+      ...item,
+      unit_price,
+      total_price: totalPrice - totalPrice * ((custom_discount || 0) / 100),
+    };
+  };
+
   const updateOrderItem = (item: TableItem) => {
     const updated = orderItems.map((obj) =>
-      obj.item_number === item.item_number ? item : obj,
+      obj.item_number === item.item_number ? formatTableItem(item) : obj,
     );
     setOrderItems(updated);
   };
@@ -138,8 +200,18 @@ export default function GenerateSales() {
     const subtotal = computeSubtotal();
     const discountAmount =
       discount_type === 'amount' ? discount : subtotal * (discount / 100);
-    return isNaN(subtotal - discountAmount) ? 0 : subtotal - discountAmount;
+    return convertNaNToZero(subtotal - discountAmount);
   };
+
+  // eslint-disable-next-line
+  const saveHandler = (formValues: { [x: string]: any }) => {
+    mutateUpdateOrder({
+      _id: orderId,
+      ...formValues,
+    } as Order);
+  };
+
+  const handleSave = useMemo(() => debounce(saveHandler, 1000), []);
 
   useEffect(() => {
     if (customer_details) {
@@ -153,12 +225,50 @@ export default function GenerateSales() {
     }
   }, [customer_details]);
 
+  useEffect(() => {
+    if (order) {
+      reset({
+        customer_id: order.customer_id?._id,
+        payment_type: order.payment_type,
+        billing_address: order.billing_address,
+        tin: order.tin,
+        referrer_id: order.referrer_id?._id,
+      });
+      setPaymentType(order.payment_type);
+      console.log('order.order_items', order.order_items);
+      setOrderItems(
+        (order.order_items || []).map((item: OrderItem) => ({
+          ...DEFAULT_ITEM,
+          ...item,
+          // eslint-disable-next-line
+          product_id: (item.product_id as any)?._id,
+        })),
+      );
+    }
+  }, [order]);
+
+  useEffect(() => {
+    handleSave({ ...formValues, order_items: orderItems });
+  }, [formValues, orderItems]);
+
+  useEffect(() => {
+    if (orderId === 'new' && activeCompany?._id && userInfo?._id) {
+      mutateCreateOrder({
+        company_id: activeCompany?._id,
+        initiator_id: userInfo?._id,
+      });
+    }
+  }, [orderId, activeCompany, userInfo]);
+
   return (
     <>
       <AppNavbar title={'Generate Sales'} />
       <PageWrapper>
         <>
           <Header />
+          {(isLoadingCreate || isLoadingOrder) && (
+            <CircularProgress color="inherit" />
+          )}
           <Grid container spacing={2} width={'100%'}>
             <Grid size={12}>
               <Item>
@@ -190,8 +300,9 @@ export default function GenerateSales() {
                             category: customer_type,
                           }),
                         )}
-                        register={register}
                         setValue={setValue}
+                        register={register}
+                        getValues={getValues}
                         name="customer_id"
                         autoFocus
                         placeholder={'Select Customer'}
@@ -234,6 +345,11 @@ export default function GenerateSales() {
                         }}
                         variant="outlined"
                         fullWidth
+                        value={paymentType}
+                        onChange={(e) => {
+                          setPaymentType(e.target.value);
+                          setValue('payment_type', e.target.value);
+                        }}
                       >
                         <MenuItem key={'payment-type-cash'} value={'cash'}>
                           CASH
@@ -327,6 +443,7 @@ export default function GenerateSales() {
                         options={[]} // TODO: add referrers list
                         register={register}
                         setValue={setValue}
+                        getValues={getValues}
                         name="referrer"
                         placeholder={'Enter Referrer Name'}
                       />
@@ -423,11 +540,17 @@ export default function GenerateSales() {
                 <Stack direction={'row'} gap={2} alignItems={'center'}>
                   <Typography variant={'h6'}>Status:</Typography>
                   <Alert
-                    icon={<EditNote fontSize="inherit" />}
+                    icon={
+                      isLoadingUpdate ? (
+                        <Edit fontSize="inherit" />
+                      ) : (
+                        <EditNote fontSize="inherit" />
+                      )
+                    }
                     severity="info"
                     variant="filled"
                   >
-                    Draft
+                    {isLoadingUpdate ? 'Saving...' : 'Draft'}
                   </Alert>
                 </Stack>
 

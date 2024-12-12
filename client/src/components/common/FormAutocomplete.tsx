@@ -1,10 +1,16 @@
 import { Autocomplete, TextField } from '@mui/material';
-import React, { useState } from 'react';
-import { FieldValues, UseFormRegister, UseFormSetValue } from 'react-hook-form';
+import React, { useEffect, useState } from 'react';
+import {
+  FieldValues,
+  UseFormGetValues,
+  UseFormRegister,
+  UseFormSetValue,
+} from 'react-hook-form';
 
 interface IProps {
   setValue: UseFormSetValue<FieldValues>;
   register: UseFormRegister<FieldValues>;
+  getValues: UseFormGetValues<FieldValues>;
   options: { label: string; value: string }[];
   name: string;
   autoFocus?: boolean;
@@ -18,8 +24,10 @@ export default function FormAutocomplete({
   name,
   autoFocus,
   placeholder,
+  getValues,
 }: IProps) {
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState<string | null>(null);
+  const value = getValues(name);
 
   // eslint-disable-next-line
   const handleAutocompleteChange = (_: any, newValue: any) => {
@@ -31,8 +39,14 @@ export default function FormAutocomplete({
   // eslint-disable-next-line
   const handleInputChange = (_: any, newInputValue: any) => {
     setInputValue(newInputValue);
-    setValue(name, newInputValue); // Update form state with the current input
+    // setValue(name, newInputValue); // TODO: add new strings
   };
+
+  useEffect(() => {
+    if (!!value && value !== '' && inputValue === null) {
+      setInputValue(options.find((o) => o.value === value)?.label || null);
+    }
+  }, [value, options, inputValue]);
 
   return (
     <>
@@ -50,7 +64,7 @@ export default function FormAutocomplete({
         isOptionEqualToValue={(option, value) => option.value === value?.value}
         // value={selectedValue}
         onChange={handleAutocompleteChange}
-        inputValue={inputValue}
+        inputValue={inputValue || ''}
         onInputChange={handleInputChange}
         renderInput={(params) => (
           <TextField

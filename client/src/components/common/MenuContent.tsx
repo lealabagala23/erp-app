@@ -6,7 +6,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Stack from '@mui/material/Stack';
 import HomeRoundedIcon from '@mui/icons-material/DashboardRounded';
-import AnalyticsRoundedIcon from '@mui/icons-material/AnalyticsRounded';
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
@@ -22,11 +21,20 @@ const secondaryListItems = [
 const nestedMainItems = [
   { text: 'Home', icon: <HomeRoundedIcon />, route: '/home' },
   {
-    text: 'Generate Sales',
-    icon: <AnalyticsRoundedIcon />,
-    route: '/generate-sales',
+    text: 'Orders',
+    icon: <MoneyRounded />,
+    route: null,
+    children: [
+      {
+        text: 'Create New Order',
+        route: '/orders/new',
+      },
+      {
+        text: 'Orders List',
+        route: '/orders/list',
+      },
+    ],
   },
-  { text: 'Orders', icon: <MoneyRounded />, route: '/orders' },
   {
     text: 'Inventory',
     icon: <AssignmentRoundedIcon />,
