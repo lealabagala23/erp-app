@@ -51,7 +51,7 @@ const COLUMNS: GridColDef<Product>[] = [
     flex: 1,
     valueGetter: formatCurrency,
   },
-  { field: 'barcode', headerName: 'Barcode', flex: 1 },
+  { field: 'total_quantity_on_hand', headerName: 'Available Stock', flex: 1 },
   {
     field: 'created_at',
     headerName: 'Created at',

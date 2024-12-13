@@ -26,7 +26,11 @@ import ItemTable from './ItemTable';
 import { Order, OrderItem, TableItem } from './types';
 import { fetchProducts } from '../inventory/apis';
 import dayjs from 'dayjs';
-import { convertNaNToZero, formatCurrency } from '../../../utils/auth';
+import {
+  convertNaNToZero,
+  formatCurrency,
+  getUnitPrice,
+} from '../../../utils/auth';
 import {
   Approval,
   Edit,
@@ -156,36 +160,24 @@ export default function GenerateSales() {
     setOrderItems([DEFAULT_ITEM]);
   };
 
-  const getUnitPrice = (product_id: string) => {
-    // eslint-disable-next-line
-    const selectedProduct = products.find(({ _id }: any) => _id === product_id);
-    switch (customer_type) {
-      case 'PATIENT':
-        return selectedProduct?.patient_price ?? 0;
-      case 'DOCTOR':
-        return selectedProduct?.doctor_price ?? 0;
-      case 'AGENCY':
-        return selectedProduct?.agency_price ?? 0;
-      default:
-        return 0;
-    }
-  };
-
   const computeSubtotal = () =>
     orderItems.reduce((accum, obj) => {
-      const totalPrice = getUnitPrice(obj.product_id as string) * obj.quantity;
+      const totalPrice =
+        getUnitPrice(products, obj.product_id as string, customer_type) *
+        obj.quantity;
       const totalPriceWDisc =
         totalPrice -
         (obj.custom_discount ? totalPrice * (obj.custom_discount / 100) : 0);
       return accum + totalPriceWDisc;
     }, 0);
 
-  const computeLessDiscount = () => {
-    const subtotal = computeSubtotal();
-    const discountAmount =
-      discount_type === 'amount' ? discount : subtotal * (discount / 100);
-    return convertNaNToZero(subtotal - discountAmount);
-  };
+  const computeDiscountAmount = () =>
+    discount_type === 'amount'
+      ? discount
+      : computeSubtotal() * (discount / 100);
+
+  const computeTotalSales = () =>
+    convertNaNToZero(computeSubtotal() - computeDiscountAmount());
 
   // eslint-disable-next-line
   const saveHandler = (formValues: { [x: string]: any }) => {
@@ -217,6 +209,7 @@ export default function GenerateSales() {
         billing_address: order.billing_address,
         tin: order.tin,
         referrer_id: order.referrer_id?._id,
+        invoice_number: order.invoice_number,
       });
       setPaymentType(order.payment_type);
       console.log('order.order_items', order.order_items);
@@ -380,7 +373,7 @@ export default function GenerateSales() {
               >
                 <Typography>BALANCE DUE</Typography>
                 <Typography variant="h1">
-                  ₱ {formatCurrency(computeLessDiscount())}
+                  ₱ {formatCurrency(computeTotalSales())}
                 </Typography>
                 <FormControl margin="dense">
                   <FormLabel>Invoice No.</FormLabel>
@@ -447,7 +440,6 @@ export default function GenerateSales() {
                   updateOrderItem={updateOrderItem}
                   deleteOrderItem={deleteOrderItem}
                   clearAllOrderItems={clearAllOrderItems}
-                  getUnitPrice={getUnitPrice}
                   subtotal={computeSubtotal()}
                   disabled={!customer_id}
                 />
@@ -502,7 +494,8 @@ export default function GenerateSales() {
                       />
                     </FormControl>
                     <Typography variant="h6">
-                      {formatCurrency(computeLessDiscount())}
+                      {'-'}
+                      {formatCurrency(computeDiscountAmount())}
                     </Typography>
                   </Stack>
                   <Stack
@@ -514,7 +507,7 @@ export default function GenerateSales() {
                   >
                     <Typography variant="h6">TOTAL AMOUNT DUE:</Typography>
                     <Typography variant="h6">
-                      ₱ {formatCurrency(computeLessDiscount())}
+                      ₱ {formatCurrency(computeTotalSales())}
                     </Typography>
                   </Stack>
                 </Stack>

@@ -8,15 +8,20 @@ interface IProps {
   itemName: string;
   searchText: string;
   setSearchText: Dispatch<SetStateAction<string>>;
+  fullWidth?: boolean;
 }
 
 export default function SearchBar({
   itemName,
   searchText,
   setSearchText,
+  fullWidth,
 }: IProps) {
   return (
-    <FormControl sx={{ width: { xs: '100%', md: '35ch' } }} variant="outlined">
+    <FormControl
+      sx={{ width: { xs: '100%', md: fullWidth ? '100%' : '35ch' } }}
+      variant="outlined"
+    >
       <OutlinedInput
         size="small"
         id="search"

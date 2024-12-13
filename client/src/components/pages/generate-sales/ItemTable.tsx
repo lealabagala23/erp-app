@@ -14,10 +14,11 @@ import {
   GridCellParams,
   GridColDef,
 } from '@mui/x-data-grid';
-import React from 'react';
+import React, { useState } from 'react';
 import { TableItem } from './types';
-import { formatCurrency } from '../../../utils/auth';
+import { formatCurrency, getUnitPrice } from '../../../utils/auth';
 import { Product } from '../inventory/types';
+import ProductSelector from './ProductSelector';
 
 interface IProps {
   products: Product[];
@@ -27,7 +28,6 @@ interface IProps {
   deleteOrderItem: (t: TableItem) => void;
   clearAllOrderItems: () => void;
   customerType?: string;
-  getUnitPrice: (s: string) => number;
   subtotal: number;
   disabled?: boolean;
 }
@@ -40,15 +40,24 @@ export default function ItemTable({
   deleteOrderItem,
   clearAllOrderItems,
   customerType,
-  getUnitPrice,
   subtotal,
   disabled,
 }: IProps) {
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedRow, setSelectedRow] = useState<TableItem | null>(null);
   const [cellModesModel, setCellModesModel] =
     React.useState<GridCellModesModel>({});
 
+  const handleCloseDialog = () => setOpenDialog(false);
+
   const handleCellClick = React.useCallback(
     (params: GridCellParams, event: React.MouseEvent) => {
+      if (params.field === 'product_id') {
+        setOpenDialog(true);
+        setSelectedRow(params.row);
+        return;
+      }
+
       if (!params.isEditable) {
         return;
       }
@@ -128,7 +137,11 @@ export default function ItemTable({
 
     if (!product_id) return item;
 
-    const unit_price = getUnitPrice(product_id);
+    const unit_price = getUnitPrice(
+      products,
+      product_id,
+      customerType as string,
+    );
     const totalPrice = unit_price * quantity;
 
     return {
@@ -150,17 +163,9 @@ export default function ItemTable({
       field: 'product_id',
       headerName: 'Product',
       flex: 1,
-      valueOptions: products.map(({ product_name, _id }) => ({
-        label: product_name,
-        value: _id,
-      })),
-      // eslint-disable-next-line
-      getOptionLabel: (option: any) => option.label, // Map object to its label
-      // eslint-disable-next-line
-      getOptionValue: (option: any) => option.value, // Map object to its value
-      editable: true,
-      type: 'singleSelect',
       cellClassName: 'editable-cell',
+      valueGetter: (_, row) =>
+        products.find(({ _id }) => _id === row.product_id)?.product_name,
     },
     {
       field: 'description',
@@ -365,6 +370,19 @@ export default function ItemTable({
           <Typography variant={'h6'}>{formatCurrency(subtotal)}</Typography>
         </Stack>
       </Stack>
+      <ProductSelector
+        products={products}
+        customerType={customerType as string}
+        open={openDialog}
+        handleClose={handleCloseDialog}
+        onSelectProduct={(product_id: string) => {
+          const newRow = formatTableItem({
+            ...(selectedRow as TableItem),
+            product_id,
+          });
+          updateOrderItem(newRow);
+        }}
+      />
     </Box>
   );
 }
