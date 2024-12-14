@@ -6,6 +6,7 @@ export type UserInfo = {
   first_name: string;
   last_name: string;
   user_name: string;
+  role: 'admin' | 'approver' | 'user'
 };
 
 export type Company = {

@@ -6,6 +6,8 @@ import { GridColDef } from '@mui/x-data-grid';
 import { InfoOutlined } from '@mui/icons-material';
 import CustomerForm from '../accounts/CustomerForm';
 import { useNavigate } from 'react-router-dom';
+import { Chip } from '@mui/material';
+import { getOrderStatusColor } from '../generate-sales/constants';
 
 const FETCH_ORDERS_QUERY_KEY = 'fetchOrders';
 
@@ -49,9 +51,16 @@ const COLUMNS: GridColDef<Order>[] = [
     valueGetter: (value) => ((value || '') as string).toUpperCase(),
   },
   {
-    field: 'payment_status',
-    headerName: 'Payment Status',
+    field: 'status',
+    headerName: 'Status',
     flex: 1,
+    // eslint-disable-next-line
+    renderCell: ({ row }: any) => (
+      <Chip
+        label={row.status?.toUpperCase()}
+        color={getOrderStatusColor(row.status)}
+      />
+    ),
   },
   {
     field: 'initiator_id',

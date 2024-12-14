@@ -11,7 +11,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 // Register a new user
 router.post("/register", async (req, res) => {
-  const { username, password, first_name, last_name } = req.body;
+  const { username, password, first_name, last_name, role } = req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -20,6 +20,7 @@ router.post("/register", async (req, res) => {
       password: hashedPassword,
       first_name,
       last_name,
+      role: role || "user",
     });
     await newUser.save();
     res.status(201).send("User registered successfully");
@@ -51,6 +52,18 @@ router.post("/login", async (req, res) => {
 // Get current user
 router.get("/me", authenticateToken, async (req, res) => {
   const user = await User.findById(req.user.id).select("-password");
+  res.json(user);
+});
+
+router.put("/me", authenticateToken, async (req, res) => {
+  const { username, first_name, last_name, role } = req.body;
+  const user = await User.findByIdAndUpdate(
+    req.user.id,
+    { username, first_name, last_name, role },
+    {
+      new: true,
+    }
+  );
   res.json(user);
 });
 

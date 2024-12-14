@@ -3,8 +3,8 @@ import AppNavbar from '../../common/AppNavbar';
 import Header from '../../common/Header';
 import PageWrapper from '../../wrappers/PageWrapper';
 import {
-  Alert,
   Button,
+  Chip,
   CircularProgress,
   FormControl,
   FormLabel,
@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { fetchCustomers } from '../accounts/apis';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Customer } from '../accounts/types';
 import { useForm, useWatch } from 'react-hook-form';
 import FormAutocomplete from '../../common/FormAutocomplete';
@@ -42,9 +42,19 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import { FETCH_PRODUCTS_QUERY_KEY } from '../inventory/constants';
 import { FETCH_CUSTOMERS_QUERY_KEY } from '../accounts/constants';
-import { createOrder, fetchOrderById, updateOrder } from './apis';
+import {
+  createOrder,
+  fetchOrderById,
+  updateOrder,
+  updateOrderStatus,
+} from './apis';
 import AuthContext from '../../auth/AuthContext';
 import { debounce } from 'lodash';
+import {
+  FETCH_ORDER_BY_ID_QUERY_KEY,
+  getOrderStatusColor,
+  OrderStatus,
+} from './constants';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#fff',
@@ -66,6 +76,7 @@ const DEFAULT_ITEM = {
 };
 
 export default function GenerateSales() {
+  const queryClient = useQueryClient();
   const { activeCompany, userInfo } = useContext(AuthContext);
   const { id: orderId } = useParams();
   const navigate = useNavigate();
@@ -74,7 +85,7 @@ export default function GenerateSales() {
   const [paymentType, setPaymentType] = useState('');
 
   const { data: order = {}, isLoading: isLoadingOrder } = useQuery(
-    ['fetchOrderById', orderId],
+    [FETCH_ORDER_BY_ID_QUERY_KEY, orderId],
     () => fetchOrderById({ id: orderId as string }),
     {
       enabled: !!orderId && orderId !== 'new',
@@ -122,6 +133,19 @@ export default function GenerateSales() {
         console.error(err);
       },
     });
+
+  const {
+    mutateAsync: mutateUpdateOrderStatus,
+    isLoading: isLoadingUpdateStatus,
+  } = useMutation({
+    mutationFn: updateOrderStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries([FETCH_ORDER_BY_ID_QUERY_KEY]);
+    },
+    onError: (err) => {
+      console.error(err);
+    },
+  });
 
   const { customer_id, invoice_number, discount, discount_type } = watch();
 
@@ -189,6 +213,10 @@ export default function GenerateSales() {
 
   const handleSave = useMemo(() => debounce(saveHandler, 1000), []);
 
+  const onUpdateOrderStatus = (status: OrderStatus) => {
+    mutateUpdateOrderStatus({ ...order, status });
+  };
+
   useEffect(() => {
     if (customer_details) {
       setValue('discount_card', customer_details?.discount_card);
@@ -212,7 +240,6 @@ export default function GenerateSales() {
         invoice_number: order.invoice_number,
       });
       setPaymentType(order.payment_type);
-      console.log('order.order_items', order.order_items);
       setOrderItems(
         (order.order_items || []).map((item: OrderItem, key: number) => ({
           ...DEFAULT_ITEM,
@@ -299,7 +326,7 @@ export default function GenerateSales() {
                           '.MuiInputBase-input': {
                             cursor: 'not-allowed',
                             color: 'var(--template-palette-grey-600)',
-                            '-webkit-text-fill-color': 'unset',
+                            WebkitTextFillColor: 'unset',
                           },
                         }}
                       />
@@ -517,7 +544,7 @@ export default function GenerateSales() {
               <Stack direction={'row'} gap={2} justifyContent={'space-between'}>
                 <Stack direction={'row'} gap={2} alignItems={'center'}>
                   <Typography variant={'h6'}>Status:</Typography>
-                  <Alert
+                  <Chip
                     icon={
                       isLoadingUpdate ? (
                         <Edit fontSize="inherit" />
@@ -525,11 +552,15 @@ export default function GenerateSales() {
                         <EditNote fontSize="inherit" />
                       )
                     }
-                    severity="info"
+                    color={getOrderStatusColor(order?.status)}
                     variant="filled"
-                  >
-                    {isLoadingUpdate ? 'Saving...' : 'Draft'}
-                  </Alert>
+                    size="medium"
+                    label={
+                      isLoadingUpdate
+                        ? 'Saving...'
+                        : order?.status?.toUpperCase().replaceAll('_', ' ')
+                    }
+                  />
                 </Stack>
 
                 <Stack
@@ -539,27 +570,82 @@ export default function GenerateSales() {
                   alignItems={'center'}
                 >
                   <Button
-                    variant={'outlined'}
+                    variant={
+                      order?.status === OrderStatus.UNPAID
+                        ? 'contained'
+                        : 'outlined'
+                    }
                     startIcon={<MoneyOutlined />}
-                    sx={{ cursor: 'not-allowed' }}
+                    sx={{
+                      cursor:
+                        order?.status === OrderStatus.UNPAID
+                          ? undefined
+                          : 'not-allowed',
+                    }}
                   >
                     Add Payment
                   </Button>
                   <Button
-                    variant={'outlined'}
+                    variant={
+                      order?.status === OrderStatus.FOR_APPROVAL &&
+                      userInfo?.role === 'admin'
+                        ? 'contained'
+                        : 'outlined'
+                    }
+                    onClick={() =>
+                      onUpdateOrderStatus(OrderStatus.FOR_PRINTING)
+                    }
                     startIcon={<Approval />}
-                    sx={{ cursor: 'not-allowed' }}
+                    sx={{
+                      cursor:
+                        order?.status === OrderStatus.FOR_APPROVAL &&
+                        userInfo?.role === 'admin'
+                          ? undefined
+                          : 'not-allowed',
+                    }}
                   >
                     Approve Order
                   </Button>
                   <Button
-                    variant={'outlined'}
+                    variant={
+                      order?.status === OrderStatus.FOR_PRINTING
+                        ? 'contained'
+                        : 'outlined'
+                    }
                     startIcon={<Print />}
-                    sx={{ cursor: 'not-allowed' }}
+                    sx={{
+                      cursor:
+                        order?.status === OrderStatus.FOR_PRINTING
+                          ? undefined
+                          : 'not-allowed',
+                    }}
+                    onClick={() => onUpdateOrderStatus(OrderStatus.UNPAID)}
                   >
                     Generate Sales Invoice
                   </Button>
-                  <Button variant={'contained'} startIcon={<Send />}>
+                  <Button
+                    variant={
+                      order.status !== OrderStatus.DRAFT
+                        ? 'outlined'
+                        : 'contained'
+                    }
+                    startIcon={
+                      isLoadingUpdateStatus ? (
+                        <CircularProgress color="inherit" size={16} />
+                      ) : (
+                        <Send />
+                      )
+                    }
+                    onClick={() =>
+                      onUpdateOrderStatus(OrderStatus.FOR_APPROVAL)
+                    }
+                    sx={{
+                      cursor:
+                        order.status !== OrderStatus.DRAFT
+                          ? 'not-allowed'
+                          : undefined,
+                    }}
+                  >
                     Send Order for Approval
                   </Button>
                 </Stack>

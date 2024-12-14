@@ -219,6 +219,25 @@ router.get("/:id", authenticateToken, async (req, res) => {
 });
 
 // Update a Order
+router.put("/:id/status", authenticateToken, async (req, res) => {
+  try {
+    const order_id = req.params.id;
+    const { status } = req.body;
+    const updatedOrder = await Order.findByIdAndUpdate(
+      order_id,
+      { status },
+      {
+        new: true,
+      }
+    );
+    res.status(200).json(updatedOrder);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
+// Update a Order
 router.put("/:id", authenticateToken, async (req, res) => {
   try {
     const order_id = req.params.id;

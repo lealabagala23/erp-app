@@ -81,3 +81,11 @@ export const updateOrder = async (order: Order) => {
 
   return response?.data;
 };
+
+export const updateOrderStatus = async (order: Order) => {
+  const response = await axiosConfig.put(`${ORDERS_API}/${order._id}/status`, {
+    status: order.status,
+  });
+
+  return response?.data;
+};

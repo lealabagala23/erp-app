@@ -53,7 +53,7 @@ export default function FormAutocomplete({
       <input
         type="hidden"
         {...register(name, { required: 'This field is required' })}
-        value={inputValue as unknown as string}
+        value={(inputValue || '') as unknown as string}
       />
 
       <Autocomplete
