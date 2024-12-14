@@ -15,6 +15,7 @@ interface IProps {
   name: string;
   autoFocus?: boolean;
   placeholder?: string;
+  disabled?: boolean;
 }
 
 export default function FormAutocomplete({
@@ -25,6 +26,7 @@ export default function FormAutocomplete({
   autoFocus,
   placeholder,
   getValues,
+  disabled,
 }: IProps) {
   const [inputValue, setInputValue] = useState<string | null>(null);
   const value = getValues(name);
@@ -59,6 +61,7 @@ export default function FormAutocomplete({
       <Autocomplete
         freeSolo
         options={options}
+        disabled={disabled}
         // eslint-disable-next-line
         getOptionLabel={(option: any) => option.label || ''}
         isOptionEqualToValue={(option, value) => option.value === value?.value}

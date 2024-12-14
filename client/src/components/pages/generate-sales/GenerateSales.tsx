@@ -23,7 +23,7 @@ import { Customer } from '../accounts/types';
 import { useForm, useWatch } from 'react-hook-form';
 import FormAutocomplete from '../../common/FormAutocomplete';
 import ItemTable from './ItemTable';
-import { Order, OrderItem, TableItem } from './types';
+import { Order, OrderItem, Payment, TableItem } from './types';
 import { fetchProducts } from '../inventory/apis';
 import dayjs from 'dayjs';
 import {
@@ -36,6 +36,7 @@ import {
   Edit,
   EditNote,
   MoneyOutlined,
+  Person,
   Print,
   Send,
 } from '@mui/icons-material';
@@ -43,6 +44,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { FETCH_PRODUCTS_QUERY_KEY } from '../inventory/constants';
 import { FETCH_CUSTOMERS_QUERY_KEY } from '../accounts/constants';
 import {
+  addOrderPayment,
   createOrder,
   fetchOrderById,
   updateOrder,
@@ -55,6 +57,7 @@ import {
   getOrderStatusColor,
   OrderStatus,
 } from './constants';
+import PaymentForm from './PaymentForm';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#fff',
@@ -80,9 +83,19 @@ export default function GenerateSales() {
   const { activeCompany, userInfo } = useContext(AuthContext);
   const { id: orderId } = useParams();
   const navigate = useNavigate();
-  const { register, setValue, reset, watch, control, getValues } = useForm();
+  const {
+    register,
+    setValue,
+    reset,
+    watch,
+    control,
+    getValues,
+    formState: { isDirty },
+  } = useForm();
   const formValues = useWatch({ control });
   const [paymentType, setPaymentType] = useState('');
+  const [openPaymentForm, setOpenPaymentForm] = useState(false);
+  const [itemTableClicked, setItemTableClick] = useState(false);
 
   const { data: order = {}, isLoading: isLoadingOrder } = useQuery(
     [FETCH_ORDER_BY_ID_QUERY_KEY, orderId],
@@ -127,7 +140,7 @@ export default function GenerateSales() {
     useMutation({
       mutationFn: updateOrder,
       onSuccess: () => {
-        // Do something
+        queryClient.invalidateQueries([FETCH_ORDER_BY_ID_QUERY_KEY]);
       },
       onError: (err) => {
         console.error(err);
@@ -139,6 +152,19 @@ export default function GenerateSales() {
     isLoading: isLoadingUpdateStatus,
   } = useMutation({
     mutationFn: updateOrderStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries([FETCH_ORDER_BY_ID_QUERY_KEY]);
+    },
+    onError: (err) => {
+      console.error(err);
+    },
+  });
+
+  const {
+    mutateAsync: mutateUpdateOrderPayment,
+    isLoading: isLoadingUpdatePayment,
+  } = useMutation({
+    mutationFn: addOrderPayment,
     onSuccess: () => {
       queryClient.invalidateQueries([FETCH_ORDER_BY_ID_QUERY_KEY]);
     },
@@ -208,6 +234,7 @@ export default function GenerateSales() {
     mutateUpdateOrder({
       _id: orderId,
       ...formValues,
+      status: order?.status || 'draft',
     } as Order);
   };
 
@@ -215,6 +242,12 @@ export default function GenerateSales() {
 
   const onUpdateOrderStatus = (status: OrderStatus) => {
     mutateUpdateOrderStatus({ ...order, status });
+  };
+
+  const handleClosePaymentForm = () => setOpenPaymentForm(false);
+
+  const onPaymentSubmit = (payment: Payment) => {
+    mutateUpdateOrderPayment({ ...payment, order_id: order?._id });
   };
 
   useEffect(() => {
@@ -253,7 +286,8 @@ export default function GenerateSales() {
   }, [order]);
 
   useEffect(() => {
-    handleSave({ ...formValues, order_items: orderItems });
+    if (isDirty || itemTableClicked)
+      handleSave({ ...formValues, order_items: orderItems });
   }, [formValues, orderItems]);
 
   useEffect(() => {
@@ -351,6 +385,7 @@ export default function GenerateSales() {
                         variant="outlined"
                         fullWidth
                         value={paymentType}
+                        disabled={!customer_id}
                         onChange={(e) => {
                           setPaymentType(e.target.value);
                           setValue('payment_type', e.target.value);
@@ -375,6 +410,7 @@ export default function GenerateSales() {
                             placeholder={'Enter Discount Card'}
                             variant="outlined"
                             fullWidth
+                            disabled={!customer_id}
                           />
                         </FormControl>
                       </Grid>
@@ -386,6 +422,7 @@ export default function GenerateSales() {
                             placeholder={'Enter Discount Card Number'}
                             variant="outlined"
                             fullWidth
+                            disabled={!customer_id}
                           />
                         </FormControl>
                       </Grid>
@@ -400,7 +437,13 @@ export default function GenerateSales() {
               >
                 <Typography>BALANCE DUE</Typography>
                 <Typography variant="h1">
-                  ₱ {formatCurrency(computeTotalSales())}
+                  ₱{' '}
+                  {formatCurrency(
+                    order?.total_amount - order?.total_amount_paid,
+                  )}
+                </Typography>
+                <Typography>
+                  (Amount Paid: ₱ {formatCurrency(order?.total_amount_paid)})
                 </Typography>
                 <FormControl margin="dense">
                   <FormLabel>Invoice No.</FormLabel>
@@ -409,6 +452,7 @@ export default function GenerateSales() {
                     placeholder={'Enter Invoice Number'}
                     variant="outlined"
                     sx={{ '.MuiInputBase-input': { textAlign: 'right' } }}
+                    disabled={!customer_id}
                   />
                 </FormControl>
               </Item>
@@ -426,6 +470,7 @@ export default function GenerateSales() {
                         fullWidth
                         multiline
                         rows={4}
+                        disabled={!customer_id}
                         sx={{ '.MuiInputBase-root': { height: 'unset' } }}
                       />
                     </FormControl>
@@ -438,6 +483,7 @@ export default function GenerateSales() {
                         placeholder={'Enter TIN'}
                         variant="outlined"
                         fullWidth
+                        disabled={!customer_id}
                       />
                     </FormControl>
                   </Grid>
@@ -451,6 +497,7 @@ export default function GenerateSales() {
                         getValues={getValues}
                         name="referrer"
                         placeholder={'Enter Referrer Name'}
+                        disabled={!customer_id}
                       />
                     </FormControl>
                   </Grid>
@@ -469,6 +516,7 @@ export default function GenerateSales() {
                   clearAllOrderItems={clearAllOrderItems}
                   subtotal={computeSubtotal()}
                   disabled={!customer_id}
+                  onTableClick={() => setItemTableClick(true)}
                 />
                 <Stack direction="column">
                   <Stack
@@ -485,6 +533,7 @@ export default function GenerateSales() {
                         select
                         variant="outlined"
                         defaultValue={'percent'}
+                        disabled={!customer_id}
                       >
                         <MenuItem
                           key={'discount-type-percent'}
@@ -502,6 +551,7 @@ export default function GenerateSales() {
                         {...register('discount')}
                         sx={{ width: '150px' }}
                         type={'number'}
+                        disabled={!customer_id}
                         slotProps={{
                           input: {
                             startAdornment:
@@ -561,6 +611,18 @@ export default function GenerateSales() {
                         : order?.status?.toUpperCase().replaceAll('_', ' ')
                     }
                   />
+                  {order?.approver_id?._id && (
+                    <>
+                      <Typography variant={'h6'}>Approved by:</Typography>
+                      <Chip
+                        icon={<Person />}
+                        color={'default'}
+                        variant="filled"
+                        size="medium"
+                        label={`${order?.approver_id?.first_name} ${order?.approver_id?.last_name}`}
+                      />
+                    </>
+                  )}
                 </Stack>
 
                 <Stack
@@ -582,6 +644,7 @@ export default function GenerateSales() {
                           ? undefined
                           : 'not-allowed',
                     }}
+                    onClick={() => setOpenPaymentForm(true)}
                   >
                     Add Payment
                   </Button>
@@ -652,6 +715,12 @@ export default function GenerateSales() {
               </Stack>
             </Grid>
           </Grid>
+          <PaymentForm
+            open={openPaymentForm}
+            handleClose={handleClosePaymentForm}
+            onPaymentSubmit={onPaymentSubmit}
+            isLoading={isLoadingUpdatePayment}
+          />
         </>
       </PageWrapper>
     </>

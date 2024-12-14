@@ -30,12 +30,10 @@ export default function DownloadPDF({ data, columns, title }: IProps) {
       body: data.map((obj) => {
         // eslint-disable-next-line
         const { _id, barcode, __v, created_at, ...rest } = obj;
-        console.log('created_at', created_at);
         const allData = Object.values({
           ...rest,
           created_at: dayjs(created_at).format('MM/DD/YYYY'),
         });
-        console.log('daaasdf', allData);
         return allData;
       }),
       margin, // Define margins

@@ -1,4 +1,4 @@
-import { Order, OrderItem } from './types';
+import { Order, OrderItem, Payment } from './types';
 import axiosConfig from '../../../utils/axiosConfig';
 
 const ORDERS_API = '/api/orders';
@@ -85,6 +85,14 @@ export const updateOrder = async (order: Order) => {
 export const updateOrderStatus = async (order: Order) => {
   const response = await axiosConfig.put(`${ORDERS_API}/${order._id}/status`, {
     status: order.status,
+  });
+
+  return response?.data;
+};
+
+export const addOrderPayment = async ({ order_id, ...payload }: Payment) => {
+  const response = await axiosConfig.put(`${ORDERS_API}/${order_id}/payment`, {
+    ...payload
   });
 
   return response?.data;

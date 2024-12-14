@@ -34,3 +34,14 @@ export type Order = {
   approver_id?: string | { _id: string; first_name: string; last_name: string };
   order_items?: OrderItem[];
 };
+
+export type Payment = {
+  order_id: string;
+  payment_date: string;
+  amount_paid: number;
+  payment_method: string;
+  bank_name: string;
+  trans_ref_no: string;
+  collection_receipt_no: string;
+  created_at?: string;
+};

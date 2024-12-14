@@ -4,6 +4,7 @@ const Order = require("../models/Order");
 const authenticateToken = require("../middleware/auth");
 const OrderItem = require("../models/OrderItem");
 const { default: mongoose } = require("mongoose");
+const Payment = require("../models/Payment");
 
 const getOrderPayload = ({
   customer_id,
@@ -99,6 +100,14 @@ const orderAggregateParams = [
     },
   },
   {
+    $lookup: {
+      from: "payments",
+      localField: "_id",
+      foreignField: "order_id",
+      as: "payments",
+    },
+  },
+  {
     $unwind: {
       path: "$customer_id",
       preserveNullAndEmptyArrays: true,
@@ -159,6 +168,7 @@ const orderAggregateParams = [
       approver_id: { $first: "$approver_id" },
       created_at: { $first: "$created_at" },
       order_items: { $push: "$order_items" },
+      payments: { $first: "$payments" },
     },
   },
 ];
@@ -210,8 +220,43 @@ router.get("/:id", authenticateToken, async (req, res) => {
       },
       ...orderAggregateParams,
     ]);
+    const { payments } = orders[0];
+    const total_amount_paid = payments.reduce(
+      (accum, obj) => accum + obj.amount_paid,
+      0
+    );
 
-    res.status(200).json(orders[0]);
+    res.status(200).json({ ...orders[0], total_amount_paid });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
+// Update a Order
+router.put("/:id/payment", authenticateToken, async (req, res) => {
+  try {
+    const order_id = req.params.id;
+    const {
+      payment_date,
+      amount_paid,
+      payment_method,
+      bank_name,
+      trans_ref_no,
+      collection_receipt_no,
+    } = req.body;
+    const newPayment = new Payment({
+      order_id,
+      payment_date,
+      amount_paid,
+      payment_method,
+      bank_name,
+      trans_ref_no,
+      collection_receipt_no,
+      created_at: new Date(),
+    });
+    await newPayment.save();
+    res.status(200).json("Payment success");
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
@@ -223,9 +268,11 @@ router.put("/:id/status", authenticateToken, async (req, res) => {
   try {
     const order_id = req.params.id;
     const { status } = req.body;
+    const approverParams =
+      status === "for_printing" ? { approver_id: req.user.id } : {};
     const updatedOrder = await Order.findByIdAndUpdate(
       order_id,
-      { status },
+      { status, ...approverParams },
       {
         new: true,
       }
@@ -242,9 +289,17 @@ router.put("/:id", authenticateToken, async (req, res) => {
   try {
     const order_id = req.params.id;
     const { order_items, ...rest } = req.body;
+
+    if (rest.status !== "draft")
+      return res.status(200).json("Only draft orders can be updated");
+
+    const total_amount = order_items.reduce(
+      (accum, obj) => accum + obj.total_price,
+      0
+    );
     const updatedOrder = await Order.findByIdAndUpdate(
       order_id,
-      getOrderPayload(rest),
+      { ...getOrderPayload(rest), total_amount },
       {
         new: true,
       }
