@@ -1,6 +1,8 @@
+import { Customer } from "../accounts/types";
+
 export type OrderItem = {
   order_id: string;
-  product_id: string | { _id: string; product_name: string };
+  product_id: string | { _id: string; product_name: string; product_description: string; product_unit: string };
   quantity: number;
   unit_price: number;
   custom_discount: number;
@@ -21,7 +23,7 @@ export type TableItem = {
 
 export type Order = {
   _id?: string;
-  customer_id?: string | { _id: string; customer_name: string };
+  customer_id?: string | Customer;
   invoice_number?: string;
   tin?: string;
   billing_address?: string;
@@ -33,6 +35,7 @@ export type Order = {
   referrer_id?: string | { _id: string; referrer_name: string };
   approver_id?: string | { _id: string; first_name: string; last_name: string };
   order_items?: OrderItem[];
+  created_at?: string;
 };
 
 export type Payment = {

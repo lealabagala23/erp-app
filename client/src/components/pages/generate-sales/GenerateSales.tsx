@@ -26,6 +26,8 @@ import ItemTable from './ItemTable';
 import { Order, OrderItem, Payment, TableItem } from './types';
 import { fetchProducts } from '../inventory/apis';
 import dayjs from 'dayjs';
+import lhctPDF from '../../../assets/lhct_invoice.pdf';
+import lmtPDF from '../../../assets/lmt_invoice.pdf';
 import {
   convertNaNToZero,
   formatCurrency,
@@ -58,6 +60,7 @@ import {
   OrderStatus,
 } from './constants';
 import PaymentForm from './PaymentForm';
+import { modifyPdf } from '../../../utils/pdfWriter';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#fff',
@@ -683,7 +686,15 @@ export default function GenerateSales() {
                           ? undefined
                           : 'not-allowed',
                     }}
-                    onClick={() => onUpdateOrderStatus(OrderStatus.UNPAID)}
+                    onClick={() => {
+                      modifyPdf(
+                        activeCompany?.company_name?.includes('LHCT')
+                          ? lhctPDF
+                          : lmtPDF,
+                        order,
+                      );
+                      onUpdateOrderStatus(OrderStatus.UNPAID);
+                    }}
                   >
                     Generate Sales Invoice
                   </Button>
