@@ -27,17 +27,25 @@ export type Order = {
 
 const COLUMNS: GridColDef<Order>[] = [
   {
+    field: 'created_at',
+    headerName: 'Transaction Date',
+    valueGetter: (value, row) =>
+      `${new Date(row.created_at || '').toLocaleDateString('en-US')}`,
+    sortComparator: (v1, v2) => new Date(v1).getTime() - new Date(v2).getTime(),
+    flex: 1,
+  },
+  {
+    field: 'invoice_number',
+    headerName: 'Invoice ID',
+    flex: 1,
+  },
+  {
     field: 'customer_name',
     headerName: 'Customer Name',
     minWidth: 300,
     flex: 1,
     // eslint-disable-next-line
     valueGetter: (value, row) => (row?.customer_id as any)?.customer_name,
-  },
-  {
-    field: 'invoice_number',
-    headerName: 'Invoice ID',
-    flex: 1,
   },
   {
     field: 'total_amount',
@@ -70,13 +78,6 @@ const COLUMNS: GridColDef<Order>[] = [
       // eslint-disable-next-line
       `${(row?.initiator_id as any)?.first_name} ${(row?.initiator_id as any)?.last_name}`,
   },
-  {
-    field: 'created_at',
-    headerName: 'Created at',
-    valueGetter: (value, row) =>
-      `${new Date(row.created_at || '').toLocaleDateString('en-US')}`,
-    flex: 1,
-  },
 ];
 
 export default function Orders() {
@@ -95,7 +96,8 @@ export default function Orders() {
       queryKey={FETCH_ORDERS_QUERY_KEY}
       itemName="order"
       searchAttr="invoice_id"
-      sortField="invoice_id"
+      sortField="created_at"
+      sortDir="desc"
       columns={COLUMNS}
       menuActions={['View']}
       drawerTabs={[

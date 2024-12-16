@@ -30,7 +30,6 @@ interface IProps {
   customerType?: string;
   subtotal: number;
   disabled?: boolean;
-  onTableClick: () => void;
 }
 
 export default function ItemTable({
@@ -43,7 +42,6 @@ export default function ItemTable({
   customerType,
   subtotal,
   disabled,
-  onTableClick,
 }: IProps) {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState<TableItem | null>(null);
@@ -293,7 +291,6 @@ export default function ItemTable({
           border: '2px solid var(--template-palette-error-main)',
         },
       }}
-      onClick={onTableClick}
     >
       <DataGrid
         disableRowSelectionOnClick={disabled}

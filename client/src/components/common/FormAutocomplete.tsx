@@ -1,15 +1,14 @@
 import { Autocomplete, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import {
+  Control,
+  Controller,
   FieldValues,
   UseFormGetValues,
-  UseFormRegister,
-  UseFormSetValue,
 } from 'react-hook-form';
 
 interface IProps {
-  setValue: UseFormSetValue<FieldValues>;
-  register: UseFormRegister<FieldValues>;
+  control: Control<FieldValues>;
   getValues: UseFormGetValues<FieldValues>;
   options: { label: string; value: string }[];
   name: string;
@@ -19,24 +18,16 @@ interface IProps {
 }
 
 export default function FormAutocomplete({
-  setValue,
-  register,
   options,
   name,
   autoFocus,
   placeholder,
   getValues,
   disabled,
+  control,
 }: IProps) {
   const [inputValue, setInputValue] = useState<string | null>(null);
   const value = getValues(name);
-
-  // eslint-disable-next-line
-  const handleAutocompleteChange = (_: any, newValue: any) => {
-    const value =
-      typeof newValue === 'string' ? newValue : newValue?.value || '';
-    setValue(name, value);
-  };
 
   // eslint-disable-next-line
   const handleInputChange = (_: any, newInputValue: any) => {
@@ -50,37 +41,52 @@ export default function FormAutocomplete({
     }
   }, [value, options, inputValue]);
 
+  useEffect(() => {
+    if (value === undefined) {
+      setInputValue(null);
+    }
+  }, [value]);
+
   return (
     <>
-      <input
-        type="hidden"
-        {...register(name, { required: 'This field is required' })}
-        value={(inputValue || '') as unknown as string}
-      />
-
-      <Autocomplete
-        freeSolo
-        options={options}
-        disabled={disabled}
-        // eslint-disable-next-line
-        getOptionLabel={(option: any) => option.label || ''}
-        isOptionEqualToValue={(option, value) => option.value === value?.value}
-        // value={selectedValue}
-        onChange={handleAutocompleteChange}
-        inputValue={inputValue || ''}
-        onInputChange={handleInputChange}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            autoFocus={autoFocus}
-            placeholder={placeholder}
-            sx={{
-              '.MuiButtonBase-root': {
-                border: 0,
-                height: '38px',
-                width: '38px',
-              },
-            }}
+      <Controller
+        name={name}
+        control={control}
+        rules={{ required: 'This field is required' }}
+        render={({ field }) => (
+          <Autocomplete
+            {...field}
+            freeSolo
+            options={options}
+            disabled={disabled}
+            // eslint-disable-next-line
+            getOptionLabel={(option: any) => option.label || ''}
+            isOptionEqualToValue={(option, value) =>
+              option.value === value?.value
+            }
+            onChange={(_, newValue) =>
+              field.onChange(
+                typeof newValue === 'string'
+                  ? newValue
+                  : newValue?.value || '' || '',
+              )
+            }
+            inputValue={inputValue || ''}
+            onInputChange={handleInputChange}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                autoFocus={autoFocus}
+                placeholder={placeholder}
+                sx={{
+                  '.MuiButtonBase-root': {
+                    border: 0,
+                    height: '38px',
+                    width: '38px',
+                  },
+                }}
+              />
+            )}
           />
         )}
       />

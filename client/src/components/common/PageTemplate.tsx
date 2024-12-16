@@ -43,6 +43,7 @@ interface IProps {
   queryKey: string;
   searchAttr: string;
   sortField: string;
+  sortDir?: string;
   // eslint-disable-next-line
   columns: GridColDef<any>[];
   menuActions?: string[];
@@ -60,6 +61,7 @@ export default function PageTemplate({
   queryKey,
   searchAttr,
   sortField,
+  sortDir,
   columns,
   menuActions,
   fetchParams,
@@ -299,6 +301,7 @@ export default function PageTemplate({
             onActionClick={onActionClick}
             searchAttr={searchAttr}
             sortField={sortField}
+            sortDir={sortDir}
             menuActions={menuActions}
           />
           {uploadCSVAPI && (

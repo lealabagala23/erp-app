@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridSortDirection } from '@mui/x-data-grid';
 import { Box, IconButton, Menu, MenuItem } from '@mui/material';
 import {
   DeleteOutline,
@@ -20,6 +20,7 @@ interface IProps {
   onActionClick: (action: string) => void;
   searchAttr: string;
   sortField: string;
+  sortDir?: string;
   menuActions?: string[];
 }
 
@@ -32,6 +33,7 @@ export default function DataTable({
   onActionClick,
   searchAttr,
   sortField,
+  sortDir,
   menuActions = ['Edit', 'Delete'],
 }: IProps) {
   const [anchorEl, setAnchorEl] = useState<
@@ -100,7 +102,12 @@ export default function DataTable({
         initialState={{
           pagination: { paginationModel: { pageSize: 20 } },
           sorting: {
-            sortModel: [{ field: sortField, sort: 'asc' }],
+            sortModel: [
+              {
+                field: sortField,
+                sort: (sortDir as GridSortDirection) ?? 'asc',
+              },
+            ],
           },
         }}
         pageSizeOptions={[10, 20, 50]}

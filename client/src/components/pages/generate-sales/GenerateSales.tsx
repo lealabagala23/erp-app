@@ -40,7 +40,7 @@ import {
   Print,
   Send,
 } from '@mui/icons-material';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { FETCH_PRODUCTS_QUERY_KEY } from '../inventory/constants';
 import { FETCH_CUSTOMERS_QUERY_KEY } from '../accounts/constants';
 import {
@@ -82,7 +82,6 @@ export default function GenerateSales() {
   const queryClient = useQueryClient();
   const { activeCompany, userInfo } = useContext(AuthContext);
   const { id: orderId } = useParams();
-  const navigate = useNavigate();
   const {
     register,
     setValue,
@@ -95,7 +94,6 @@ export default function GenerateSales() {
   const formValues = useWatch({ control });
   const [paymentType, setPaymentType] = useState('');
   const [openPaymentForm, setOpenPaymentForm] = useState(false);
-  const [itemTableClicked, setItemTableClick] = useState(false);
 
   const { data: order = {}, isLoading: isLoadingOrder } = useQuery(
     [FETCH_ORDER_BY_ID_QUERY_KEY, orderId],
@@ -129,7 +127,7 @@ export default function GenerateSales() {
     useMutation({
       mutationFn: createOrder,
       onSuccess: ({ _id }) => {
-        navigate(`/orders/${_id}`);
+        window.location.assign(`/orders/${_id}`);
       },
       onError: (err) => {
         console.error(err);
@@ -183,10 +181,14 @@ export default function GenerateSales() {
   const { customer_type, customer_details } = getCustomer() || {};
 
   const addOrderItem = () => {
-    setOrderItems((v) => [
-      ...v,
-      { ...DEFAULT_ITEM, item_number: v.length + 1 },
-    ]);
+    setOrderItems((v) => {
+      const newOrderItems = [
+        ...v,
+        { ...DEFAULT_ITEM, item_number: v.length + 1 },
+      ];
+      handleSave({ ...formValues, order_items: newOrderItems });
+      return newOrderItems;
+    });
   };
 
   const updateOrderItem = (item: TableItem) => {
@@ -194,6 +196,7 @@ export default function GenerateSales() {
       obj.item_number === item.item_number ? item : obj,
     );
     setOrderItems(updated);
+    handleSave({ ...formValues, order_items: updated });
   };
 
   const deleteOrderItem = (item: TableItem) => {
@@ -204,10 +207,12 @@ export default function GenerateSales() {
             .filter((obj) => obj.item_number !== item.item_number)
             .map((obj, key) => ({ ...obj, item_number: key + 1 }));
     setOrderItems(updated);
+    handleSave({ ...formValues, order_items: updated });
   };
 
   const clearAllOrderItems = () => {
     setOrderItems([DEFAULT_ITEM]);
+    handleSave({ ...formValues, order_items: [DEFAULT_ITEM] });
   };
 
   const computeSubtotal = () =>
@@ -267,8 +272,8 @@ export default function GenerateSales() {
       reset({
         customer_id: order.customer_id?._id,
         payment_type: order.payment_type,
-        billing_address: order.billing_address,
-        tin: order.tin,
+        billing_address: order.billing_address ?? order.customer_id?.address,
+        tin: order.tin ?? order.customer_id?.tin,
         referrer_id: order.referrer_id?._id,
         invoice_number: order.invoice_number,
       });
@@ -286,8 +291,7 @@ export default function GenerateSales() {
   }, [order]);
 
   useEffect(() => {
-    if (isDirty || itemTableClicked)
-      handleSave({ ...formValues, order_items: orderItems });
+    if (isDirty) handleSave({ ...formValues, order_items: orderItems });
   }, [formValues, orderItems]);
 
   useEffect(() => {
@@ -339,12 +343,11 @@ export default function GenerateSales() {
                             category: customer_type,
                           }),
                         )}
-                        setValue={setValue}
-                        register={register}
                         getValues={getValues}
                         name="customer_id"
                         autoFocus
                         placeholder={'Select Customer'}
+                        control={control}
                       />
                     </FormControl>
                   </Grid>
@@ -492,12 +495,11 @@ export default function GenerateSales() {
                       <FormLabel>Referrer</FormLabel>
                       <FormAutocomplete
                         options={[]} // TODO: add referrers list
-                        register={register}
-                        setValue={setValue}
                         getValues={getValues}
                         name="referrer"
                         placeholder={'Enter Referrer Name'}
                         disabled={!customer_id}
+                        control={control}
                       />
                     </FormControl>
                   </Grid>
@@ -516,7 +518,6 @@ export default function GenerateSales() {
                   clearAllOrderItems={clearAllOrderItems}
                   subtotal={computeSubtotal()}
                   disabled={!customer_id}
-                  onTableClick={() => setItemTableClick(true)}
                 />
                 <Stack direction="column">
                   <Stack
