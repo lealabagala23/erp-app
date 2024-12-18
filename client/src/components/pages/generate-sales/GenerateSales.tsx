@@ -42,7 +42,7 @@ import {
   Print,
   Send,
 } from '@mui/icons-material';
-import { useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { FETCH_PRODUCTS_QUERY_KEY } from '../inventory/constants';
 import { FETCH_CUSTOMERS_QUERY_KEY } from '../accounts/constants';
 import {
@@ -84,6 +84,11 @@ const DEFAULT_ITEM = {
 
 export default function GenerateSales() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const loadCustomerId = params.get('customer_id');
+
   const { activeCompany, userInfo } = useContext(AuthContext);
   const { id: orderId } = useParams();
   const {
@@ -311,6 +316,12 @@ export default function GenerateSales() {
     }
   }, [orderId, activeCompany, userInfo]);
 
+  useEffect(() => {
+    if (loadCustomerId && !customer_id) {
+      setValue('customer_id', loadCustomerId);
+    }
+  }, [loadCustomerId]);
+
   return (
     <>
       <AppNavbar title={'Generate Sales'} />
@@ -340,17 +351,23 @@ export default function GenerateSales() {
                     <FormControl fullWidth margin="dense">
                       <FormLabel>Customer</FormLabel>
                       <FormAutocomplete
-                        options={customers.map(
-                          ({
-                            _id,
-                            customer_name,
-                            customer_type,
-                          }: Customer) => ({
-                            label: customer_name,
-                            value: _id,
-                            category: customer_type,
-                          }),
-                        )}
+                        options={[
+                          { label: 'Add New Customer...', value: 'new' },
+                          ...customers.map(
+                            ({
+                              _id,
+                              customer_name,
+                              customer_type,
+                            }: Customer) => ({
+                              label: customer_name,
+                              value: _id,
+                              category: customer_type,
+                            }),
+                          ),
+                        ]}
+                        onCreateNew={() =>
+                          navigate(`/customers?create=true&orderId=${orderId}`)
+                        }
                         getValues={getValues}
                         name="customer_id"
                         autoFocus

@@ -15,6 +15,7 @@ interface IProps {
   autoFocus?: boolean;
   placeholder?: string;
   disabled?: boolean;
+  onCreateNew?: () => void;
 }
 
 export default function FormAutocomplete({
@@ -25,6 +26,7 @@ export default function FormAutocomplete({
   getValues,
   disabled,
   control,
+  onCreateNew,
 }: IProps) {
   const [inputValue, setInputValue] = useState<string | null>(null);
   const value = getValues(name);
@@ -64,13 +66,16 @@ export default function FormAutocomplete({
             isOptionEqualToValue={(option, value) =>
               option.value === value?.value
             }
-            onChange={(_, newValue) =>
+            onChange={(_, newValue) => {
+              if (newValue?.value === 'new' && onCreateNew) {
+                return onCreateNew();
+              }
               field.onChange(
                 typeof newValue === 'string'
                   ? newValue
                   : newValue?.value || '' || '',
-              )
-            }
+              );
+            }}
             inputValue={inputValue || ''}
             onInputChange={handleInputChange}
             renderInput={(params) => (

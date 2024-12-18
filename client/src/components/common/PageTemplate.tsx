@@ -47,6 +47,8 @@ interface IProps {
   // eslint-disable-next-line
   columns: GridColDef<any>[];
   menuActions?: string[];
+  isCreateNew?: boolean;
+  redirectOnCreate?: (id: string) => void;
 }
 
 export default function PageTemplate({
@@ -65,6 +67,8 @@ export default function PageTemplate({
   columns,
   menuActions,
   fetchParams,
+  isCreateNew,
+  redirectOnCreate,
 }: IProps) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -102,7 +106,10 @@ export default function PageTemplate({
   const { mutateAsync: mutateCreate, isLoading: isLoadingCreate } = useMutation(
     {
       mutationFn: createAPI,
-      onSuccess: () => {
+      onSuccess: ({ _id }) => {
+        if (redirectOnCreate) {
+          return redirectOnCreate(_id);
+        }
         setSnackbarProps({
           open: true,
           message: `Added new ${itemName} successfully.`,
@@ -226,6 +233,12 @@ export default function PageTemplate({
       }
     }
   }, [location, data]);
+
+  useEffect(() => {
+    if (isCreateNew && !openDrawer) {
+      toggleDrawer();
+    }
+  }, [isCreateNew]);
 
   return (
     <>

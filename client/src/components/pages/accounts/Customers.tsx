@@ -12,6 +12,7 @@ import { InfoOutlined } from '@mui/icons-material';
 import CustomerForm from './CustomerForm';
 import { Customer } from './types';
 import { GridColDef } from '@mui/x-data-grid';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const COLUMNS: GridColDef<Customer>[] = [
   {
@@ -50,6 +51,12 @@ const COLUMNS: GridColDef<Customer>[] = [
 ];
 
 export default function Customers() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const isCreateNew = params.get('create') === 'true';
+  const orderId = params.get('orderId');
+
   return (
     <PageTemplate
       fetchAPI={fetchCustomers}
@@ -69,6 +76,10 @@ export default function Customers() {
           Component: CustomerForm,
         },
       ]}
+      isCreateNew={isCreateNew}
+      redirectOnCreate={(id) =>
+        navigate(`/orders/${orderId}?customer_id=${id}`)
+      }
     />
   );
 }

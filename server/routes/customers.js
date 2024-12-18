@@ -80,7 +80,7 @@ router.post("/", authenticateToken, async (req, res) => {
         break;
     }
 
-    res.status(201).json("Customer created successfully");
+    res.status(201).json(savedCustomer);
   } catch (err) {
     console.log("err", err);
     res.status(500).json(err);
