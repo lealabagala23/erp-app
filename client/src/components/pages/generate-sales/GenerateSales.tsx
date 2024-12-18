@@ -282,6 +282,8 @@ export default function GenerateSales() {
         tin: order.tin ?? order.customer_id?.tin,
         referrer_id: order.referrer_id?._id,
         invoice_number: order.invoice_number,
+        discount_type: order.discount_type,
+        discount: order.discount,
       });
       setPaymentType(order.payment_type);
       setOrderItems(

@@ -14,6 +14,8 @@ const getOrderPayload = ({
   total_amount,
   payment_type,
   status,
+  discount_type,
+  discount,
   initiator_id,
   company_id,
   referrer_id,
@@ -27,6 +29,8 @@ const getOrderPayload = ({
     total_amount,
     payment_type,
     status,
+    discount_type,
+    discount,
     initiator_id,
     company_id,
     referrer_id,
@@ -270,6 +274,29 @@ router.put("/:id/payment", authenticateToken, async (req, res) => {
       created_at: new Date(),
     });
     await newPayment.save();
+    const orders = await Order.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(req.params.id),
+        },
+      },
+      {
+        $lookup: {
+          from: "payments",
+          localField: "_id",
+          foreignField: "order_id",
+          as: "payments",
+        },
+      },
+    ]);
+    const { payments, total_amount } = orders[0];
+    const total_amount_paid = payments.reduce(
+      (accum, obj) => accum + obj.amount_paid,
+      0
+    );
+    if (total_amount_paid >= total_amount) {
+      await Order.findByIdAndUpdate({ _id: order_id }, { status: "completed" });
+    }
     res.status(200).json("Payment success");
   } catch (err) {
     console.log(err);
@@ -307,13 +334,20 @@ router.put("/:id", authenticateToken, async (req, res) => {
     if (rest.status !== "draft")
       return res.status(200).json("Only draft orders can be updated");
 
-    const total_amount = order_items.reduce(
+    const total_sales = order_items.reduce(
       (accum, obj) => accum + obj.total_price,
       0
     );
+    const { discount_type, discount } = rest;
+    const discount_amount =
+      !discount_type || !discount
+        ? 0
+        : discount_type === "amount"
+        ? discount
+        : total_sales * (discount / 100);
     const updatedOrder = await Order.findByIdAndUpdate(
       order_id,
-      { ...getOrderPayload(rest), total_amount },
+      { ...getOrderPayload(rest), total_amount: total_sales - discount_amount },
       {
         new: true,
       }

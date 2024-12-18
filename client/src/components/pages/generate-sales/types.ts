@@ -30,6 +30,8 @@ export type Order = {
   total_amount?: number;
   payment_type?: string;
   status?: string;
+  discount_type?: string;
+  discount?: number;
   initiator_id: string | { _id: string; first_name: string; last_name: string };
   company_id: string | { _id: string; company_name: string };
   referrer_id?: string | { _id: string; referrer_name: string };

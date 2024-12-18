@@ -231,7 +231,8 @@ export const modifyPdf = async (
 
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'modified-imported.pdf';
+    // eslint-disable-next-line
+    link.download = `Invoice-${order.invoice_number}-${(order.customer_id as any)?.customer_name}.pdf`;
     link.click();
   } catch (error) {
     console.error('Error modifying the PDF:', error);

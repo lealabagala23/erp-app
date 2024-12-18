@@ -28,6 +28,12 @@ const OrderSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  discount_type: {
+    type: String,
+  },
+  discount: {
+    type: Number,
+  },
   company_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Company",
