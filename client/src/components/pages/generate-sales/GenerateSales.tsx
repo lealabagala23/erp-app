@@ -28,11 +28,7 @@ import { fetchProducts } from '../inventory/apis';
 import dayjs from 'dayjs';
 import lhctPDF from '../../../assets/lhct_invoice.pdf';
 import lmtPDF from '../../../assets/lmt_invoice.pdf';
-import {
-  convertNaNToZero,
-  formatCurrency,
-  getUnitPrice,
-} from '../../../utils/auth';
+import { formatCurrency, getUnitPrice } from '../../../utils/auth';
 import {
   Approval,
   Edit,
@@ -241,9 +237,6 @@ export default function GenerateSales() {
       ? discount
       : computeSubtotal() * (discount / 100);
 
-  const computeTotalSales = () =>
-    convertNaNToZero(computeSubtotal() - computeDiscountAmount());
-
   // eslint-disable-next-line
   const saveHandler = (formValues: { [x: string]: any }) => {
     mutateUpdateOrder({
@@ -373,6 +366,7 @@ export default function GenerateSales() {
                         autoFocus
                         placeholder={'Select Customer'}
                         control={control}
+                        disabled={order?.status !== OrderStatus.DRAFT}
                       />
                     </FormControl>
                   </Grid>
@@ -413,7 +407,9 @@ export default function GenerateSales() {
                         variant="outlined"
                         fullWidth
                         value={paymentType}
-                        disabled={!customer_id}
+                        disabled={
+                          !customer_id || order?.status !== OrderStatus.DRAFT
+                        }
                         onChange={(e) => {
                           setPaymentType(e.target.value);
                           setValue('payment_type', e.target.value);
@@ -438,7 +434,10 @@ export default function GenerateSales() {
                             placeholder={'Enter Discount Card'}
                             variant="outlined"
                             fullWidth
-                            disabled={!customer_id}
+                            disabled={
+                              !customer_id ||
+                              order?.status !== OrderStatus.DRAFT
+                            }
                           />
                         </FormControl>
                       </Grid>
@@ -450,7 +449,10 @@ export default function GenerateSales() {
                             placeholder={'Enter Discount Card Number'}
                             variant="outlined"
                             fullWidth
-                            disabled={!customer_id}
+                            disabled={
+                              !customer_id ||
+                              order?.status !== OrderStatus.DRAFT
+                            }
                           />
                         </FormControl>
                       </Grid>
@@ -480,7 +482,9 @@ export default function GenerateSales() {
                     placeholder={'Enter Invoice Number'}
                     variant="outlined"
                     sx={{ '.MuiInputBase-input': { textAlign: 'right' } }}
-                    disabled={!customer_id}
+                    disabled={
+                      !customer_id || order?.status !== OrderStatus.DRAFT
+                    }
                   />
                 </FormControl>
               </Item>
@@ -498,7 +502,9 @@ export default function GenerateSales() {
                         fullWidth
                         multiline
                         rows={4}
-                        disabled={!customer_id}
+                        disabled={
+                          !customer_id || order?.status !== OrderStatus.DRAFT
+                        }
                         sx={{ '.MuiInputBase-root': { height: 'unset' } }}
                       />
                     </FormControl>
@@ -511,7 +517,9 @@ export default function GenerateSales() {
                         placeholder={'Enter TIN'}
                         variant="outlined"
                         fullWidth
-                        disabled={!customer_id}
+                        disabled={
+                          !customer_id || order?.status !== OrderStatus.DRAFT
+                        }
                       />
                     </FormControl>
                   </Grid>
@@ -523,7 +531,9 @@ export default function GenerateSales() {
                         getValues={getValues}
                         name="referrer"
                         placeholder={'Enter Referrer Name'}
-                        disabled={!customer_id}
+                        disabled={
+                          !customer_id || order?.status !== OrderStatus.DRAFT
+                        }
                         control={control}
                       />
                     </FormControl>
@@ -542,7 +552,7 @@ export default function GenerateSales() {
                   deleteOrderItem={deleteOrderItem}
                   clearAllOrderItems={clearAllOrderItems}
                   subtotal={computeSubtotal()}
-                  disabled={!customer_id}
+                  disabled={!customer_id || order?.status !== OrderStatus.DRAFT}
                 />
                 <Stack direction="column">
                   <Stack
@@ -559,7 +569,9 @@ export default function GenerateSales() {
                         select
                         variant="outlined"
                         defaultValue={'percent'}
-                        disabled={!customer_id}
+                        disabled={
+                          !customer_id || order?.status !== OrderStatus.DRAFT
+                        }
                       >
                         <MenuItem
                           key={'discount-type-percent'}
@@ -577,7 +589,9 @@ export default function GenerateSales() {
                         {...register('discount')}
                         sx={{ width: '150px' }}
                         type={'number'}
-                        disabled={!customer_id}
+                        disabled={
+                          !customer_id || order?.status !== OrderStatus.DRAFT
+                        }
                         slotProps={{
                           input: {
                             startAdornment:
@@ -610,7 +624,7 @@ export default function GenerateSales() {
                   >
                     <Typography variant="h6">TOTAL AMOUNT DUE:</Typography>
                     <Typography variant="h6">
-                      ₱ {formatCurrency(computeTotalSales())}
+                      ₱ {formatCurrency(order?.total_amount || 0)}
                     </Typography>
                   </Stack>
                 </Stack>
