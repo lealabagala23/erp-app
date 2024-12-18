@@ -1,4 +1,5 @@
 export const FETCH_ORDER_BY_ID_QUERY_KEY = 'fetchOrderById';
+export const FETCH_REFERRERS_QUERY_KEY = 'fetchReferrers';
 
 export enum OrderStatus {
   DRAFT = 'draft',

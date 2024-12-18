@@ -17,9 +17,9 @@ import {
   Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { fetchCustomers } from '../accounts/apis';
+import { fetchCustomers, fetchReferrers } from '../accounts/apis';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Customer } from '../accounts/types';
+import { Customer, Referrer } from '../accounts/types';
 import { useForm, useWatch } from 'react-hook-form';
 import FormAutocomplete from '../../common/FormAutocomplete';
 import ItemTable from './ItemTable';
@@ -52,6 +52,7 @@ import AuthContext from '../../auth/AuthContext';
 import { debounce } from 'lodash';
 import {
   FETCH_ORDER_BY_ID_QUERY_KEY,
+  FETCH_REFERRERS_QUERY_KEY,
   getOrderStatusColor,
   OrderStatus,
 } from './constants';
@@ -104,6 +105,16 @@ export default function GenerateSales() {
   const { data: order = {}, isLoading: isLoadingOrder } = useQuery(
     [FETCH_ORDER_BY_ID_QUERY_KEY, orderId],
     () => fetchOrderById({ id: orderId as string }),
+    {
+      enabled: !!orderId && orderId !== 'new',
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  );
+
+  const { data: referrers = {} } = useQuery(
+    [FETCH_REFERRERS_QUERY_KEY],
+    fetchReferrers,
     {
       enabled: !!orderId && orderId !== 'new',
       refetchOnWindowFocus: false,
@@ -527,9 +538,14 @@ export default function GenerateSales() {
                     <FormControl fullWidth margin="dense">
                       <FormLabel>Referrer</FormLabel>
                       <FormAutocomplete
-                        options={[]} // TODO: add referrers list
+                        options={referrers.map(
+                          ({ _id, referrer_name }: Referrer) => ({
+                            label: referrer_name,
+                            value: _id,
+                          }),
+                        )}
                         getValues={getValues}
-                        name="referrer"
+                        name="referrer_id"
                         placeholder={'Enter Referrer Name'}
                         disabled={
                           !customer_id || order?.status !== OrderStatus.DRAFT

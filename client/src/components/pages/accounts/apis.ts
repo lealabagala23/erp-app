@@ -1,7 +1,8 @@
 import axiosConfig from '../../../utils/axiosConfig';
-import { Customer } from './types';
+import { Customer, Referrer } from './types';
 
 const CUSTOMERS_API = '/api/customers';
+const REFERRERS_API = '/api/referrers';
 
 const generatePayload = (customer: Customer) => {
   return { ...customer };
@@ -53,6 +54,20 @@ export const updateCustomer = async (customer: Customer) => {
 
 export const deleteCustomer = async (customer: Customer) => {
   const response = await axiosConfig.delete(`${CUSTOMERS_API}/${customer._id}`);
+
+  return response?.data;
+};
+
+export const fetchReferrers = async () => {
+  const response = await axiosConfig.get(`${REFERRERS_API}`);
+  return response?.data;
+};
+
+
+export const createReferrer = async (payload: Referrer) => {
+  const response = await axiosConfig.post(`${CUSTOMERS_API}`, {
+    ...payload,
+  });
 
   return response?.data;
 };
