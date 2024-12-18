@@ -53,3 +53,6 @@ export const getUnitPrice = (
       return 0;
   }
 };
+
+export const formatEmptyString = (v: string) =>
+  v === undefined || v === '' ? '-' : v;

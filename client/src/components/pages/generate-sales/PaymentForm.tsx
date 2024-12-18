@@ -36,12 +36,14 @@ const PaymentForm = ({
     handleSubmit,
     control,
     formState: { errors },
+    reset,
   } = useForm();
 
   // eslint-disable-next-line
   const onSubmit = (data: any) => {
     onPaymentSubmit(data);
     handleClose();
+    reset();
   };
 
   return (
@@ -194,7 +196,7 @@ const PaymentForm = ({
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="secondary">
+        <Button onClick={handleClose} color="inherit">
           Cancel
         </Button>
         <Button

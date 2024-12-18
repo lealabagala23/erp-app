@@ -61,6 +61,7 @@ import {
 } from './constants';
 import PaymentForm from './PaymentForm';
 import { modifyPdf } from '../../../utils/pdfWriter';
+import PaymentsList from './PaymentsList';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#fff',
@@ -96,6 +97,7 @@ export default function GenerateSales() {
   } = useForm();
   const formValues = useWatch({ control });
   const [paymentType, setPaymentType] = useState('');
+  const [openPaymentList, setOpenPaymentList] = useState(false);
   const [openPaymentForm, setOpenPaymentForm] = useState(false);
 
   const { data: order = {}, isLoading: isLoadingOrder } = useQuery(
@@ -253,6 +255,7 @@ export default function GenerateSales() {
   };
 
   const handleClosePaymentForm = () => setOpenPaymentForm(false);
+  const handleClosePaymentList = () => setOpenPaymentList(false);
 
   const onPaymentSubmit = (payment: Payment) => {
     mutateUpdateOrderPayment({ ...payment, order_id: order?._id });
@@ -594,137 +597,125 @@ export default function GenerateSales() {
                 </Stack>
               </Item>
             </Grid>
-            <Grid size={12}>
-              <Stack direction={'row'} gap={2} justifyContent={'space-between'}>
-                <Stack direction={'row'} gap={2} alignItems={'center'}>
-                  <Typography variant={'h6'}>Status:</Typography>
+            <Grid container size={12} alignItems={'center'}>
+              <Typography variant={'h6'}>Status:</Typography>
+              <Chip
+                icon={
+                  isLoadingUpdate ? (
+                    <Edit fontSize="inherit" />
+                  ) : (
+                    <EditNote fontSize="inherit" />
+                  )
+                }
+                color={getOrderStatusColor(order?.status)}
+                variant="filled"
+                size="medium"
+                label={
+                  isLoadingUpdate
+                    ? 'Saving...'
+                    : order?.status?.toUpperCase().replaceAll('_', ' ')
+                }
+              />
+              {order?.approver_id?._id && (
+                <>
+                  <Typography variant={'h6'}>Approved by:</Typography>
                   <Chip
-                    icon={
-                      isLoadingUpdate ? (
-                        <Edit fontSize="inherit" />
-                      ) : (
-                        <EditNote fontSize="inherit" />
-                      )
-                    }
-                    color={getOrderStatusColor(order?.status)}
+                    icon={<Person />}
+                    color={'default'}
                     variant="filled"
                     size="medium"
-                    label={
-                      isLoadingUpdate
-                        ? 'Saving...'
-                        : order?.status?.toUpperCase().replaceAll('_', ' ')
-                    }
+                    label={`${order?.approver_id?.first_name} ${order?.approver_id?.last_name}`}
                   />
-                  {order?.approver_id?._id && (
-                    <>
-                      <Typography variant={'h6'}>Approved by:</Typography>
-                      <Chip
-                        icon={<Person />}
-                        color={'default'}
-                        variant="filled"
-                        size="medium"
-                        label={`${order?.approver_id?.first_name} ${order?.approver_id?.last_name}`}
-                      />
-                    </>
-                  )}
-                </Stack>
-
-                <Stack
-                  direction={'row'}
-                  gap={2}
-                  justifyContent={'flex-end'}
-                  alignItems={'center'}
-                >
-                  <Button
-                    variant={
-                      order?.status === OrderStatus.UNPAID
-                        ? 'contained'
-                        : 'outlined'
-                    }
-                    startIcon={<MoneyOutlined />}
-                    sx={{
-                      cursor:
-                        order?.status === OrderStatus.UNPAID
-                          ? undefined
-                          : 'not-allowed',
-                    }}
-                    onClick={() => setOpenPaymentForm(true)}
-                  >
-                    Add Payment
-                  </Button>
-                  <Button
-                    variant={
-                      order?.status === OrderStatus.FOR_APPROVAL &&
-                      userInfo?.role === 'admin'
-                        ? 'contained'
-                        : 'outlined'
-                    }
-                    onClick={() =>
-                      onUpdateOrderStatus(OrderStatus.FOR_PRINTING)
-                    }
-                    startIcon={<Approval />}
-                    sx={{
-                      cursor:
-                        order?.status === OrderStatus.FOR_APPROVAL &&
-                        userInfo?.role === 'admin'
-                          ? undefined
-                          : 'not-allowed',
-                    }}
-                  >
-                    Approve Order
-                  </Button>
-                  <Button
-                    variant={
-                      order?.status === OrderStatus.FOR_PRINTING
-                        ? 'contained'
-                        : 'outlined'
-                    }
-                    startIcon={<Print />}
-                    sx={{
-                      cursor:
-                        order?.status === OrderStatus.FOR_PRINTING
-                          ? undefined
-                          : 'not-allowed',
-                    }}
-                    onClick={() => {
-                      modifyPdf(
-                        activeCompany?.company_name?.includes('LHCT')
-                          ? lhctPDF
-                          : lmtPDF,
-                        order,
-                      );
-                      onUpdateOrderStatus(OrderStatus.UNPAID);
-                    }}
-                  >
-                    Generate Sales Invoice
-                  </Button>
-                  <Button
-                    variant={
-                      order.status !== OrderStatus.DRAFT
-                        ? 'outlined'
-                        : 'contained'
-                    }
-                    startIcon={
-                      isLoadingUpdateStatus ? (
-                        <CircularProgress color="inherit" size={16} />
-                      ) : (
-                        <Send />
-                      )
-                    }
-                    onClick={() =>
-                      onUpdateOrderStatus(OrderStatus.FOR_APPROVAL)
-                    }
-                    sx={{
-                      cursor:
-                        order.status !== OrderStatus.DRAFT
-                          ? 'not-allowed'
-                          : undefined,
-                    }}
-                  >
-                    Send Order for Approval
-                  </Button>
-                </Stack>
-              </Stack>
+                </>
+              )}
+              <Button
+                variant={
+                  order?.status === OrderStatus.UNPAID
+                    ? 'contained'
+                    : 'outlined'
+                }
+                startIcon={<MoneyOutlined />}
+                sx={{
+                  cursor:
+                    order?.status === OrderStatus.UNPAID
+                      ? undefined
+                      : 'not-allowed',
+                }}
+                onClick={() =>
+                  (order?.payments || []).length > 0
+                    ? setOpenPaymentList(true)
+                    : setOpenPaymentForm(true)
+                }
+              >
+                {(order?.payments || []).length > 0
+                  ? 'See Payments'
+                  : 'Add Payment'}
+              </Button>
+              <Button
+                variant={
+                  order?.status === OrderStatus.FOR_APPROVAL &&
+                  userInfo?.role === 'admin'
+                    ? 'contained'
+                    : 'outlined'
+                }
+                onClick={() => onUpdateOrderStatus(OrderStatus.FOR_PRINTING)}
+                startIcon={<Approval />}
+                sx={{
+                  cursor:
+                    order?.status === OrderStatus.FOR_APPROVAL &&
+                    userInfo?.role === 'admin'
+                      ? undefined
+                      : 'not-allowed',
+                }}
+              >
+                Approve Order
+              </Button>
+              <Button
+                variant={
+                  order?.status === OrderStatus.FOR_PRINTING
+                    ? 'contained'
+                    : 'outlined'
+                }
+                startIcon={<Print />}
+                sx={{
+                  cursor:
+                    order?.status === OrderStatus.FOR_PRINTING
+                      ? undefined
+                      : 'not-allowed',
+                }}
+                onClick={() => {
+                  modifyPdf(
+                    activeCompany?.company_name?.includes('LHCT')
+                      ? lhctPDF
+                      : lmtPDF,
+                    order,
+                  );
+                  onUpdateOrderStatus(OrderStatus.UNPAID);
+                }}
+              >
+                Generate Sales Invoice
+              </Button>
+              <Button
+                variant={
+                  order.status !== OrderStatus.DRAFT ? 'outlined' : 'contained'
+                }
+                startIcon={
+                  isLoadingUpdateStatus ? (
+                    <CircularProgress color="inherit" size={16} />
+                  ) : (
+                    <Send />
+                  )
+                }
+                onClick={() => onUpdateOrderStatus(OrderStatus.FOR_APPROVAL)}
+                sx={{
+                  cursor:
+                    order.status !== OrderStatus.DRAFT
+                      ? 'not-allowed'
+                      : undefined,
+                }}
+              >
+                Send Order for Approval
+              </Button>
             </Grid>
           </Grid>
           <PaymentForm
@@ -732,6 +723,12 @@ export default function GenerateSales() {
             handleClose={handleClosePaymentForm}
             onPaymentSubmit={onPaymentSubmit}
             isLoading={isLoadingUpdatePayment}
+          />
+          <PaymentsList
+            payments={order?.payments || []}
+            open={openPaymentList}
+            handleClose={handleClosePaymentList}
+            onAddPayment={() => setOpenPaymentForm(true)}
           />
         </>
       </PageWrapper>

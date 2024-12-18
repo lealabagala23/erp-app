@@ -36,9 +36,11 @@ export type Order = {
   approver_id?: string | { _id: string; first_name: string; last_name: string };
   order_items?: OrderItem[];
   created_at?: string;
+  payments?: Payment[]
 };
 
 export type Payment = {
+  _id?: string;
   order_id: string;
   payment_date: string;
   amount_paid: number;
