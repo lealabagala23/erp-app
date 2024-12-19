@@ -37,11 +37,11 @@ instance.interceptors.response.use(
         case 400:
         case 403:
           console.error('Bad Request');
-          window.location.href = '/log-in';
+          window.location.href = '/log-in?sessionExpired=true';
           break;
         case 401:
           console.error('Unauthorized');
-          window.location.href = '/log-in';
+          window.location.href = '/log-in?sessionExpired=true';
           break;
         case 404:
           console.error('Not Found');

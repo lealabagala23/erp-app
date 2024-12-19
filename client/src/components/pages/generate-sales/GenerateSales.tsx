@@ -112,7 +112,7 @@ export default function GenerateSales() {
     },
   );
 
-  const { data: referrers = {} } = useQuery(
+  const { data: referrers = [] } = useQuery(
     [FETCH_REFERRERS_QUERY_KEY],
     fetchReferrers,
     {

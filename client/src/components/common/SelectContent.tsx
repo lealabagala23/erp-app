@@ -44,6 +44,7 @@ export default function SelectContent() {
       (c) => c.company_display_name === event.target.value,
     );
     setActiveCompany(company as Company);
+    if (company?._id) localStorage.setItem('active_company_id', company?._id);
   };
 
   if (!activeCompany || companies.length === 0) {

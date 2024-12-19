@@ -82,8 +82,18 @@ export const AuthProvider = ({ children }: IProps) => {
   }, []);
 
   useEffect(() => {
+    const activeCompanyId = localStorage.getItem('active_company_id');
     if (companies.length > 0) {
-      setActiveCompany(companies[0]);
+      if (activeCompanyId) {
+        const company = companies.find(({ _id }) => _id === activeCompanyId);
+        if (company) {
+          setActiveCompany(company);
+        } else {
+          setActiveCompany(companies[0]);
+        }
+      } else {
+        setActiveCompany(companies[0]);
+      }
     }
   }, [companies]);
 

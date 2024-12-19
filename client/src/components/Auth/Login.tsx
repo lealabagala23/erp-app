@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 // import Checkbox from '@mui/material/Checkbox';
@@ -13,15 +13,16 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 // import ForgotPassword from './ForgotPassword';
-import { SitemarkIcon } from '../../CustomIcons';
+// import { SitemarkIcon } from '../../CustomIcons';
 import ColorModeSelect from '../../theme/ColorModeSelect';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 import { fetchLogin } from './apis';
 import { useMutation } from '@tanstack/react-query';
 import lhctLogo from '../../assets/lhct.png';
 
 import lamorenetaLogo from '../../assets/la_moreneta.png';
+import AlertSnackbar from '../common/AlertSnackbar';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -67,10 +68,14 @@ const LoginContainer = styled(Stack)(({ theme }) => ({
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const sessionExpired = params.get('sessionExpired') === 'true';
   const [usernameError, setUsernameError] = useState(false);
   const [usernameErrorMessage, setUsernameErrorMessage] = useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
+  const [open, setOpen] = useState(false);
   // const [open, setOpen] = React.useState(false);
 
   // const handleClickOpen = () => {
@@ -134,6 +139,16 @@ export default function Login() {
 
     return isValid;
   };
+
+  const toggleSnackbar = () => {
+    setOpen((v) => !v);
+  };
+
+  useEffect(() => {
+    if (!open && sessionExpired) {
+      setOpen(true);
+    }
+  }, [sessionExpired]);
 
   return (
     <LoginContainer direction="column" justifyContent="space-between">
@@ -259,6 +274,12 @@ export default function Login() {
             </Button>
           </Box> */}
       </Card>
+      <AlertSnackbar
+        open={open}
+        toggleSnackbar={toggleSnackbar}
+        type="warning"
+        message="Session expired. Please log in again."
+      />
     </LoginContainer>
   );
 }
