@@ -1,65 +1,10 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction, useContext, useState } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Box, IconButton, Menu, MenuItem } from '@mui/material';
 import { Product } from './types';
 import { DeleteOutline, EditOutlined, MoreHoriz } from '@mui/icons-material';
 import { formatCurrency } from '../../../utils/auth';
-
-const COLUMNS: GridColDef<Product>[] = [
-  {
-    field: 'product_name',
-    headerName: 'Product Name',
-    minWidth: 300,
-    flex: 1,
-  },
-  {
-    field: 'product_description',
-    headerName: 'Description',
-    flex: 1,
-  },
-  {
-    field: 'product_unit',
-    headerName: 'Unit',
-    flex: 1,
-  },
-  {
-    field: 'generic_name',
-    headerName: 'Generic Name',
-    flex: 1,
-  },
-  {
-    field: 'purchase_price',
-    headerName: 'Purchase Price',
-    flex: 1,
-    valueGetter: formatCurrency,
-  },
-  {
-    field: 'patient_price',
-    headerName: 'Patient Price',
-    flex: 1,
-    valueGetter: formatCurrency,
-  },
-  {
-    field: 'doctor_price',
-    headerName: 'Doctor Price',
-    flex: 1,
-    valueGetter: formatCurrency,
-  },
-  {
-    field: 'agency_price',
-    headerName: 'Agency Price',
-    flex: 1,
-    valueGetter: formatCurrency,
-  },
-  { field: 'total_quantity_on_hand', headerName: 'Available Stock', flex: 1 },
-  {
-    field: 'created_at',
-    headerName: 'Created at',
-    valueGetter: (value, row) =>
-      `${new Date(row.created_at || '').toLocaleDateString('en-US')}`,
-    flex: 1,
-  },
-];
+import AuthContext from '../../auth/AuthContext';
 
 interface IProps {
   searchText: string;
@@ -76,12 +21,71 @@ export default function ProductTable({
   setSelectedRow,
   onActionClick,
 }: IProps) {
+  const { activeCompany } = useContext(AuthContext);
   const [anchorEl, setAnchorEl] = useState<
     (EventTarget & HTMLButtonElement) | null
   >(null);
 
-  const columns = [
-    ...COLUMNS,
+  const columns: GridColDef<Product>[] = [
+    {
+      field: 'product_name',
+      headerName: 'Product Name',
+      minWidth: 300,
+      flex: 1,
+    },
+    {
+      field: 'product_description',
+      headerName: 'Description',
+      flex: 1,
+    },
+    {
+      field: 'product_unit',
+      headerName: 'Unit',
+      flex: 1,
+    },
+    {
+      field: 'generic_name',
+      headerName: 'Generic Name',
+      flex: 1,
+    },
+    {
+      field: 'purchase_price',
+      headerName: 'Purchase Price',
+      flex: 1,
+      valueGetter: formatCurrency,
+    },
+    {
+      field: 'patient_price',
+      headerName: 'Patient Price',
+      flex: 1,
+      valueGetter: formatCurrency,
+    },
+    {
+      field: 'doctor_price',
+      headerName: 'Doctor Price',
+      flex: 1,
+      valueGetter: formatCurrency,
+    },
+    {
+      field: 'agency_price',
+      headerName: 'Agency Price',
+      flex: 1,
+      valueGetter: formatCurrency,
+    },
+    {
+      field: 'total_quantity_on_hand',
+      headerName: 'Available Stock',
+      flex: 1,
+      valueGetter: (_, row) =>
+        row.total_quantity_on_hand[activeCompany?._id as string] || 0,
+    },
+    {
+      field: 'created_at',
+      headerName: 'Created at',
+      valueGetter: (value, row) =>
+        `${new Date(row.created_at || '').toLocaleDateString('en-US')}`,
+      flex: 1,
+    },
     {
       field: 'actions',
       headerName: '',

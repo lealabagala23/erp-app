@@ -14,11 +14,12 @@ import {
   GridCellParams,
   GridColDef,
 } from '@mui/x-data-grid';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { TableItem } from './types';
 import { formatCurrency, getUnitPrice } from '../../../utils/auth';
 import { Product } from '../inventory/types';
 import ProductSelector from './ProductSelector';
+import AuthContext from '../../auth/AuthContext';
 
 interface IProps {
   products: Product[];
@@ -43,6 +44,7 @@ export default function ItemTable({
   subtotal,
   disabled,
 }: IProps) {
+  const { activeCompany } = useContext(AuthContext);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState<TableItem | null>(null);
   const [cellModesModel, setCellModesModel] =
@@ -191,9 +193,13 @@ export default function ItemTable({
       type: 'number',
       preProcessEditCellProps: (params) => {
         const value = params.props.value;
-        const stockCount =
+        const qtyOnHand =
           products.find(({ _id }) => _id === params.row.product_id)
-            ?.total_quantity_on_hand || 0;
+            ?.total_quantity_on_hand || {};
+
+        const stockCount =
+          // eslint-disable-next-line
+          (qtyOnHand as any)[activeCompany?._id as string] || 0;
 
         const isValid = value <= stockCount;
 

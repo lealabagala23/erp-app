@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import {
   Box,
@@ -11,6 +11,7 @@ import { formatCurrency, getUnitPrice } from '../../../utils/auth';
 import { Product } from '../inventory/types';
 import SearchBar from '../../common/SearchBar';
 import { Close } from '@mui/icons-material';
+import AuthContext from '../../auth/AuthContext';
 
 interface IProps {
   products: Product[];
@@ -27,11 +28,15 @@ export default function ProductSelector({
   handleClose,
   onSelectProduct,
 }: IProps) {
+  const { activeCompany } = useContext(AuthContext);
   const [searchText, setSearchText] = useState('');
 
   // eslint-disable-next-line
   const handleRowClick = ({ row }: any) => {
-    if (row.total_quantity_on_hand === 0) {
+    if (
+      !row.total_quantity_on_hand[activeCompany?._id as string] ||
+      row.total_quantity_on_hand[activeCompany?._id as string] === 0
+    ) {
       return;
     }
     onSelectProduct(row._id);
@@ -73,6 +78,8 @@ export default function ProductSelector({
       flex: 1,
       minWidth: 100,
       align: 'center',
+      valueGetter: (_, row) =>
+        row.total_quantity_on_hand[activeCompany?._id as string] || 0,
     },
   ];
 
@@ -132,7 +139,7 @@ export default function ProductSelector({
               columns={columns}
               getRowId={(row) => row._id || 0}
               getRowClassName={(params) =>
-                `${params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}${' '}${params.row.total_quantity_on_hand === 0 ? 'data-disabled' : ''}`
+                `${params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}${' '}${!params.row.total_quantity_on_hand[activeCompany?._id as string] ? 'data-disabled' : ''}`
               }
               initialState={{
                 pagination: { paginationModel: { pageSize: 10 } },

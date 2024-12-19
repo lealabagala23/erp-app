@@ -9,7 +9,7 @@ export type Product = {
   patient_price: number;
   doctor_price: number;
   agency_price: number;
-  total_quantity_on_hand: number;
+  total_quantity_on_hand: { [key: string]: number };
   created_at?: string;
 };
 

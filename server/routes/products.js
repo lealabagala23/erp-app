@@ -29,8 +29,13 @@ router.get("/", authenticateToken, async (req, res) => {
     const productsWQty = products.map(({ stocks, ...rest }) => ({
       ...rest,
       total_quantity_on_hand: stocks.reduce(
-        (accum, { quantity_on_hand }) => accum + quantity_on_hand,
-        0
+        (map, { company_id, quantity_on_hand }) => {
+          return {
+            ...map,
+            [company_id]: (map[company_id] || 0) + quantity_on_hand,
+          };
+        },
+        {}
       ),
     }));
     res.status(200).json(productsWQty);
