@@ -218,7 +218,6 @@ router.get("/", authenticateToken, async (req, res) => {
     if (req.query.status) {
       params.status = req.query.status;
     }
-    console.log("params", params);
     const orders = await Order.aggregate([
       {
         $match: params,
