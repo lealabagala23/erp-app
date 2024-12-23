@@ -84,7 +84,7 @@ export default function OrderApprovals() {
         <Button
           variant="text"
           endIcon={<ArrowCircleRightSharp />}
-          onClick={() => navigate('/orders')}
+          onClick={() => navigate('/orders/list')}
         >
           Go to Orders Page
         </Button>
