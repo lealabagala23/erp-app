@@ -1,33 +1,10 @@
-import React, { useContext } from 'react';
-import AppNavbar from '../common/AppNavbar';
-import Header from '../common/Header';
-import MainGrid from '../common/MainGrid';
-import PageWrapper from '../wrappers/PageWrapper';
-import AlertDialog from '../common/AlertDialog';
-import { ArrowCircleRightSharp, Warning } from '@mui/icons-material';
-import {
-  Box,
-  CircularProgress,
-  List,
-  ListItem,
-  ListItemText,
-  Stack,
-  Typography,
-} from '@mui/material';
-import AuthContext from '../auth/AuthContext';
-import dayjs from 'dayjs';
-import { dateDiffInDays } from '../../utils/auth';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import AppNavbar from '../../common/AppNavbar';
+import Header from '../../common/Header';
+import MainGrid from '../../common/MainGrid';
+import PageWrapper from '../../wrappers/PageWrapper';
 
 export default function Home() {
-  const {
-    expiringStocks,
-    fetchingExpiringStocks,
-    showExpiryWarning,
-    hideExpiryWarning,
-  } = useContext(AuthContext);
-  const navigate = useNavigate();
-
   return (
     <>
       <AppNavbar title={'Home'} />
@@ -37,7 +14,7 @@ export default function Home() {
           <MainGrid />
         </>
       </PageWrapper>
-      <AlertDialog
+      {/* <AlertDialog
         open={showExpiryWarning}
         handleClose={hideExpiryWarning}
         title={
@@ -77,7 +54,7 @@ export default function Home() {
           action: () => navigate('/stocks'),
           endIcon: <ArrowCircleRightSharp />,
         }}
-      />
+      /> */}
     </>
   );
 }

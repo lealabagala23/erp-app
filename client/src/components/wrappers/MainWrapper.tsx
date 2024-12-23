@@ -6,7 +6,7 @@ import type {} from '@mui/x-tree-view/themeAugmentation';
 import Box from '@mui/material/Box';
 import SideMenu from '../common/SideMenu';
 import { Route, Routes } from 'react-router-dom';
-import Home from '../pages/Home';
+import Home from '../pages/home/Home';
 import Products from '../pages/inventory/Products';
 import GenerateSales from '../pages/generate-sales/GenerateSales';
 import Orders from '../pages/orders/Orders';

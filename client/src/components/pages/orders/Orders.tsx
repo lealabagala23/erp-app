@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { Chip } from '@mui/material';
 import { getOrderStatusColor } from '../generate-sales/constants';
 
-const FETCH_ORDERS_QUERY_KEY = 'fetchOrders';
+export const FETCH_ORDERS_QUERY_KEY = 'fetchOrders';
 
 export type Order = {
   customer_id: string;
@@ -96,7 +96,7 @@ export default function Orders() {
       queryKey={FETCH_ORDERS_QUERY_KEY}
       itemName="order"
       searchAttr="invoice_id"
-      sortField="created_at"
+      sortField="status"
       sortDir="desc"
       columns={COLUMNS}
       menuActions={['View']}

@@ -211,11 +211,17 @@ router.post("/", authenticateToken, async (req, res) => {
 // Get all orders
 router.get("/", authenticateToken, async (req, res) => {
   try {
+    const params = {
+      company_id: new mongoose.Types.ObjectId(req.query.company_id),
+    };
+
+    if (req.query.status) {
+      params.status = req.query.status;
+    }
+    console.log("params", params);
     const orders = await Order.aggregate([
       {
-        $match: {
-          company_id: new mongoose.Types.ObjectId(req.query.company_id),
-        },
+        $match: params,
       },
       ...orderAggregateParams,
     ]);
