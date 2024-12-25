@@ -1,7 +1,9 @@
 import { Order, OrderItem, Payment } from './types';
 import axiosConfig from '../../../utils/axiosConfig';
+import { Referrer } from '../accounts/types';
 
 const ORDERS_API = '/api/orders';
+const REFERRERS_API = '/api/referrers';
 
 const getOrderItemPayload = ({
   _id,
@@ -96,6 +98,14 @@ export const updateOrderStatus = async (order: Order) => {
 
 export const addOrderPayment = async ({ order_id, ...payload }: Payment) => {
   const response = await axiosConfig.put(`${ORDERS_API}/${order_id}/payment`, {
+    ...payload
+  });
+
+  return response?.data;
+};
+
+export const createReferrer = async (payload: Referrer) => {
+  const response = await axiosConfig.post(`${REFERRERS_API}`, {
     ...payload
   });
 

@@ -21,6 +21,7 @@ export type Patient = {
 };
 
 export type Doctor = {
+  _id?: string;
   customer_id: string | { _id: string; customer_name: string };
   specialization: string;
   clinic_address: string;

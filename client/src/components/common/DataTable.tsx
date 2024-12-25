@@ -7,6 +7,7 @@ import {
   MoreHoriz,
   RemoveRedEye,
 } from '@mui/icons-material';
+import toLower from 'lodash/toLower';
 
 interface IProps {
   // eslint-disable-next-line
@@ -88,9 +89,7 @@ export default function DataTable({
         rows={
           searchText !== ''
             ? data?.filter((p) =>
-                p[searchAttr]
-                  .toLowerCase()
-                  ?.includes(searchText?.toLowerCase()),
+                toLower(p[searchAttr])?.includes(toLower(searchText)),
               )
             : data
         }

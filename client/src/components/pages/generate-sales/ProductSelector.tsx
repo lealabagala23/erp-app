@@ -12,6 +12,7 @@ import { Product } from '../inventory/types';
 import SearchBar from '../../common/SearchBar';
 import { Close } from '@mui/icons-material';
 import AuthContext from '../../auth/AuthContext';
+import toLower from 'lodash/toLower';
 
 interface IProps {
   products: Product[];
@@ -130,9 +131,7 @@ export default function ProductSelector({
               rows={
                 searchText !== ''
                   ? products?.filter((p) =>
-                      p.product_name
-                        .toLowerCase()
-                        ?.includes(searchText?.toLowerCase()),
+                      toLower(p.product_name).includes(toLower(searchText)),
                     )
                   : products
               }

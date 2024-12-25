@@ -17,6 +17,7 @@ import {
 } from '@mui/icons-material';
 import { dateDiffInDays, dateSortComparator } from '../../../../utils/auth';
 import dayjs from 'dayjs';
+import toLower from 'lodash/toLower';
 
 // eslint-disable-next-line
 const cellClassName = (params: any) =>
@@ -199,9 +200,9 @@ export default function StocksTable({
           searchText !== ''
             ? inventory?.filter((p) =>
                 // eslint-disable-next-line
-                (p.product_id as any)?.product_name
-                  .toLowerCase()
-                  ?.includes(searchText?.toLowerCase()),
+                toLower((p.product_id as any)?.product_name).includes(
+                  toLower(searchText),
+                ),
               )
             : inventory
         }

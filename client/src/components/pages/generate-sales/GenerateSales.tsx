@@ -17,7 +17,11 @@ import {
   Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { fetchCustomers, fetchReferrers } from '../accounts/apis';
+import {
+  fetchCustomers,
+  fetchCustomerType,
+  fetchReferrers,
+} from '../accounts/apis';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Customer, Referrer } from '../accounts/types';
 import { useForm, useWatch } from 'react-hook-form';
@@ -44,6 +48,7 @@ import { FETCH_CUSTOMERS_QUERY_KEY } from '../accounts/constants';
 import {
   addOrderPayment,
   createOrder,
+  createReferrer,
   fetchOrderById,
   updateOrder,
   updateOrderStatus,
@@ -59,6 +64,7 @@ import {
 import PaymentForm from './PaymentForm';
 import { modifyPdf } from '../../../utils/pdfWriter';
 import PaymentsList from './PaymentsList';
+import ReferrerForm from './ReferrerForm';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#fff',
@@ -101,6 +107,7 @@ export default function GenerateSales() {
   const [paymentType, setPaymentType] = useState('');
   const [openPaymentList, setOpenPaymentList] = useState(false);
   const [openPaymentForm, setOpenPaymentForm] = useState(false);
+  const [openReferrerForm, setOpenReferrerForm] = useState(false);
 
   const { data: order = {}, isLoading: isLoadingOrder } = useQuery(
     [FETCH_ORDER_BY_ID_QUERY_KEY, orderId],
@@ -135,6 +142,19 @@ export default function GenerateSales() {
     [FETCH_PRODUCTS_QUERY_KEY],
     () => fetchProducts(),
     {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  );
+
+  const { data: referringDoctors = [] } = useQuery(
+    ['fetchReferringDoctors'],
+    () =>
+      fetchCustomerType({
+        customer_type: 'DOCTOR',
+      }),
+    {
+      enabled: true,
       refetchOnWindowFocus: false,
       retry: 1,
     },
@@ -182,6 +202,20 @@ export default function GenerateSales() {
     mutationFn: addOrderPayment,
     onSuccess: () => {
       queryClient.invalidateQueries([FETCH_ORDER_BY_ID_QUERY_KEY]);
+    },
+    onError: (err) => {
+      console.error(err);
+    },
+  });
+
+  const {
+    mutateAsync: mutateCreateReferrer,
+    isLoading: isLoadingCreateReferrer,
+  } = useMutation({
+    mutationFn: createReferrer,
+    onSuccess: (data: Referrer) => {
+      queryClient.invalidateQueries([FETCH_REFERRERS_QUERY_KEY]);
+      setValue('referrer_id', data._id);
     },
     onError: (err) => {
       console.error(err);
@@ -264,10 +298,15 @@ export default function GenerateSales() {
   };
 
   const handleClosePaymentForm = () => setOpenPaymentForm(false);
+  const handleCloseReferrerForm = () => setOpenReferrerForm(false);
   const handleClosePaymentList = () => setOpenPaymentList(false);
 
   const onPaymentSubmit = (payment: Payment) => {
     mutateUpdateOrderPayment({ ...payment, order_id: order?._id });
+  };
+
+  const onReferrerSubmit = (referrer: Referrer) => {
+    mutateCreateReferrer({ ...referrer });
   };
 
   useEffect(() => {
@@ -538,12 +577,15 @@ export default function GenerateSales() {
                     <FormControl fullWidth margin="dense">
                       <FormLabel>Referrer</FormLabel>
                       <FormAutocomplete
-                        options={referrers.map(
-                          ({ _id, referrer_name }: Referrer) => ({
-                            label: referrer_name,
-                            value: _id,
-                          }),
-                        )}
+                        options={[
+                          { label: 'Add New Referrer...', value: 'new' },
+                          ...referrers.map(
+                            ({ _id, referrer_name }: Referrer) => ({
+                              label: referrer_name,
+                              value: _id,
+                            }),
+                          ),
+                        ]}
                         getValues={getValues}
                         name="referrer_id"
                         placeholder={'Enter Referrer Name'}
@@ -551,6 +593,7 @@ export default function GenerateSales() {
                           !customer_id || order?.status !== OrderStatus.DRAFT
                         }
                         control={control}
+                        onCreateNew={() => setOpenReferrerForm(true)}
                       />
                     </FormControl>
                   </Grid>
@@ -772,6 +815,13 @@ export default function GenerateSales() {
             handleClose={handleClosePaymentForm}
             onPaymentSubmit={onPaymentSubmit}
             isLoading={isLoadingUpdatePayment}
+          />
+          <ReferrerForm
+            open={openReferrerForm}
+            handleClose={handleCloseReferrerForm}
+            onReferrerSubmit={onReferrerSubmit}
+            isLoading={isLoadingCreateReferrer}
+            doctors={referringDoctors}
           />
           <PaymentsList
             payments={order?.payments || []}

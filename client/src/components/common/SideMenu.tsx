@@ -11,6 +11,7 @@ import MenuContent from './MenuContent';
 // import CardAlert from './CardAlert';
 import OptionsMenu from './OptionsMenu';
 import AuthContext from '../auth/AuthContext';
+import toLower from 'lodash/toLower';
 
 const drawerWidth = 240;
 
@@ -80,8 +81,8 @@ export default function SideMenu() {
             {userInfo?.first_name} {userInfo?.last_name}
           </Typography>
           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            {userInfo?.first_name?.toLowerCase()}_
-            {userInfo?.last_name?.toLowerCase()}@email.com
+            {toLower(userInfo?.first_name)}_{toLower(userInfo?.last_name)}
+            @email.com
           </Typography>
         </Box>
         <OptionsMenu />

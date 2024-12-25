@@ -95,7 +95,7 @@ export default function Orders() {
       viewItem={(item: any) => navigate(`/orders/${item._id}`)}
       queryKey={FETCH_ORDERS_QUERY_KEY}
       itemName="order"
-      searchAttr="invoice_id"
+      searchAttr="invoice_number"
       sortField="status"
       sortDir="desc"
       columns={COLUMNS}

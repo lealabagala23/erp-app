@@ -5,6 +5,7 @@ import { Product } from './types';
 import { DeleteOutline, EditOutlined, MoreHoriz } from '@mui/icons-material';
 import { formatCurrency } from '../../../utils/auth';
 import AuthContext from '../../auth/AuthContext';
+import toLower from 'lodash/toLower';
 
 interface IProps {
   searchText: string;
@@ -131,9 +132,7 @@ export default function ProductTable({
         rows={
           searchText !== ''
             ? products?.filter((p) =>
-                p.product_name
-                  .toLowerCase()
-                  ?.includes(searchText?.toLowerCase()),
+                toLower(p.product_name).includes(toLower(searchText)),
               )
             : products
         }
