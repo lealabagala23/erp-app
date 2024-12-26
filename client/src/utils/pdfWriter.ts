@@ -164,7 +164,7 @@ const drawSCDetails = (
   const { width, height } = firstPage.getSize();
   const { customer_id } = order;
   // eslint-disable-next-line
-  const text: string = `${(customer_id as any)?.customer_details?.discount_card_number}`;
+  const text: string = `${(customer_id as any)?.customer_details?.discount_card_number || ''}`;
 
   firstPage.drawText(text, {
     x: 42 + (width - 160 + (10 - text.length) * 6),

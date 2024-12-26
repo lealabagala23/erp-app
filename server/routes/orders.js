@@ -200,6 +200,7 @@ router.post("/", authenticateToken, async (req, res) => {
   const newOrder = new Order({
     ...payload,
     status: "draft",
+    discount_type: "percent",
     created_at: new Date(),
   });
   try {
