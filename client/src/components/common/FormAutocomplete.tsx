@@ -38,7 +38,11 @@ export default function FormAutocomplete({
   };
 
   useEffect(() => {
-    if (!!value && value !== '' && inputValue === null) {
+    if (
+      !!value &&
+      value !== '' &&
+      (inputValue === null || inputValue.includes('Add'))
+    ) {
       setInputValue(options.find((o) => o.value === value)?.label || null);
     }
   }, [value, options, inputValue]);

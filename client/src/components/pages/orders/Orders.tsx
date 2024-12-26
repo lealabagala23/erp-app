@@ -67,7 +67,7 @@ const COLUMNS: GridColDef<Order>[] = [
     // eslint-disable-next-line
     renderCell: ({ row }: any) => (
       <Chip
-        label={row.status?.toUpperCase()}
+        label={row.status?.toUpperCase()?.replaceAll('_', ' ')}
         color={getOrderStatusColor(row.status)}
       />
     ),

@@ -90,7 +90,16 @@ router.post("/", authenticateToken, async (req, res) => {
 router.post("/bulk", authenticateToken, async (req, res) => {
   try {
     const data = req.body; // Assuming JSON data from the client
-    const existingCustomers = await Customers.find();
+    const existingCustomers = await Customer.find();
+
+    const capitalize = (str) => {
+      if (!str) return ""; // Handle empty strings
+      return str
+        .split(" ") // Split the string into an array of words
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
+        .join(" "); // Join the array back into a string
+    };
+
     const dataWithCreatedAt = data
       .filter((d) => {
         const { customer_name } = d;
@@ -99,11 +108,58 @@ router.post("/bulk", authenticateToken, async (req, res) => {
         );
         return !existing;
       })
-      .map((d) => ({
+      .map(({ customer_name, ...d }) => ({
         ...d,
+        customer_name: capitalize(customer_name),
         created_at: new Date(),
       }));
-    const newCustomers = await Customer.insertMany(dataWithCreatedAt); // Insert multiple records
+
+    let newCustomers = [...existingCustomers];
+
+    if (dataWithCreatedAt.length > 0) {
+      newCustomers = await Customer.insertMany(dataWithCreatedAt); // Insert multiple records
+    }
+
+    const patientData = data
+      .filter((d) => d.customer_type === "PATIENT")
+      .map(
+        ({
+          date_of_birth,
+          discount_card,
+          discount_card_number,
+          customer_name,
+        }) => ({
+          customer_id: newCustomers.find(
+            (c) => c.customer_name === customer_name
+          )?._id,
+          date_of_birth,
+          discount_card,
+          discount_card_number,
+          status: "active",
+          created_at: new Date(),
+        })
+      );
+    await Patient.insertMany(patientData);
+
+    const doctorData = data
+      .filter((d) => d.customer_type === "DOCTOR")
+      .map(
+        ({
+          specialization,
+          license_number,
+          clinic_address,
+          customer_name,
+        }) => ({
+          customer_id: newCustomers.find(
+            (c) => c.customer_name === customer_name
+          )?._id,
+          specialization,
+          license_number,
+          clinic_address,
+          created_at: new Date(),
+        })
+      );
+    await Doctor.insertMany(doctorData);
     res.status(200).send("Data uploaded successfully");
   } catch (err) {
     console.error(err);
@@ -143,11 +199,11 @@ router.get("/", authenticateToken, async (req, res) => {
     const formatted = customers.reduce((arr, obj) => {
       const { patients, doctors, agencies, ...rest } = obj;
       const customer_details =
-        rest.customer_type === "PATIENT"
+        (rest.customer_type === "PATIENT"
           ? patients[0]
           : rest.customer_type === "DOCTOR"
           ? doctors[0]
-          : agencies[0];
+          : agencies[0]) || {};
       return [...arr, { ...rest, customer_details }];
     }, []);
 

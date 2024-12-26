@@ -314,9 +314,10 @@ export default function GenerateSales() {
       setValue('discount_card', customer_details?.discount_card);
       setValue('discount_card_number', customer_details?.discount_card_number);
 
-      if (customer_details?.discount_card_number) {
+      if (customer_details?.discount_card_number && !formValues.discount) {
         setValue('discount_type', 'percent');
         setValue('discount', 20);
+        handleSave({ ...formValues, discount_type: 'percent', discount: 20 });
       }
     }
   }, [customer_details]);

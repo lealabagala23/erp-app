@@ -135,14 +135,14 @@ const drawTotalSales = (
   order: Order,
 ) => {
   const { width, height } = firstPage.getSize();
-  const { order_items, total_amount, customer_id } = order;
+  const { order_items, total_amount = 0 } = order;
   const total = (order_items || []).reduce(
     (accum, item) => item.total_price + accum,
     0,
   );
   const totalSales: string = `${formatCurrency(total)}`;
-  // eslint-disable-next-line
-  const lessDiscount = `-${formatCurrency((customer_id as any)?.discount_card_number ? total - total * 0.2 : 0)}`;
+   
+  const lessDiscount = `${formatCurrency(total_amount - total)}`;
 
   const texts = [totalSales, lessDiscount, formatCurrency(total_amount || 0)];
   texts.forEach((text, key2) =>
@@ -232,7 +232,7 @@ export const modifyPdf = async (
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     // eslint-disable-next-line
-    link.download = `Invoice-${order.invoice_number}-${(order.customer_id as any)?.customer_name}.pdf`;
+    link.download = `Invoice-${order.invoice_number || ''}-${(order.customer_id as any)?.customer_name}.pdf`;
     link.click();
   } catch (error) {
     console.error('Error modifying the PDF:', error);
