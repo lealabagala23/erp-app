@@ -28,10 +28,26 @@ export default function DownloadPDF({ data, columns, title }: IProps) {
     doc.autoTable({
       head: [columns],
       body: data.map((obj) => {
-        // eslint-disable-next-line
-        const { _id, barcode, __v, created_at, ...rest } = obj;
+        const {
+          product_name,
+          product_description,
+          product_unit,
+          generic_name,
+          purchase_price,
+          patient_price,
+          doctor_price,
+          agency_price,
+          created_at,
+        } = obj;
         const allData = Object.values({
-          ...rest,
+          product_name,
+          product_description,
+          product_unit,
+          generic_name,
+          purchase_price,
+          patient_price,
+          doctor_price,
+          agency_price,
           created_at: dayjs(created_at).format('MM/DD/YYYY'),
         });
         return allData;

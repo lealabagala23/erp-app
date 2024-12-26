@@ -19,6 +19,7 @@ const StyledBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
 const labelRouteMapping = {
   '/home': {
     primary: 'Dashboard',
+    secondary: 'Home',
   },
   '/generate-sales': {
     primary: 'Orders',

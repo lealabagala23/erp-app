@@ -26,6 +26,9 @@ export default function OptionsMenu() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const handleSettings = () => {
+    navigate('/settings');
+  };
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/log-in');
@@ -60,11 +63,11 @@ export default function OptionsMenu() {
           },
         }}
       >
-        <MenuItem onClick={handleClose}>Profile</MenuItem>
+        {/* <MenuItem onClick={handleClose}>Profile</MenuItem>
         <MenuItem onClick={handleClose}>My account</MenuItem>
         <Divider />
-        <MenuItem onClick={handleClose}>Add another account</MenuItem>
-        <MenuItem onClick={handleClose}>Settings</MenuItem>
+        <MenuItem onClick={handleClose}>Add another account</MenuItem> */}
+        <MenuItem onClick={handleSettings}>Settings</MenuItem>
         <Divider />
         <MenuItem
           onClick={handleLogout}

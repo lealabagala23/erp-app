@@ -214,7 +214,7 @@ export default function StocksTable({
         initialState={{
           pagination: { paginationModel: { pageSize: 20 } },
           sorting: {
-            sortModel: [{ field: 'expiry_date', sort: 'desc' }],
+            sortModel: [{ field: 'status', sort: 'asc' }],
           },
         }}
         pageSizeOptions={[10, 20, 50]}

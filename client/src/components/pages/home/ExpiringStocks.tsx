@@ -43,16 +43,18 @@ export default function ExpiringStocks() {
             </Box>
           ) : (
             <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-              {expiringStocks.map((stock, key) => (
-                <ListItem key={key}>
-                  <ListItemText
-                    // eslint-disable-next-line
-                    primary={`${(stock.product_id as any)?.product_name} ${(stock.product_id as any)?.product_description} (${stock.quantity_on_hand} ${(stock.product_id as any)?.product_unit}S)`}
-                    secondary={`${dateDiffInDays(stock.expiry_date) < 0 ? 'Expired on' : 'Expiring on'} ${dayjs(stock.expiry_date).format('MM/DD/YYYY')}`}
-                    sx={{ color: 'var(--template-palette-error-main)' }}
-                  />
-                </ListItem>
-              ))}
+              {expiringStocks
+                .filter((s) => s.status !== 'EXPIRED')
+                .map((stock, key) => (
+                  <ListItem key={key}>
+                    <ListItemText
+                      // eslint-disable-next-line
+                      primary={`${(stock.product_id as any)?.product_name} ${(stock.product_id as any)?.product_description} (${stock.quantity_on_hand} ${(stock.product_id as any)?.product_unit}S)`}
+                      secondary={`${dateDiffInDays(stock.expiry_date) < 0 ? 'Expired on' : 'Expiring on'} ${dayjs(stock.expiry_date).format('MM/DD/YYYY')}`}
+                      sx={{ color: 'var(--template-palette-error-main)' }}
+                    />
+                  </ListItem>
+                ))}
             </List>
           )}
         </Stack>

@@ -8,6 +8,7 @@ import CustomerForm from '../accounts/CustomerForm';
 import { useNavigate } from 'react-router-dom';
 import { Chip } from '@mui/material';
 import { getOrderStatusColor } from '../generate-sales/constants';
+import { formatCurrency } from '../../../utils/auth';
 
 export const FETCH_ORDERS_QUERY_KEY = 'fetchOrders';
 
@@ -51,6 +52,7 @@ const COLUMNS: GridColDef<Order>[] = [
     field: 'total_amount',
     headerName: 'Total Amount',
     flex: 1,
+    valueGetter: (value) => formatCurrency(value || 0),
   },
   {
     field: 'payment_type',

@@ -13,6 +13,7 @@ import SessionsChart from './SessionsChart';
 import StatCard, { StatCardProps } from './StatCard';
 import ExpiringStocks from '../pages/home/ExpiringStocks';
 import OrderApprovals from '../pages/home/OrderApprovals';
+import AuthContext from '../auth/AuthContext';
 
 const data: StatCardProps[] = [
   {
@@ -49,6 +50,7 @@ const data: StatCardProps[] = [
 ];
 
 export default function MainGrid() {
+  const { userInfo } = React.useContext(AuthContext);
   return (
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
       {/* cards */}
@@ -73,10 +75,12 @@ export default function MainGrid() {
           {/* <SessionsChart /> */}
           <ExpiringStocks />
         </Grid>
-        <Grid size={{ xs: 12, md: 6 }}>
-          {/* <PageViewsBarChart /> */}
-          <OrderApprovals />
-        </Grid>
+        {userInfo?.role === 'admin' && (
+          <Grid size={{ xs: 12, md: 6 }}>
+            {/* <PageViewsBarChart /> */}
+            <OrderApprovals />
+          </Grid>
+        )}
       </Grid>
       {/* <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
         Details

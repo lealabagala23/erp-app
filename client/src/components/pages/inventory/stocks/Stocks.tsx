@@ -224,7 +224,6 @@ export default function Stocks() {
                   product_id: selectedRow?.product_id,
                   status: 'EXPIRED',
                 } as Inventory),
-              danger: true,
             }}
           />
         </>

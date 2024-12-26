@@ -8,15 +8,11 @@ import Stack from '@mui/material/Stack';
 import HomeRoundedIcon from '@mui/icons-material/DashboardRounded';
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
-import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
+// import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import { ExpandLess, MoneyRounded } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material';
 import { GridExpandMoreIcon } from '@mui/x-data-grid';
-
-const secondaryListItems = [
-  { text: 'Settings', icon: <SettingsRoundedIcon />, route: '/settings' },
-];
 
 const nestedMainItems = [
   { text: 'Home', icon: <HomeRoundedIcon />, route: '/home' },
@@ -78,6 +74,10 @@ const nestedMainItems = [
     ],
   },
 ];
+
+// const secondaryListItems = [
+//   { text: 'Settings', icon: <SettingsRoundedIcon />, route: '/settings' },
+// ] as typeof nestedMainItems;
 
 export default function MenuContent() {
   const { pathname } = useLocation();
@@ -193,7 +193,7 @@ export default function MenuContent() {
         ))}
       </List>
 
-      <List dense>
+      {/* <List dense>
         {secondaryListItems.map((item, index) => (
           <ListItem key={index} disablePadding sx={{ display: 'block' }}>
             <ListItemButton onClick={() => navigate(item.route)}>
@@ -202,7 +202,7 @@ export default function MenuContent() {
             </ListItemButton>
           </ListItem>
         ))}
-      </List>
+      </List> */}
     </Stack>
   );
 }

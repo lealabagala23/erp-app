@@ -1,9 +1,9 @@
 import * as React from 'react';
 import Stack from '@mui/material/Stack';
-import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
+// import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import ColorModeIconDropdown from '../../theme/ColorModeIconDropdown';
 import NavbarBreadcrumbs from './NavbarBreadcrumbs';
-import MenuButton from './MenuButton';
+// import MenuButton from './MenuButton';
 
 export default function Header() {
   return (
@@ -21,9 +21,9 @@ export default function Header() {
     >
       <NavbarBreadcrumbs />
       <Stack direction="row" sx={{ gap: 1 }}>
-        <MenuButton showBadge aria-label="Open notifications">
+        {/* <MenuButton showBadge aria-label="Open notifications">
           <NotificationsRoundedIcon />
-        </MenuButton>
+        </MenuButton> */}
         <ColorModeIconDropdown />
       </Stack>
     </Stack>
