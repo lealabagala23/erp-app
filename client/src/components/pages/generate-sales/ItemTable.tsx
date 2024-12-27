@@ -135,7 +135,7 @@ export default function ItemTable({
   );
 
   const formatTableItem = (item: TableItem) => {
-    const { product_id, quantity, custom_discount } = item;
+    const { product_id, quantity } = item;
 
     if (!product_id) return item;
 
@@ -144,12 +144,11 @@ export default function ItemTable({
       product_id,
       customerType as string,
     );
-    const totalPrice = unit_price * quantity;
 
     return {
       ...item,
       unit_price,
-      total_price: totalPrice - totalPrice * ((custom_discount || 0) / 100),
+      total_price: unit_price * quantity,
     };
   };
 
@@ -230,18 +229,6 @@ export default function ItemTable({
           `This is the ${customerType || ''} price set on Products page`,
           row.unit_price,
         ),
-    },
-    {
-      field: 'custom_discount',
-      headerName: 'Custom Discount',
-      flex: 1,
-      align: 'right',
-      headerAlign: 'right',
-      editable: true,
-      type: 'number',
-      valueFormatter: (value) =>
-        value === 0 || value === undefined ? '-' : `${value}%`,
-      cellClassName: 'editable-cell',
     },
     {
       field: 'total_price',

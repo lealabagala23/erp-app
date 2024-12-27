@@ -28,10 +28,13 @@ const OrderSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  discount_type: {
-    type: String,
+  sc_pwd_discount: {
+    type: Boolean,
   },
-  discount: {
+  vat_exempted: {
+    type: Boolean,
+  },
+  special_discount: {
     type: Number,
   },
   company_id: {
@@ -42,6 +45,10 @@ const OrderSchema = new mongoose.Schema({
   referrer_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Referrer",
+  },
+  referring_doctor_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Doctor",
   },
   approver_id: {
     type: mongoose.Schema.Types.ObjectId,

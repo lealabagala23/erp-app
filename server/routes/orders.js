@@ -14,11 +14,13 @@ const getOrderPayload = ({
   total_amount,
   payment_type,
   status,
-  discount_type,
-  discount,
+  sc_pwd_discount,
+  vat_exempted,
+  special_discount,
   initiator_id,
   company_id,
   referrer_id,
+  referring_doctor_id,
   approver_id,
 }) => {
   return {
@@ -29,11 +31,13 @@ const getOrderPayload = ({
     total_amount,
     payment_type,
     status,
-    discount_type,
-    discount,
+    sc_pwd_discount,
+    vat_exempted,
+    special_discount,
     initiator_id,
     company_id,
     referrer_id,
+    referring_doctor_id,
     approver_id,
   };
 };
@@ -43,14 +47,12 @@ const getOrderItemPayload = ({
   product_id,
   quantity,
   unit_price,
-  custom_discount,
   total_price,
 }) => ({
   _id,
   product_id,
   quantity,
   unit_price,
-  custom_discount,
   total_price,
 });
 
@@ -93,6 +95,14 @@ const orderAggregateParams = [
       localField: "referrer_id",
       foreignField: "_id",
       as: "referrer_id",
+    },
+  },
+  {
+    $lookup: {
+      from: "doctors",
+      localField: "referring_doctor_id",
+      foreignField: "_id",
+      as: "referring_doctor_id",
     },
   },
   {
@@ -141,6 +151,12 @@ const orderAggregateParams = [
       preserveNullAndEmptyArrays: true,
     },
   },
+  {
+    $unwind: {
+      path: "$referring_doctor_id",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
   { $unwind: { path: "$order_items", preserveNullAndEmptyArrays: true } },
   {
     $lookup: {
@@ -178,14 +194,16 @@ const orderAggregateParams = [
       billing_address: { $first: "$billing_address" },
       total_amount: { $first: "$total_amount" },
       total_amount_paid: { $first: "$total_amount_paid" },
-      discount_type: { $first: "$discount_type" },
-      discount: { $first: "$discount" },
+      sc_pwd_discount: { $first: "$sc_pwd_discount" },
+      vat_exempted: { $first: "$vat_exempted" },
+      special_discount: { $first: "$special_discount" },
       payment_type: { $first: "$payment_type" },
       status: { $first: "$status" },
       initiator_id: { $first: "$initiator_id" },
       customer_id: { $first: "$customer_id" },
       company_id: { $first: "$company_id" },
       referrer_id: { $first: "$referrer_id" },
+      referring_doctor_id: { $first: "$referring_doctor_id" },
       approver_id: { $first: "$approver_id" },
       created_at: { $first: "$created_at" },
       order_items: { $push: "$order_items" },
@@ -200,7 +218,6 @@ router.post("/", authenticateToken, async (req, res) => {
   const newOrder = new Order({
     ...payload,
     status: "draft",
-    discount_type: "percent",
     created_at: new Date(),
   });
   try {
@@ -347,16 +364,20 @@ router.put("/:id", authenticateToken, async (req, res) => {
       (accum, obj) => accum + obj.total_price,
       0
     );
-    const { discount_type, discount } = rest;
-    const discount_amount =
-      !discount_type || !discount
-        ? 0
-        : discount_type === "amount"
-        ? discount
-        : total_sales * (discount / 100);
+    const { sc_pwd_discount, vat_exempted, special_discount } = rest;
+    let total_sales_amount = vat_exempted
+      ? total_sales - total_sales * 0.12
+      : total_sales;
+    total_sales_amount = sc_pwd_discount
+      ? total_sales_amount - total_sales_amount * 0.2
+      : total_sales_amount;
+
     const updatedOrder = await Order.findByIdAndUpdate(
       order_id,
-      { ...getOrderPayload(rest), total_amount: total_sales - discount_amount },
+      {
+        ...getOrderPayload(rest),
+        total_amount: total_sales_amount - special_discount,
+      },
       {
         new: true,
       }

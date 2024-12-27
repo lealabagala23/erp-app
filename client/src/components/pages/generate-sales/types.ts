@@ -5,7 +5,6 @@ export type OrderItem = {
   product_id: string | { _id: string; product_name: string; product_description: string; product_unit: string };
   quantity: number;
   unit_price: number;
-  custom_discount: number;
   total_price: number;
   created_at?: string;
   _id?: string;
@@ -16,7 +15,6 @@ export type TableItem = {
   product_id: string | null;
   quantity: number;
   unit_price: number;
-  custom_discount: number;
   total_price: number;
   _id?: string;
 };
@@ -30,11 +28,13 @@ export type Order = {
   total_amount?: number;
   payment_type?: string;
   status?: string;
-  discount_type?: string;
-  discount?: number;
+  sc_pwd_discount?: boolean;
+  vat_exempted?: boolean;
+  special_discount?: number;
   initiator_id: string | { _id: string; first_name: string; last_name: string };
   company_id: string | { _id: string; company_name: string };
   referrer_id?: string | { _id: string; referrer_name: string };
+  referring_doctor_id?: string;
   approver_id?: string | { _id: string; first_name: string; last_name: string };
   order_items?: OrderItem[];
   created_at?: string;

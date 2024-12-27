@@ -23,6 +23,7 @@ export type Order = {
   payment_type?: string;
   payment_status?: string;
   referrer_id?: string;
+  referring_doctor_id?: string;
   approver_id?: string;
   created_at?: string;
 };

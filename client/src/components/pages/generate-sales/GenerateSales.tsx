@@ -4,6 +4,7 @@ import Header from '../../common/Header';
 import PageWrapper from '../../wrappers/PageWrapper';
 import {
   Button,
+  Checkbox,
   Chip,
   CircularProgress,
   FormControl,
@@ -17,19 +18,14 @@ import {
   Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import {
-  fetchCustomers,
-  fetchCustomerType,
-  fetchReferrers,
-} from '../accounts/apis';
+import { fetchCustomers, fetchCustomerType } from '../accounts/apis';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Customer, Referrer } from '../accounts/types';
-import { useForm, useWatch } from 'react-hook-form';
+import { Customer, Doctor } from '../accounts/types';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import FormAutocomplete from '../../common/FormAutocomplete';
 import ItemTable from './ItemTable';
 import { Order, OrderItem, Payment, TableItem } from './types';
 import { fetchProducts } from '../inventory/apis';
-import dayjs from 'dayjs';
 import lhctPDF from '../../../assets/lhct_invoice.pdf';
 import lmtPDF from '../../../assets/lmt_invoice.pdf';
 import { formatCurrency, getUnitPrice } from '../../../utils/auth';
@@ -48,7 +44,6 @@ import { FETCH_CUSTOMERS_QUERY_KEY } from '../accounts/constants';
 import {
   addOrderPayment,
   createOrder,
-  createReferrer,
   fetchOrderById,
   updateOrder,
   updateOrderStatus,
@@ -57,14 +52,13 @@ import AuthContext from '../../auth/AuthContext';
 import { debounce } from 'lodash';
 import {
   FETCH_ORDER_BY_ID_QUERY_KEY,
-  FETCH_REFERRERS_QUERY_KEY,
   getOrderStatusColor,
   OrderStatus,
 } from './constants';
 import PaymentForm from './PaymentForm';
 import { modifyPdf } from '../../../utils/pdfWriter';
 import PaymentsList from './PaymentsList';
-import ReferrerForm from './ReferrerForm';
+import LiveDateAndTime from '../../common/LiveDateAndTime';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#fff',
@@ -81,7 +75,6 @@ const DEFAULT_ITEM = {
   product_id: null,
   quantity: 1,
   unit_price: 0,
-  custom_discount: 0,
   total_price: 0,
 };
 
@@ -107,21 +100,10 @@ export default function GenerateSales() {
   const [paymentType, setPaymentType] = useState('');
   const [openPaymentList, setOpenPaymentList] = useState(false);
   const [openPaymentForm, setOpenPaymentForm] = useState(false);
-  const [openReferrerForm, setOpenReferrerForm] = useState(false);
 
   const { data: order = {}, isLoading: isLoadingOrder } = useQuery(
     [FETCH_ORDER_BY_ID_QUERY_KEY, orderId],
     () => fetchOrderById({ id: orderId as string }),
-    {
-      enabled: !!orderId && orderId !== 'new',
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  );
-
-  const { data: referrers = [] } = useQuery(
-    [FETCH_REFERRERS_QUERY_KEY],
-    fetchReferrers,
     {
       enabled: !!orderId && orderId !== 'new',
       refetchOnWindowFocus: false,
@@ -209,20 +191,13 @@ export default function GenerateSales() {
   });
 
   const {
-    mutateAsync: mutateCreateReferrer,
-    isLoading: isLoadingCreateReferrer,
-  } = useMutation({
-    mutationFn: createReferrer,
-    onSuccess: (data: Referrer) => {
-      queryClient.invalidateQueries([FETCH_REFERRERS_QUERY_KEY]);
-      setValue('referrer_id', data._id);
-    },
-    onError: (err) => {
-      console.error(err);
-    },
-  });
-
-  const { customer_id, invoice_number, discount, discount_type } = watch();
+    customer_id,
+    invoice_number,
+    vat_exempted,
+    sc_pwd_discount,
+    discount_card_number,
+    special_discount,
+  } = watch();
 
   const [orderItems, setOrderItems] = useState<TableItem[]>([DEFAULT_ITEM]);
 
@@ -271,16 +246,17 @@ export default function GenerateSales() {
       const totalPrice =
         getUnitPrice(products, obj.product_id as string, customer_type) *
         obj.quantity;
-      const totalPriceWDisc =
-        totalPrice -
-        (obj.custom_discount ? totalPrice * (obj.custom_discount / 100) : 0);
-      return accum + totalPriceWDisc;
+      return accum + totalPrice;
     }, 0);
 
-  const computeDiscountAmount = () =>
-    discount_type === 'amount'
-      ? discount
-      : computeSubtotal() * (discount / 100);
+  const computeVATExemptAmount = () =>
+    vat_exempted ? computeSubtotal() * (12 / 100) : 0;
+
+  const computeLessDiscAmount = () =>
+    sc_pwd_discount ? computeVATExemptAmount() * (20 / 100) : 0;
+
+  const computeSpecialDiscAmount = () =>
+    special_discount ? special_discount * -1 : 0;
 
   // eslint-disable-next-line
   const saveHandler = (formValues: { [x: string]: any }) => {
@@ -288,6 +264,7 @@ export default function GenerateSales() {
       _id: orderId,
       ...formValues,
       status: order?.status || 'draft',
+      sc_pwd_discount: !!discount_card_number,
     } as Order);
   };
 
@@ -298,27 +275,16 @@ export default function GenerateSales() {
   };
 
   const handleClosePaymentForm = () => setOpenPaymentForm(false);
-  const handleCloseReferrerForm = () => setOpenReferrerForm(false);
   const handleClosePaymentList = () => setOpenPaymentList(false);
 
   const onPaymentSubmit = (payment: Payment) => {
     mutateUpdateOrderPayment({ ...payment, order_id: order?._id });
   };
 
-  const onReferrerSubmit = (referrer: Referrer) => {
-    mutateCreateReferrer({ ...referrer });
-  };
-
   useEffect(() => {
     if (customer_details) {
       setValue('discount_card', customer_details?.discount_card);
       setValue('discount_card_number', customer_details?.discount_card_number);
-
-      if (customer_details?.discount_card_number && !formValues.discount) {
-        setValue('discount_type', 'percent');
-        setValue('discount', 20);
-        handleSave({ ...formValues, discount_type: 'percent', discount: 20 });
-      }
     }
   }, [customer_details]);
 
@@ -330,9 +296,11 @@ export default function GenerateSales() {
         billing_address: order.billing_address ?? order.customer_id?.address,
         tin: order.tin ?? order.customer_id?.tin,
         referrer_id: order.referrer_id?._id,
+        referring_doctor_id: order.referring_doctor_id?._id,
         invoice_number: order.invoice_number,
-        discount_type: order.discount_type,
-        discount: order.discount,
+        special_discount: order.special_discount,
+        vat_exempted: order.vat_exempted || false,
+        sc_pwd_discount: order.sc_pwd_discount || false,
       });
       setPaymentType(order.payment_type);
       setOrderItems(
@@ -383,7 +351,7 @@ export default function GenerateSales() {
                     Invoice #{invoice_number}
                   </Typography>
                   <Typography variant="h6" fontWeight="bold">
-                    Date: {dayjs().format('MM-DD-YYYY hh:mm A')}
+                    Date: <LiveDateAndTime />
                   </Typography>
                 </Stack>
               </Item>
@@ -475,6 +443,29 @@ export default function GenerateSales() {
                       </TextField>
                     </FormControl>
                   </Grid>
+                  <Grid size={4}>
+                    <FormControl fullWidth margin="dense">
+                      <FormLabel>Referring Doctor</FormLabel>
+                      <FormAutocomplete
+                        options={[
+                          ...referringDoctors.map(
+                            ({ _id, customer_id }: Doctor) => ({
+                              // eslint-disable-next-line
+                              label: (customer_id as any)?.customer_name,
+                              value: _id,
+                            }),
+                          ),
+                        ]}
+                        getValues={getValues}
+                        name="referring_doctor_id"
+                        placeholder={'Select Doctor'}
+                        disabled={
+                          !customer_id || order?.status !== OrderStatus.DRAFT
+                        }
+                        control={control}
+                      />
+                    </FormControl>
+                  </Grid>
                   {customer_type === 'PATIENT' && customer_details && (
                     <>
                       <Grid size={4}>
@@ -543,7 +534,7 @@ export default function GenerateSales() {
             <Grid size={12}>
               <Item>
                 <Grid container spacing={2}>
-                  <Grid size={4}>
+                  <Grid size={8}>
                     <FormControl fullWidth margin="dense">
                       <FormLabel>Billing Address</FormLabel>
                       <TextField
@@ -551,12 +542,12 @@ export default function GenerateSales() {
                         placeholder={'Enter billing address'}
                         variant="outlined"
                         fullWidth
-                        multiline
-                        rows={4}
+                        // multiline
+                        // rows={1}
                         disabled={
                           !customer_id || order?.status !== OrderStatus.DRAFT
                         }
-                        sx={{ '.MuiInputBase-root': { height: 'unset' } }}
+                        // sx={{ '.MuiInputBase-root': { height: 'unset' } }}
                       />
                     </FormControl>
                   </Grid>
@@ -571,30 +562,6 @@ export default function GenerateSales() {
                         disabled={
                           !customer_id || order?.status !== OrderStatus.DRAFT
                         }
-                      />
-                    </FormControl>
-                  </Grid>
-                  <Grid size={4}>
-                    <FormControl fullWidth margin="dense">
-                      <FormLabel>Referrer</FormLabel>
-                      <FormAutocomplete
-                        options={[
-                          { label: 'Add New Referrer...', value: 'new' },
-                          ...referrers.map(
-                            ({ _id, referrer_name }: Referrer) => ({
-                              label: referrer_name,
-                              value: _id,
-                            }),
-                          ),
-                        ]}
-                        getValues={getValues}
-                        name="referrer_id"
-                        placeholder={'Enter Referrer Name'}
-                        disabled={
-                          !customer_id || order?.status !== OrderStatus.DRAFT
-                        }
-                        control={control}
-                        onCreateNew={() => setOpenReferrerForm(true)}
                       />
                     </FormControl>
                   </Grid>
@@ -622,57 +589,71 @@ export default function GenerateSales() {
                     justifyContent={'flex-end'}
                     alignItems={'center'}
                   >
-                    <Typography>Less:</Typography>
+                    <Stack direction="row" alignItems={'center'}>
+                      <Controller
+                        name="vat_exempted"
+                        control={control}
+                        render={({ field }) => (
+                          <Checkbox {...field} checked={field.value} />
+                        )}
+                      />
+                      <Typography variant="body1" fontWeight={'bold'}>
+                        VAT Exempt (-12%):
+                      </Typography>
+                    </Stack>
+                    <Typography variant="body1" fontWeight={'bold'}>
+                      {`-${formatCurrency(computeVATExemptAmount())}`}
+                    </Typography>
+                  </Stack>
+                  <Stack
+                    direction="row"
+                    gap={4}
+                    padding={1}
+                    justifyContent={'flex-end'}
+                    alignItems={'center'}
+                  >
+                    <Typography variant="body1" fontWeight={'bold'}>
+                      Less SC/PWD/NAAC/MOV Discount (-20%):
+                    </Typography>
+                    <Typography variant="body1" fontWeight={'bold'}>
+                      {'-'}
+                      {formatCurrency(computeLessDiscAmount())}
+                    </Typography>
+                  </Stack>
+                  <Stack
+                    direction="row"
+                    gap={4}
+                    padding={1}
+                    justifyContent={'flex-end'}
+                    alignItems={'center'}
+                  >
+                    <Typography variant="body1" fontWeight={'bold'}>
+                      Special Discount:
+                    </Typography>
                     <FormControl margin="dense">
                       <TextField
-                        {...register('discount_type')}
-                        select
-                        variant="outlined"
-                        defaultValue={'percent'}
-                        disabled={
-                          !customer_id || order?.status !== OrderStatus.DRAFT
-                        }
-                      >
-                        <MenuItem
-                          key={'discount-type-percent'}
-                          value={'percent'}
-                        >
-                          Discount Percentage
-                        </MenuItem>
-                        <MenuItem key={'discount-type-amount'} value={'amount'}>
-                          Discount Amount
-                        </MenuItem>
-                      </TextField>
-                    </FormControl>
-                    <FormControl margin="dense">
-                      <TextField
-                        {...register('discount')}
+                        {...register('special_discount')}
                         sx={{ width: '150px' }}
+                        inputProps={{
+                          style: { textAlign: 'right' },
+                        }}
                         type={'number'}
                         disabled={
                           !customer_id || order?.status !== OrderStatus.DRAFT
                         }
                         slotProps={{
                           input: {
-                            startAdornment:
-                              discount_type === 'amount' ? (
-                                <InputAdornment position="start">
-                                  Php
-                                </InputAdornment>
-                              ) : undefined,
-                            endAdornment:
-                              discount_type === 'percent' ? (
-                                <InputAdornment position="end">
-                                  %
-                                </InputAdornment>
-                              ) : undefined,
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                Php
+                              </InputAdornment>
+                            ),
                           },
                         }}
                       />
                     </FormControl>
-                    <Typography variant="h6">
-                      {'-'}
-                      {formatCurrency(computeDiscountAmount())}
+                    <Typography variant="body1" fontWeight={'bold'}>
+                      {formatCurrency(computeSpecialDiscAmount())}
                     </Typography>
                   </Stack>
                   <Stack
@@ -816,13 +797,6 @@ export default function GenerateSales() {
             handleClose={handleClosePaymentForm}
             onPaymentSubmit={onPaymentSubmit}
             isLoading={isLoadingUpdatePayment}
-          />
-          <ReferrerForm
-            open={openReferrerForm}
-            handleClose={handleCloseReferrerForm}
-            onReferrerSubmit={onReferrerSubmit}
-            isLoading={isLoadingCreateReferrer}
-            doctors={referringDoctors}
           />
           <PaymentsList
             payments={order?.payments || []}

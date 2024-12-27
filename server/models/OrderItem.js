@@ -16,9 +16,6 @@ const OrderItemSchema = new mongoose.Schema({
   unit_price: {
     type: Number,
   },
-  custom_discount: {
-    type: Number,
-  },
   total_price: {
     type: Number,
   },
