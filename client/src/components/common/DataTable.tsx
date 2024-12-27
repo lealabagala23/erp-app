@@ -7,7 +7,6 @@ import {
   MoreHoriz,
   RemoveRedEye,
 } from '@mui/icons-material';
-import toLower from 'lodash/toLower';
 
 interface IProps {
   // eslint-disable-next-line
@@ -27,12 +26,10 @@ interface IProps {
 
 export default function DataTable({
   columns,
-  searchText,
   isLoading,
   data,
   setSelectedRow,
   onActionClick,
-  searchAttr,
   sortField,
   sortDir,
   menuActions = ['Edit', 'Delete'],
@@ -86,13 +83,7 @@ export default function DataTable({
       <DataGrid
         checkboxSelection={false}
         loading={isLoading}
-        rows={
-          searchText !== ''
-            ? data?.filter((p) =>
-                toLower(p[searchAttr])?.includes(toLower(searchText)),
-              )
-            : data
-        }
+        rows={data}
         columns={tableColumns}
         getRowId={(row) => row._id || 0}
         getRowClassName={(params) =>

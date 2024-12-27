@@ -9,7 +9,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import AlertSnackbar from './AlertSnackbar';
 import AlertDialog from './AlertDialog';
 import { AddBoxOutlined, Upload } from '@mui/icons-material';
-import { capitalize } from 'lodash';
+import { capitalize, toLower } from 'lodash';
 import DataTable from './DataTable';
 import CSVUploader from './CSVUploader';
 import { GridColDef } from '@mui/x-data-grid';
@@ -49,6 +49,9 @@ interface IProps {
   menuActions?: string[];
   isCreateNew?: boolean;
   redirectOnCreate?: (id: string) => void;
+  searchPlaceholder?: string;
+  // eslint-disable-next-line
+  searchFunc?: (d: any[], v: string) => any[];
 }
 
 export default function PageTemplate({
@@ -69,6 +72,8 @@ export default function PageTemplate({
   fetchParams,
   isCreateNew,
   redirectOnCreate,
+  searchPlaceholder,
+  searchFunc,
 }: IProps) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -259,6 +264,7 @@ export default function PageTemplate({
             spacing={2}
           >
             <SearchBar
+              placeholder={searchPlaceholder}
               itemName={itemName}
               searchText={searchText}
               setSearchText={setSearchText}
@@ -308,7 +314,16 @@ export default function PageTemplate({
           <DataTable
             columns={columns}
             searchText={searchText}
-            data={data}
+            data={
+              searchText !== ''
+                ? searchFunc
+                  ? searchFunc(data, searchText)
+                  : // eslint-disable-next-line
+                    data?.filter((p: any) =>
+                      toLower(p[searchAttr])?.includes(toLower(searchText)),
+                    )
+                : data
+            }
             isLoading={isLoadingFetch || isLoadingDelete}
             setSelectedRow={setSelectedRow}
             onActionClick={onActionClick}

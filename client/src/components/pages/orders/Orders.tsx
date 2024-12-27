@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { Chip } from '@mui/material';
 import { getOrderStatusColor } from '../generate-sales/constants';
 import { formatCurrency } from '../../../utils/auth';
+import { toLower } from 'lodash';
 
 export const FETCH_ORDERS_QUERY_KEY = 'fetchOrders';
 
@@ -97,7 +98,18 @@ export default function Orders() {
       viewItem={(item: any) => navigate(`/orders/${item._id}`)}
       queryKey={FETCH_ORDERS_QUERY_KEY}
       itemName="order"
+      searchPlaceholder="Search by invoice number or customer name..."
       searchAttr="invoice_number"
+      searchFunc={(data: Order[], value: string) =>
+        data.filter(
+          ({ invoice_number, customer_id }) =>
+            toLower(invoice_number).includes(toLower(value)) ||
+            // eslint-disable-next-line
+            toLower((customer_id as any)?.customer_name).includes(
+              toLower(value),
+            ),
+        )
+      }
       sortField="status"
       sortDir="desc"
       columns={COLUMNS}
