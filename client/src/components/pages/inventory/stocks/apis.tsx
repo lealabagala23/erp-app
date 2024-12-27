@@ -17,6 +17,7 @@ export const generateInventoryPayload = (inventory: Inventory) => {
     'quantity_on_hand',
     'quantity_on_order',
     'expiry_date',
+    'batch_number',
     'status',
     'company_id',
     'supplier_id',

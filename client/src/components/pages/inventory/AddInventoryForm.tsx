@@ -189,6 +189,20 @@ export default function AddInventoryForm({
         </FormControl>
 
         <FormControl fullWidth margin="dense">
+          <FormLabel>Batch No.</FormLabel>
+          <TextField
+            {...register('batch_number', {
+              required: 'Batch No. is required',
+            })}
+            placeholder="Enter batch number"
+            variant="outlined"
+            fullWidth
+            error={Boolean(errors.batch_number)}
+            helperText={<>{errors.batch_number?.message}</>}
+          />
+        </FormControl>
+
+        <FormControl fullWidth margin="dense">
           <FormLabel>Quantity on Order</FormLabel>
           <TextField
             {...register('quantity_on_order', {

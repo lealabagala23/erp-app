@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { Chip } from '@mui/material';
 import { getOrderStatusColor } from '../generate-sales/constants';
 import { formatCurrency } from '../../../utils/auth';
-import { toLower } from 'lodash';
+import toLower from 'lodash/toLower';
 
 export const FETCH_ORDERS_QUERY_KEY = 'fetchOrders';
 

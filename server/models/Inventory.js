@@ -21,6 +21,10 @@ const InventorySchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  batch_number: {
+    type: String,
+    required: true,
+  },
   status: {
     type: String,
     required: true,
