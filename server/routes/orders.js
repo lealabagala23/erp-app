@@ -5,6 +5,7 @@ const authenticateToken = require("../middleware/auth");
 const OrderItem = require("../models/OrderItem");
 const { default: mongoose } = require("mongoose");
 const Payment = require("../models/Payment");
+const Inventory = require("../models/Inventory");
 
 const getOrderPayload = ({
   customer_id,
@@ -344,6 +345,48 @@ router.put("/:id/status", authenticateToken, async (req, res) => {
         new: true,
       }
     );
+
+    const orderItems = OrderItem.find({ order_id });
+    const promises = orderItems.map(({ product_id, quantity }) => {
+      return Inventory.findOneAndUpdate(
+        { product_id },
+        { $inc: { quantity_on_hand: -quantity } },
+        { new: true, useFindAndModify: false }
+      );
+    });
+
+    await Promise.all(promises);
+
+    res.status(200).json(updatedOrder);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
+// Update a Order
+router.put("/:id/cancel", authenticateToken, async (req, res) => {
+  try {
+    const order_id = req.params.id;
+    const { cancel_items, cancel_all } = req.body;
+    const updatedOrder = await Order.findByIdAndUpdate(
+      order_id,
+      { status: cancel_all ? "cancelled" : "partial_cancelled" },
+      {
+        new: true,
+      }
+    );
+
+    const promises = cancel_items.map(({ product_id, quantity }) => {
+      return Inventory.findOneAndUpdate(
+        { product_id },
+        { $inc: { quantity_on_hand: quantity } },
+        { new: true, useFindAndModify: false }
+      );
+    });
+
+    await Promise.all(promises);
+
     res.status(200).json(updatedOrder);
   } catch (err) {
     console.log(err);
@@ -417,8 +460,6 @@ router.put("/:id", authenticateToken, async (req, res) => {
       if (newOrderItems.length > 0) {
         await OrderItem.insertMany(newOrderItems);
       }
-
-      // TODO: if status === 'approved', reduce quantity_on_hand on Product Inventory
     }
     res.status(200).json(updatedOrder);
   } catch (err) {

@@ -24,13 +24,14 @@ import { Customer, Doctor } from '../accounts/types';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import FormAutocomplete from '../../common/FormAutocomplete';
 import ItemTable from './ItemTable';
-import { Order, OrderItem, Payment, TableItem } from './types';
+import { CancelItem, Order, OrderItem, Payment, TableItem } from './types';
 import { fetchProducts } from '../inventory/apis';
 import lhctPDF from '../../../assets/lhct_invoice.pdf';
 import lmtPDF from '../../../assets/lmt_invoice.pdf';
 import { formatCurrency, getUnitPrice } from '../../../utils/auth';
 import {
   Approval,
+  Cancel,
   Edit,
   EditNote,
   MoneyOutlined,
@@ -43,6 +44,7 @@ import { FETCH_PRODUCTS_QUERY_KEY } from '../inventory/constants';
 import { FETCH_CUSTOMERS_QUERY_KEY } from '../accounts/constants';
 import {
   addOrderPayment,
+  cancelOrder,
   createOrder,
   fetchOrderById,
   updateOrder,
@@ -59,6 +61,7 @@ import PaymentForm from './PaymentForm';
 import { modifyPdf } from '../../../utils/pdfWriter';
 import PaymentsList from './PaymentsList';
 import LiveDateAndTime from '../../common/LiveDateAndTime';
+import CancelOrder from './CancelOrder';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#fff',
@@ -100,6 +103,7 @@ export default function GenerateSales() {
   const [paymentType, setPaymentType] = useState('');
   const [openPaymentList, setOpenPaymentList] = useState(false);
   const [openPaymentForm, setOpenPaymentForm] = useState(false);
+  const [openCancelOrder, setOpenCancelOrder] = useState(false);
 
   const { data: order = {}, isLoading: isLoadingOrder } = useQuery(
     [FETCH_ORDER_BY_ID_QUERY_KEY, orderId],
@@ -184,6 +188,17 @@ export default function GenerateSales() {
     mutationFn: addOrderPayment,
     onSuccess: () => {
       queryClient.invalidateQueries([FETCH_ORDER_BY_ID_QUERY_KEY]);
+    },
+    onError: (err) => {
+      console.error(err);
+    },
+  });
+
+  const { mutateAsync: mutateCancelOrder } = useMutation({
+    mutationFn: cancelOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries([FETCH_ORDER_BY_ID_QUERY_KEY]);
+      setOpenCancelOrder(false);
     },
     onError: (err) => {
       console.error(err);
@@ -279,6 +294,16 @@ export default function GenerateSales() {
 
   const onPaymentSubmit = (payment: Payment) => {
     mutateUpdateOrderPayment({ ...payment, order_id: order?._id });
+  };
+
+  const onCancelSubmit = (cancel_items: CancelItem[], total: number) => {
+    const cancel_all =
+      total >=
+      order.order_items.reduce(
+        (accum: number, obj: OrderItem) => accum + obj.quantity,
+        0,
+      );
+    mutateCancelOrder({ order_id: order?._id, cancel_items, cancel_all });
   };
 
   useEffect(() => {
@@ -790,6 +815,17 @@ export default function GenerateSales() {
               >
                 Send Order for Approval
               </Button>
+              {[OrderStatus.COMPLETED, OrderStatus.PARTIAL_CANCELLED].includes(
+                order.status,
+              ) && (
+                <Button
+                  variant={'contained'}
+                  startIcon={<Cancel />}
+                  onClick={() => setOpenCancelOrder(true)}
+                >
+                  Cancel Order
+                </Button>
+              )}
             </Grid>
           </Grid>
           <PaymentForm
@@ -803,6 +839,12 @@ export default function GenerateSales() {
             open={openPaymentList}
             handleClose={handleClosePaymentList}
             onAddPayment={() => setOpenPaymentForm(true)}
+          />
+          <CancelOrder
+            open={openCancelOrder}
+            handleClose={() => setOpenCancelOrder(false)}
+            orderItems={order.order_items as OrderItem[]}
+            onCancel={onCancelSubmit}
           />
         </>
       </PageWrapper>

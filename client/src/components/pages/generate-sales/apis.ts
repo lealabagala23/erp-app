@@ -1,4 +1,4 @@
-import { Order, OrderItem, Payment } from './types';
+import { CancelItem, Order, OrderItem, Payment } from './types';
 import axiosConfig from '../../../utils/axiosConfig';
 import { Referrer } from '../accounts/types';
 
@@ -100,15 +100,24 @@ export const updateOrderStatus = async (order: Order) => {
 
 export const addOrderPayment = async ({ order_id, ...payload }: Payment) => {
   const response = await axiosConfig.put(`${ORDERS_API}/${order_id}/payment`, {
-    ...payload
+    ...payload,
   });
 
   return response?.data;
 };
 
-export const createReferrer = async (payload: Referrer) => {
-  const response = await axiosConfig.post(`${REFERRERS_API}`, {
-    ...payload
+export const cancelOrder = async ({
+  order_id,
+  cancel_items,
+  cancel_all,
+}: {
+  order_id: string;
+  cancel_items: CancelItem[];
+  cancel_all?: boolean;
+}) => {
+  const response = await axiosConfig.put(`${ORDERS_API}/${order_id}/cancel`, {
+    cancel_items,
+    cancel_all,
   });
 
   return response?.data;

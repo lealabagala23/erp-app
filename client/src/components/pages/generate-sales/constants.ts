@@ -7,6 +7,8 @@ export enum OrderStatus {
   FOR_PRINTING = 'for_printing',
   UNPAID = 'unpaid',
   COMPLETED = 'completed',
+  PARTIAL_CANCELLED = 'partial_cancelled',
+  CANCELLED = 'cancelled',
 }
 
 export const getOrderStatusColor = (status: OrderStatus) => {
@@ -21,5 +23,9 @@ export const getOrderStatusColor = (status: OrderStatus) => {
       return 'warning';
     case OrderStatus.COMPLETED:
       return 'success';
+    case OrderStatus.PARTIAL_CANCELLED:
+      return 'warning';
+    case OrderStatus.CANCELLED:
+      return 'error';
   }
 };

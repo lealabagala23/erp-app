@@ -52,3 +52,12 @@ export type Payment = {
   collection_receipt_no: string;
   created_at?: string;
 };
+
+export type CancelItem = {
+  _id: string;
+  product_id: string;
+  checked: boolean;
+  label: string;
+  quantity: number;
+  maxQty: number;
+}
