@@ -410,7 +410,12 @@ export default function GenerateSales() {
                         autoFocus
                         placeholder={'Select Customer'}
                         control={control}
-                        disabled={order?.status !== OrderStatus.DRAFT}
+                        disabled={
+                          ![
+                            OrderStatus.DRAFT,
+                            OrderStatus.FOR_APPROVAL,
+                          ].includes(order?.status)
+                        }
                       />
                     </FormControl>
                   </Grid>
@@ -452,7 +457,11 @@ export default function GenerateSales() {
                         fullWidth
                         value={paymentType}
                         disabled={
-                          !customer_id || order?.status !== OrderStatus.DRAFT
+                          !customer_id ||
+                          ![
+                            OrderStatus.DRAFT,
+                            OrderStatus.FOR_APPROVAL,
+                          ].includes(order?.status)
                         }
                         onChange={(e) => {
                           setPaymentType(e.target.value);
@@ -485,7 +494,11 @@ export default function GenerateSales() {
                         name="referring_doctor_id"
                         placeholder={'Select Doctor'}
                         disabled={
-                          !customer_id || order?.status !== OrderStatus.DRAFT
+                          !customer_id ||
+                          ![
+                            OrderStatus.DRAFT,
+                            OrderStatus.FOR_APPROVAL,
+                          ].includes(order?.status)
                         }
                         control={control}
                       />
@@ -503,7 +516,10 @@ export default function GenerateSales() {
                             fullWidth
                             disabled={
                               !customer_id ||
-                              order?.status !== OrderStatus.DRAFT
+                              ![
+                                OrderStatus.DRAFT,
+                                OrderStatus.FOR_APPROVAL,
+                              ].includes(order?.status)
                             }
                           />
                         </FormControl>
@@ -518,7 +534,10 @@ export default function GenerateSales() {
                             fullWidth
                             disabled={
                               !customer_id ||
-                              order?.status !== OrderStatus.DRAFT
+                              ![
+                                OrderStatus.DRAFT,
+                                OrderStatus.FOR_APPROVAL,
+                              ].includes(order?.status)
                             }
                           />
                         </FormControl>
@@ -550,7 +569,10 @@ export default function GenerateSales() {
                     variant="outlined"
                     sx={{ '.MuiInputBase-input': { textAlign: 'right' } }}
                     disabled={
-                      !customer_id || order?.status !== OrderStatus.DRAFT
+                      !customer_id ||
+                      ![OrderStatus.DRAFT, OrderStatus.FOR_APPROVAL].includes(
+                        order?.status,
+                      )
                     }
                   />
                 </FormControl>
@@ -570,7 +592,11 @@ export default function GenerateSales() {
                         // multiline
                         // rows={1}
                         disabled={
-                          !customer_id || order?.status !== OrderStatus.DRAFT
+                          !customer_id ||
+                          ![
+                            OrderStatus.DRAFT,
+                            OrderStatus.FOR_APPROVAL,
+                          ].includes(order?.status)
                         }
                         // sx={{ '.MuiInputBase-root': { height: 'unset' } }}
                       />
@@ -585,7 +611,11 @@ export default function GenerateSales() {
                         variant="outlined"
                         fullWidth
                         disabled={
-                          !customer_id || order?.status !== OrderStatus.DRAFT
+                          !customer_id ||
+                          ![
+                            OrderStatus.DRAFT,
+                            OrderStatus.FOR_APPROVAL,
+                          ].includes(order?.status)
                         }
                       />
                     </FormControl>
@@ -604,7 +634,12 @@ export default function GenerateSales() {
                   deleteOrderItem={deleteOrderItem}
                   clearAllOrderItems={clearAllOrderItems}
                   subtotal={computeSubtotal()}
-                  disabled={!customer_id || order?.status !== OrderStatus.DRAFT}
+                  disabled={
+                    !customer_id ||
+                    ![OrderStatus.DRAFT, OrderStatus.FOR_APPROVAL].includes(
+                      order?.status,
+                    )
+                  }
                 />
                 <Stack direction="column">
                   <Stack
@@ -664,7 +699,11 @@ export default function GenerateSales() {
                         }}
                         type={'number'}
                         disabled={
-                          !customer_id || order?.status !== OrderStatus.DRAFT
+                          !customer_id ||
+                          ![
+                            OrderStatus.DRAFT,
+                            OrderStatus.FOR_APPROVAL,
+                          ].includes(order?.status)
                         }
                         slotProps={{
                           input: {
