@@ -195,6 +195,8 @@ const orderAggregateParams = [
       billing_address: { $first: "$billing_address" },
       total_amount: { $first: "$total_amount" },
       total_amount_paid: { $first: "$total_amount_paid" },
+      discount_card: { $first: "$discount_card" },
+      discount_card_number: { $first: "$discount_card_number" },
       sc_pwd_discount: { $first: "$sc_pwd_discount" },
       vat_exempted: { $first: "$vat_exempted" },
       special_discount: { $first: "$special_discount" },

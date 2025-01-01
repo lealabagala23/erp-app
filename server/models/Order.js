@@ -28,6 +28,12 @@ const OrderSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  discount_card: {
+    type: String,
+  },
+  discount_card_number: {
+    type: String,
+  },
   sc_pwd_discount: {
     type: Boolean,
   },

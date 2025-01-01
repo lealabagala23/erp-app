@@ -63,7 +63,7 @@ import PaymentsList from './PaymentsList';
 import LiveDateAndTime from '../../common/LiveDateAndTime';
 import CancelOrder from './CancelOrder';
 
-const Item = styled(Paper)(({ theme }) => ({
+export const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#fff',
   ...theme.typography.body2,
   padding: theme.spacing(1),
@@ -104,6 +104,8 @@ export default function GenerateSales() {
   const [openPaymentList, setOpenPaymentList] = useState(false);
   const [openPaymentForm, setOpenPaymentForm] = useState(false);
   const [openCancelOrder, setOpenCancelOrder] = useState(false);
+  const [hasSpecialDisc, setHasSpecialDisc] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const { data: order = {}, isLoading: isLoadingOrder } = useQuery(
     [FETCH_ORDER_BY_ID_QUERY_KEY, orderId],
@@ -162,9 +164,11 @@ export default function GenerateSales() {
       mutationFn: updateOrder,
       onSuccess: () => {
         queryClient.invalidateQueries([FETCH_ORDER_BY_ID_QUERY_KEY]);
+        setIsSaving(false);
       },
       onError: (err) => {
         console.error(err);
+        setIsSaving(false);
       },
     });
 
@@ -210,7 +214,6 @@ export default function GenerateSales() {
     invoice_number,
     vat_exempted,
     sc_pwd_discount,
-    discount_card_number,
     special_discount,
   } = watch();
 
@@ -267,7 +270,7 @@ export default function GenerateSales() {
     vat_exempted ? computeSubtotal() * (12 / 100) : 0;
 
   const computeLessDiscAmount = () =>
-    sc_pwd_discount ? computeVATExemptAmount() * (20 / 100) : 0;
+    sc_pwd_discount ? computeSubtotal() * (20 / 100) : 0;
 
   const computeSpecialDiscAmount = () =>
     special_discount ? special_discount * -1 : 0;
@@ -278,7 +281,6 @@ export default function GenerateSales() {
       _id: orderId,
       ...formValues,
       status: order?.status || 'draft',
-      sc_pwd_discount: !!discount_card_number,
     } as Order);
   };
 
@@ -313,6 +315,12 @@ export default function GenerateSales() {
   }, [customer_details]);
 
   useEffect(() => {
+    if (formValues.discount_card_number && !sc_pwd_discount) {
+      setValue('sc_pwd_discount', true);
+    }
+  }, [formValues.discount_card_number]);
+
+  useEffect(() => {
     if (order) {
       reset({
         customer_id: order.customer_id?._id,
@@ -340,7 +348,10 @@ export default function GenerateSales() {
   }, [order]);
 
   useEffect(() => {
-    if (isDirty) handleSave({ ...formValues, order_items: orderItems });
+    if (isDirty) {
+      setIsSaving(true);
+      handleSave({ ...formValues, order_items: orderItems });
+    }
   }, [formValues, orderItems]);
 
   useEffect(() => {
@@ -374,9 +385,15 @@ export default function GenerateSales() {
                   <Typography variant="h3" fontWeight="bold">
                     Invoice #{invoice_number}
                   </Typography>
-                  <Typography variant="h6" fontWeight="bold">
-                    Date: <LiveDateAndTime />
-                  </Typography>
+                  {isSaving ? (
+                    <Typography variant="h6" fontStyle={'italic'}>
+                      Saving...
+                    </Typography>
+                  ) : (
+                    <Typography variant="h6" fontWeight="bold">
+                      Date: <LiveDateAndTime />
+                    </Typography>
+                  )}
                 </Stack>
               </Item>
             </Grid>
@@ -557,8 +574,11 @@ export default function GenerateSales() {
                 <Typography>
                   (Amount Paid: ₱ {formatCurrency(order?.total_amount_paid)})
                 </Typography>
-                <FormControl margin="dense">
-                  <FormLabel>Invoice No.</FormLabel>
+                <FormControl
+                  margin="dense"
+                  sx={{ flexDirection: 'row', alignItems: 'center', gap: 1 }}
+                >
+                  <FormLabel sx={{ margin: 0 }}>Invoice No.</FormLabel>
                   <TextField
                     {...register('invoice_number')}
                     placeholder={'Enter Invoice Number'}
@@ -635,102 +655,168 @@ export default function GenerateSales() {
                     )
                   }
                 />
-                <Stack direction="column">
-                  <Stack
-                    direction="row"
-                    gap={4}
-                    padding={1}
-                    justifyContent={'flex-end'}
-                    alignItems={'center'}
-                  >
-                    <Stack direction="row" alignItems={'center'}>
-                      <Controller
-                        name="vat_exempted"
-                        control={control}
-                        render={({ field }) => (
-                          <Checkbox {...field} checked={field.value} />
-                        )}
-                        disabled={
-                          ![OrderStatus.DRAFT, OrderStatus.UNAPPROVED].includes(
-                            order?.status,
-                          )
-                        }
-                      />
+                <Grid container spacing={2} justifyContent={'flex-end'}>
+                  <Grid size={3}>
+                    <Item>
+                      <Stack direction="row" alignItems={'center'} gap={1}>
+                        <Controller
+                          name="vat_exempted"
+                          control={control}
+                          defaultValue={false}
+                          render={({ field }) => (
+                            <Checkbox
+                              {...field}
+                              checked={field.value}
+                              sx={{ padding: 0 }}
+                            />
+                          )}
+                          disabled={
+                            ![
+                              OrderStatus.DRAFT,
+                              OrderStatus.UNAPPROVED,
+                            ].includes(order?.status)
+                          }
+                        />
+                        <Typography
+                          variant="body1"
+                          fontWeight={'bold'}
+                          color={vat_exempted ? undefined : 'textDisabled'}
+                        >
+                          VAT Exempt (-12%):
+                        </Typography>
+                      </Stack>
+                    </Item>
+                  </Grid>
+                  <Grid size={1} alignItems={'center'} textAlign={'right'}>
+                    <Item>
                       <Typography variant="body1" fontWeight={'bold'}>
-                        VAT Exempt (-12%):
+                        {`-${formatCurrency(computeVATExemptAmount())}`}
                       </Typography>
-                    </Stack>
-                    <Typography variant="body1" fontWeight={'bold'}>
-                      {`-${formatCurrency(computeVATExemptAmount())}`}
-                    </Typography>
-                  </Stack>
-                  <Stack
-                    direction="row"
-                    gap={4}
-                    padding={1}
-                    justifyContent={'flex-end'}
-                    alignItems={'center'}
-                  >
-                    <Typography variant="body1" fontWeight={'bold'}>
-                      Less SC/PWD/NAAC/MOV Discount (-20%):
-                    </Typography>
-                    <Typography variant="body1" fontWeight={'bold'}>
-                      {'-'}
-                      {formatCurrency(computeLessDiscAmount())}
-                    </Typography>
-                  </Stack>
-                  <Stack
-                    direction="row"
-                    gap={4}
-                    padding={1}
-                    justifyContent={'flex-end'}
-                    alignItems={'center'}
-                  >
-                    <Typography variant="body1" fontWeight={'bold'}>
-                      Special Discount:
-                    </Typography>
-                    <FormControl margin="dense">
-                      <TextField
-                        {...register('special_discount')}
-                        sx={{ width: '150px' }}
-                        inputProps={{
-                          style: { textAlign: 'right' },
-                        }}
-                        type={'number'}
-                        disabled={
-                          !customer_id ||
-                          ![OrderStatus.DRAFT, OrderStatus.UNAPPROVED].includes(
-                            order?.status,
-                          )
-                        }
-                        slotProps={{
-                          input: {
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                Php
-                              </InputAdornment>
-                            ),
-                          },
-                        }}
-                      />
-                    </FormControl>
-                    <Typography variant="body1" fontWeight={'bold'}>
-                      {formatCurrency(computeSpecialDiscAmount())}
-                    </Typography>
-                  </Stack>
-                  <Stack
-                    direction="row"
-                    gap={4}
-                    padding={1}
-                    justifyContent={'flex-end'}
-                    alignItems={'center'}
-                  >
-                    <Typography variant="h6">TOTAL AMOUNT DUE:</Typography>
-                    <Typography variant="h6">
-                      ₱ {formatCurrency(order?.total_amount || 0)}
-                    </Typography>
-                  </Stack>
-                </Stack>
+                    </Item>
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2} justifyContent={'flex-end'}>
+                  <Grid size={3}>
+                    <Item>
+                      <Stack direction="row" alignItems={'center'} gap={1}>
+                        <Controller
+                          name="sc_pwd_discount"
+                          control={control}
+                          defaultValue={false}
+                          render={({ field }) => (
+                            <Checkbox
+                              {...field}
+                              checked={field.value}
+                              sx={{ padding: 0 }}
+                            />
+                          )}
+                          disabled={
+                            ![
+                              OrderStatus.DRAFT,
+                              OrderStatus.UNAPPROVED,
+                            ].includes(order?.status)
+                          }
+                        />
+                        <Typography
+                          variant="body1"
+                          fontWeight={'bold'}
+                          color={sc_pwd_discount ? undefined : 'textDisabled'}
+                        >
+                          Less SC/PWD/NAAC/MOV Discount (-20%):
+                        </Typography>
+                      </Stack>
+                    </Item>
+                  </Grid>
+
+                  <Grid size={1} alignItems={'center'} textAlign={'right'}>
+                    <Item>
+                      <Typography variant="body1" fontWeight={'bold'}>
+                        {'-'}
+                        {formatCurrency(computeLessDiscAmount())}
+                      </Typography>
+                    </Item>
+                  </Grid>
+                </Grid>
+
+                <Grid container spacing={2} justifyContent={'flex-end'}>
+                  <Grid size={3}>
+                    <Item>
+                      <Stack direction="row" alignItems={'center'} gap={1}>
+                        <Checkbox
+                          checked={hasSpecialDisc}
+                          onClick={() => {
+                            setHasSpecialDisc((v) => !v);
+                            setValue('vat_exempted', false);
+                            setValue('sc_pwd_discount', false);
+                          }}
+                          sx={{ padding: 0 }}
+                          disabled={
+                            ![
+                              OrderStatus.DRAFT,
+                              OrderStatus.UNAPPROVED,
+                            ].includes(order?.status)
+                          }
+                        />
+                        <Typography
+                          variant="body1"
+                          fontWeight={'bold'}
+                          color={hasSpecialDisc ? undefined : 'textDisabled'}
+                        >
+                          Special Discount:
+                        </Typography>
+
+                        <FormControl margin="dense">
+                          <TextField
+                            {...register('special_discount')}
+                            sx={{ width: '150px' }}
+                            inputProps={{
+                              style: { textAlign: 'right' },
+                            }}
+                            type={'number'}
+                            disabled={
+                              !customer_id ||
+                              ![
+                                OrderStatus.DRAFT,
+                                OrderStatus.UNAPPROVED,
+                              ].includes(order?.status) ||
+                              !hasSpecialDisc
+                            }
+                            slotProps={{
+                              input: {
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    ₱
+                                  </InputAdornment>
+                                ),
+                              },
+                            }}
+                          />
+                        </FormControl>
+                      </Stack>
+                    </Item>
+                  </Grid>
+                  <Grid size={1} alignItems={'center'} textAlign={'right'}>
+                    <Item>
+                      <Typography variant="body1" fontWeight={'bold'}>
+                        {formatCurrency(computeSpecialDiscAmount())}
+                      </Typography>
+                    </Item>
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2} justifyContent={'flex-end'}>
+                  <Grid size={3} textAlign={'right'}>
+                    <Item>
+                      <Typography variant="h6">TOTAL AMOUNT DUE:</Typography>
+                    </Item>
+                  </Grid>
+                  <Grid size={2} alignItems={'center'} textAlign={'right'}>
+                    <Item>
+                      <Typography variant="h6">
+                        ₱ {formatCurrency(order?.total_amount || 0)}
+                      </Typography>
+                    </Item>
+                  </Grid>
+                </Grid>
               </Item>
             </Grid>
             <Grid container size={12} alignItems={'center'}>
@@ -746,11 +832,7 @@ export default function GenerateSales() {
                 color={getOrderStatusColor(order?.status)}
                 variant="filled"
                 size="medium"
-                label={
-                  isLoadingUpdate
-                    ? 'Saving...'
-                    : order?.status?.toUpperCase().replaceAll('_', ' ')
-                }
+                label={order?.status?.toUpperCase().replaceAll('_', ' ')}
               />
               {order?.approver_id?._id && (
                 <>

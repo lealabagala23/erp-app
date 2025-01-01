@@ -2,6 +2,7 @@ import { DeleteOutlineRounded } from '@mui/icons-material';
 import {
   Box,
   Button,
+  Grid2 as Grid,
   IconButton,
   Stack,
   Tooltip,
@@ -20,6 +21,7 @@ import { formatCurrency, getUnitPrice } from '../../../utils/auth';
 import { Product } from '../inventory/types';
 import ProductSelector from './ProductSelector';
 import AuthContext from '../../auth/AuthContext';
+import { Item } from './GenerateSales';
 
 interface IProps {
   products: Product[];
@@ -354,11 +356,19 @@ export default function ItemTable({
             Clear all lines
           </Button>
         </Stack>
-        <Stack direction="row" gap={4} padding={1}>
-          <Typography variant={'h6'}>Total Sales</Typography>
-          <Typography variant={'h6'}>{formatCurrency(subtotal)}</Typography>
-        </Stack>
       </Stack>
+      <Grid container spacing={2} justifyContent={'flex-end'} marginTop="-40px">
+        <Grid size={3} textAlign={'right'}>
+          <Item>
+            <Typography variant="h6">Total Sales:</Typography>
+          </Item>
+        </Grid>
+        <Grid size={2} alignItems={'center'} textAlign={'right'}>
+          <Item>
+            <Typography variant="h6">₱ {formatCurrency(subtotal)}</Typography>
+          </Item>
+        </Grid>
+      </Grid>
       <ProductSelector
         products={products}
         open={openDialog}

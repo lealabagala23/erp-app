@@ -123,7 +123,7 @@ export default function CustomerForm({
       sx={{ width: '100%', height: '100%', justifyContent: 'space-between' }}
     >
       <Box padding={2}>
-        <FormControl fullWidth margin="dense" required>
+        <FormControl fullWidth margin="none" required>
           <FormLabel>Customer Name</FormLabel>
           <Controller
             name="customer_name"
