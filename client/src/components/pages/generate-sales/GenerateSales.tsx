@@ -411,10 +411,9 @@ export default function GenerateSales() {
                         placeholder={'Select Customer'}
                         control={control}
                         disabled={
-                          ![
-                            OrderStatus.DRAFT,
-                            OrderStatus.FOR_APPROVAL,
-                          ].includes(order?.status)
+                          ![OrderStatus.DRAFT, OrderStatus.UNAPPROVED].includes(
+                            order?.status,
+                          )
                         }
                       />
                     </FormControl>
@@ -458,10 +457,9 @@ export default function GenerateSales() {
                         value={paymentType}
                         disabled={
                           !customer_id ||
-                          ![
-                            OrderStatus.DRAFT,
-                            OrderStatus.FOR_APPROVAL,
-                          ].includes(order?.status)
+                          ![OrderStatus.DRAFT, OrderStatus.UNAPPROVED].includes(
+                            order?.status,
+                          )
                         }
                         onChange={(e) => {
                           setPaymentType(e.target.value);
@@ -495,10 +493,9 @@ export default function GenerateSales() {
                         placeholder={'Select Doctor'}
                         disabled={
                           !customer_id ||
-                          ![
-                            OrderStatus.DRAFT,
-                            OrderStatus.FOR_APPROVAL,
-                          ].includes(order?.status)
+                          ![OrderStatus.DRAFT, OrderStatus.UNAPPROVED].includes(
+                            order?.status,
+                          )
                         }
                         control={control}
                       />
@@ -518,7 +515,7 @@ export default function GenerateSales() {
                               !customer_id ||
                               ![
                                 OrderStatus.DRAFT,
-                                OrderStatus.FOR_APPROVAL,
+                                OrderStatus.UNAPPROVED,
                               ].includes(order?.status)
                             }
                           />
@@ -536,7 +533,7 @@ export default function GenerateSales() {
                               !customer_id ||
                               ![
                                 OrderStatus.DRAFT,
-                                OrderStatus.FOR_APPROVAL,
+                                OrderStatus.UNAPPROVED,
                               ].includes(order?.status)
                             }
                           />
@@ -570,7 +567,7 @@ export default function GenerateSales() {
                     sx={{ '.MuiInputBase-input': { textAlign: 'right' } }}
                     disabled={
                       !customer_id ||
-                      ![OrderStatus.DRAFT, OrderStatus.FOR_APPROVAL].includes(
+                      ![OrderStatus.DRAFT, OrderStatus.UNAPPROVED].includes(
                         order?.status,
                       )
                     }
@@ -593,10 +590,9 @@ export default function GenerateSales() {
                         // rows={1}
                         disabled={
                           !customer_id ||
-                          ![
-                            OrderStatus.DRAFT,
-                            OrderStatus.FOR_APPROVAL,
-                          ].includes(order?.status)
+                          ![OrderStatus.DRAFT, OrderStatus.UNAPPROVED].includes(
+                            order?.status,
+                          )
                         }
                         // sx={{ '.MuiInputBase-root': { height: 'unset' } }}
                       />
@@ -612,10 +608,9 @@ export default function GenerateSales() {
                         fullWidth
                         disabled={
                           !customer_id ||
-                          ![
-                            OrderStatus.DRAFT,
-                            OrderStatus.FOR_APPROVAL,
-                          ].includes(order?.status)
+                          ![OrderStatus.DRAFT, OrderStatus.UNAPPROVED].includes(
+                            order?.status,
+                          )
                         }
                       />
                     </FormControl>
@@ -636,7 +631,7 @@ export default function GenerateSales() {
                   subtotal={computeSubtotal()}
                   disabled={
                     !customer_id ||
-                    ![OrderStatus.DRAFT, OrderStatus.FOR_APPROVAL].includes(
+                    ![OrderStatus.DRAFT, OrderStatus.UNAPPROVED].includes(
                       order?.status,
                     )
                   }
@@ -656,6 +651,11 @@ export default function GenerateSales() {
                         render={({ field }) => (
                           <Checkbox {...field} checked={field.value} />
                         )}
+                        disabled={
+                          ![OrderStatus.DRAFT, OrderStatus.UNAPPROVED].includes(
+                            order?.status,
+                          )
+                        }
                       />
                       <Typography variant="body1" fontWeight={'bold'}>
                         VAT Exempt (-12%):
@@ -700,10 +700,9 @@ export default function GenerateSales() {
                         type={'number'}
                         disabled={
                           !customer_id ||
-                          ![
-                            OrderStatus.DRAFT,
-                            OrderStatus.FOR_APPROVAL,
-                          ].includes(order?.status)
+                          ![OrderStatus.DRAFT, OrderStatus.UNAPPROVED].includes(
+                            order?.status,
+                          )
                         }
                         slotProps={{
                           input: {
@@ -791,16 +790,16 @@ export default function GenerateSales() {
               </Button>
               <Button
                 variant={
-                  order?.status === OrderStatus.FOR_APPROVAL &&
+                  order?.status === OrderStatus.UNAPPROVED &&
                   userInfo?.role === 'admin'
                     ? 'contained'
                     : 'outlined'
                 }
-                onClick={() => onUpdateOrderStatus(OrderStatus.FOR_PRINTING)}
+                onClick={() => onUpdateOrderStatus(OrderStatus.APPROVED)}
                 startIcon={<Approval />}
                 sx={{
                   cursor:
-                    order?.status === OrderStatus.FOR_APPROVAL &&
+                    order?.status === OrderStatus.UNAPPROVED &&
                     userInfo?.role === 'admin'
                       ? undefined
                       : 'not-allowed',
@@ -810,16 +809,19 @@ export default function GenerateSales() {
               </Button>
               <Button
                 variant={
-                  order?.status === OrderStatus.FOR_PRINTING
+                  ![OrderStatus.DRAFT, OrderStatus.UNAPPROVED].includes(
+                    order?.status,
+                  )
                     ? 'contained'
                     : 'outlined'
                 }
                 startIcon={<Print />}
                 sx={{
-                  cursor:
-                    order?.status === OrderStatus.FOR_PRINTING
-                      ? undefined
-                      : 'not-allowed',
+                  cursor: ![OrderStatus.DRAFT, OrderStatus.UNAPPROVED].includes(
+                    order?.status,
+                  )
+                    ? undefined
+                    : 'not-allowed',
                 }}
                 onClick={() => {
                   modifyPdf(
@@ -828,7 +830,9 @@ export default function GenerateSales() {
                       : lmtPDF,
                     order,
                   );
-                  onUpdateOrderStatus(OrderStatus.UNPAID);
+                  if (order.status === OrderStatus.APPROVED) {
+                    onUpdateOrderStatus(OrderStatus.UNPAID);
+                  }
                 }}
               >
                 Generate Sales Invoice
@@ -844,7 +848,7 @@ export default function GenerateSales() {
                     <Send />
                   )
                 }
-                onClick={() => onUpdateOrderStatus(OrderStatus.FOR_APPROVAL)}
+                onClick={() => onUpdateOrderStatus(OrderStatus.UNAPPROVED)}
                 sx={{
                   cursor:
                     order.status !== OrderStatus.DRAFT
@@ -854,9 +858,11 @@ export default function GenerateSales() {
               >
                 Send Order for Approval
               </Button>
-              {[OrderStatus.COMPLETED, OrderStatus.PARTIAL_CANCELLED].includes(
-                order.status,
-              ) && (
+              {[
+                OrderStatus.COMPLETED,
+                OrderStatus.APPROVED,
+                OrderStatus.UNPAID,
+              ].includes(order.status) && (
                 <Button
                   variant={'contained'}
                   startIcon={<Cancel />}

@@ -34,7 +34,7 @@ export default function OrderApprovals() {
     () =>
       fetchOrders({
         company_id: activeCompany?._id as string,
-        status: OrderStatus.FOR_APPROVAL,
+        status: OrderStatus.UNAPPROVED,
       }),
     {
       enabled: !!activeCompany?._id,

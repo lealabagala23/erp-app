@@ -12,12 +12,13 @@ import {
 } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
 import React, { useState } from 'react';
-import { FieldValues, useForm } from 'react-hook-form';
+import { FieldError, FieldValues, useForm } from 'react-hook-form';
 import { changePassword } from './apis';
 import AlertSnackbar from '../common/AlertSnackbar';
 import AppNavbar from '../common/AppNavbar';
 import PageWrapper from '../wrappers/PageWrapper';
 import Header from '../common/Header';
+import ErrorMessage from '../common/ErrorMessage';
 
 export default function ChangePassword() {
   const {
@@ -94,7 +95,9 @@ export default function ChangePassword() {
                   variant="outlined"
                   fullWidth
                   error={Boolean(errors.oldPassword)}
-                  helperText={<>{errors.oldPassword?.message}</>}
+                  helperText={
+                    <ErrorMessage error={errors.oldPassword as FieldError} />
+                  }
                   type="password"
                 />
               </FormControl>
@@ -112,7 +115,9 @@ export default function ChangePassword() {
                   variant="outlined"
                   fullWidth
                   error={Boolean(errors.newPassword)}
-                  helperText={<>{errors.newPassword?.message}</>}
+                  helperText={
+                    <ErrorMessage error={errors.newPassword as FieldError} />
+                  }
                   type="password"
                 />
               </FormControl>

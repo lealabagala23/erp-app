@@ -337,7 +337,7 @@ router.put("/:id/status", authenticateToken, async (req, res) => {
     const order_id = req.params.id;
     const { status } = req.body;
     const approverParams =
-      status === "for_printing" ? { approver_id: req.user.id } : {};
+      status === "approved" ? { approver_id: req.user.id } : {};
     const updatedOrder = await Order.findByIdAndUpdate(
       order_id,
       { status, ...approverParams },
@@ -346,7 +346,7 @@ router.put("/:id/status", authenticateToken, async (req, res) => {
       }
     );
 
-    const orderItems = OrderItem.find({ order_id });
+    const orderItems = await OrderItem.find({ order_id });
     const promises = orderItems.map(({ product_id, quantity }) => {
       return Inventory.findOneAndUpdate(
         { product_id },
@@ -407,7 +407,7 @@ router.put("/:id", authenticateToken, async (req, res) => {
       (accum, obj) => accum + obj.total_price,
       0
     );
-    const { sc_pwd_discount, vat_exempted, special_discount } = rest;
+    const { sc_pwd_discount, vat_exempted, special_discount = 0 } = rest;
     let total_sales_amount = vat_exempted
       ? total_sales - total_sales * 0.12
       : total_sales;

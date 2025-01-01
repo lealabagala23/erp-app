@@ -12,13 +12,14 @@ import {
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import React, { useContext, useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, FieldError, useForm } from 'react-hook-form';
 import AuthContext from '../../auth/AuthContext';
 import { Inventory, Product } from './types';
 import dayjs from 'dayjs';
 import { useQuery } from '@tanstack/react-query';
 import { FETCH_PRODUCTS_QUERY_KEY } from './constants';
 import { fetchProducts } from './apis';
+import ErrorMessage from '../../common/ErrorMessage';
 
 interface IProps {
   onFormSubmit: (d: Inventory) => void;
@@ -110,7 +111,11 @@ export default function AddInventoryForm({
                       {...textFieldProps}
                       autoFocus
                       error={Boolean(errors.stock_arrival_date)}
-                      helperText={<>{errors.stock_arrival_date?.message}</>}
+                      helperText={
+                        <ErrorMessage
+                          error={errors.stock_arrival_date as FieldError}
+                        />
+                      }
                     />
                   ),
                 }}
@@ -146,7 +151,9 @@ export default function AddInventoryForm({
               variant="outlined"
               fullWidth
               error={Boolean(errors.product_id)}
-              helperText={<>{errors.product_id?.message}</>}
+              helperText={
+                <ErrorMessage error={errors.product_id as FieldError} />
+              }
             >
               {products.map((s: Product) => (
                 <MenuItem key={s._id} value={s._id}>
@@ -171,7 +178,11 @@ export default function AddInventoryForm({
                     <TextField
                       {...textFieldProps}
                       error={Boolean(errors.expiry_date)}
-                      helperText={<>{errors.expiry_date?.message}</>}
+                      helperText={
+                        <ErrorMessage
+                          error={errors.expiry_date as FieldError}
+                        />
+                      }
                     />
                   ),
                 }}
@@ -198,7 +209,9 @@ export default function AddInventoryForm({
             variant="outlined"
             fullWidth
             error={Boolean(errors.batch_number)}
-            helperText={<>{errors.batch_number?.message}</>}
+            helperText={
+              <ErrorMessage error={errors.batch_number as FieldError} />
+            }
           />
         </FormControl>
 
@@ -213,7 +226,9 @@ export default function AddInventoryForm({
             variant="outlined"
             fullWidth
             error={Boolean(errors.quantity_on_order)}
-            helperText={<>{errors.quantity_on_order?.message}</>}
+            helperText={
+              <ErrorMessage error={errors.quantity_on_order as FieldError} />
+            }
           />
         </FormControl>
 
@@ -233,7 +248,9 @@ export default function AddInventoryForm({
             variant="outlined"
             fullWidth
             error={Boolean(errors.supplier_id)}
-            helperText={<>{errors.supplier_id?.message}</>}
+            helperText={
+              <ErrorMessage error={errors.supplier_id as FieldError} />
+            }
           >
             {suppliers.map((s) => (
               <MenuItem key={s._id} value={s._id}>
@@ -258,7 +275,7 @@ export default function AddInventoryForm({
             placeholder="Select product status"
             fullWidth
             error={Boolean(errors.status)}
-            helperText={<>{errors.status?.message}</>}
+            helperText={<ErrorMessage error={errors.status as FieldError} />}
           >
             <MenuItem value={'active'}>ACTIVE</MenuItem>
             <MenuItem value={'out_of_stock'}>OUT OF STOCK</MenuItem>

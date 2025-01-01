@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { FieldError, useForm } from 'react-hook-form';
 import {
   Button,
   TextField,
@@ -14,6 +14,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { Product } from './types';
+import ErrorMessage from '../../common/ErrorMessage';
 
 const PRODUCT_UNIT_OPTIONS = [
   'AMPULE',
@@ -87,7 +88,9 @@ export default function ProductForm({
             variant="outlined"
             fullWidth
             error={Boolean(errors.product_name)}
-            helperText={<>{errors.product_name?.message}</>}
+            helperText={
+              <ErrorMessage error={errors.product_name as FieldError} />
+            }
           />
         </FormControl>
 
@@ -105,7 +108,9 @@ export default function ProductForm({
             variant="outlined"
             fullWidth
             error={Boolean(errors.product_description)}
-            helperText={<>{errors.product_description?.message}</>}
+            helperText={
+              <ErrorMessage error={errors.product_description as FieldError} />
+            }
           />
         </FormControl>
 
@@ -126,7 +131,9 @@ export default function ProductForm({
             variant="outlined"
             fullWidth
             error={Boolean(errors.product_unit)}
-            helperText={<>{errors.product_unit?.message}</>}
+            helperText={
+              <ErrorMessage error={errors.product_unit as FieldError} />
+            }
           >
             {PRODUCT_UNIT_OPTIONS.map((unit) => (
               <MenuItem key={unit} value={unit}>
@@ -150,7 +157,9 @@ export default function ProductForm({
             variant="outlined"
             fullWidth
             error={Boolean(errors.generic_name)}
-            helperText={<>{errors.generic_name?.message}</>}
+            helperText={
+              <ErrorMessage error={errors.generic_name as FieldError} />
+            }
           />
         </FormControl>
 
@@ -169,7 +178,9 @@ export default function ProductForm({
             fullWidth
             type="number"
             error={Boolean(errors.purchase_price)}
-            helperText={<>{errors.purchase_price?.message}</>}
+            helperText={
+              <ErrorMessage error={errors.purchase_price as FieldError} />
+            }
           />
         </FormControl>
 
@@ -188,7 +199,9 @@ export default function ProductForm({
             fullWidth
             type="number"
             error={Boolean(errors.patient_price)}
-            helperText={<>{errors.patient_price?.message}</>}
+            helperText={
+              <ErrorMessage error={errors.patient_price as FieldError} />
+            }
           />
         </FormControl>
 
@@ -207,7 +220,9 @@ export default function ProductForm({
             fullWidth
             type="number"
             error={Boolean(errors.doctor_price)}
-            helperText={<>{errors.doctor_price?.message}</>}
+            helperText={
+              <ErrorMessage error={errors.doctor_price as FieldError} />
+            }
           />
         </FormControl>
 
@@ -226,7 +241,9 @@ export default function ProductForm({
             fullWidth
             type="number"
             error={Boolean(errors.agency_price)}
-            helperText={<>{errors.agency_price?.message}</>}
+            helperText={
+              <ErrorMessage error={errors.agency_price as FieldError} />
+            }
           />
         </FormControl>
 
@@ -237,7 +254,7 @@ export default function ProductForm({
             variant="outlined"
             fullWidth
             error={Boolean(errors.barcode)}
-            helperText={<>{errors.barcode?.message}</>}
+            helperText={<ErrorMessage error={errors.barcode as FieldError} />}
           />
         </FormControl>
         <Typography variant="caption" color="textSecondary">

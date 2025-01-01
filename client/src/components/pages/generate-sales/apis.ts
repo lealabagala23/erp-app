@@ -1,9 +1,7 @@
 import { CancelItem, Order, OrderItem, Payment } from './types';
 import axiosConfig from '../../../utils/axiosConfig';
-import { Referrer } from '../accounts/types';
 
 const ORDERS_API = '/api/orders';
-const REFERRERS_API = '/api/referrers';
 
 const getOrderItemPayload = ({
   _id,

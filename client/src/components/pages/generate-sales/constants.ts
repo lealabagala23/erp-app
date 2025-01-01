@@ -3,11 +3,10 @@ export const FETCH_REFERRERS_QUERY_KEY = 'fetchReferrers';
 
 export enum OrderStatus {
   DRAFT = 'draft',
-  FOR_APPROVAL = 'for_approval',
-  FOR_PRINTING = 'for_printing',
+  UNAPPROVED = 'unapproved',
+  APPROVED = 'approved',
   UNPAID = 'unpaid',
   COMPLETED = 'completed',
-  PARTIAL_CANCELLED = 'partial_cancelled',
   CANCELLED = 'cancelled',
 }
 
@@ -15,16 +14,14 @@ export const getOrderStatusColor = (status: OrderStatus) => {
   switch (status) {
     case OrderStatus.DRAFT:
       return 'default';
-    case OrderStatus.FOR_APPROVAL:
+    case OrderStatus.UNAPPROVED:
       return 'info';
-    case OrderStatus.FOR_PRINTING:
+    case OrderStatus.APPROVED:
       return 'primary';
     case OrderStatus.UNPAID:
       return 'warning';
     case OrderStatus.COMPLETED:
       return 'success';
-    case OrderStatus.PARTIAL_CANCELLED:
-      return 'warning';
     case OrderStatus.CANCELLED:
       return 'error';
   }

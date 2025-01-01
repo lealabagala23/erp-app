@@ -1,5 +1,5 @@
 import React from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, FieldError } from 'react-hook-form';
 import {
   TextField,
   MenuItem,
@@ -18,6 +18,7 @@ import {
 import { DatePicker } from '@mui/x-date-pickers';
 import { Payment } from './types';
 import dayjs from 'dayjs';
+import ErrorMessage from '../../common/ErrorMessage';
 
 interface IProps {
   open: boolean;
@@ -70,7 +71,11 @@ const PaymentForm = ({
                             {...textFieldProps}
                             autoFocus
                             error={Boolean(errors.payment_date)}
-                            helperText={<>{errors.payment_date?.message}</>}
+                            helperText={
+                              <ErrorMessage
+                                error={errors.payment_date as FieldError}
+                              />
+                            }
                           />
                         ),
                       }}
@@ -114,7 +119,9 @@ const PaymentForm = ({
                       },
                     }}
                     error={!!errors.amount_paid}
-                    helperText={<>{errors.amount_paid?.message}</>}
+                    helperText={
+                      <ErrorMessage error={errors.amount_paid as FieldError} />
+                    }
                   />
                 )}
               />
@@ -133,7 +140,11 @@ const PaymentForm = ({
                     fullWidth
                     select
                     error={!!errors.payment_method}
-                    helperText={<>{errors.payment_method?.message}</>}
+                    helperText={
+                      <ErrorMessage
+                        error={errors.payment_method as FieldError}
+                      />
+                    }
                   >
                     <MenuItem value="cash">CASH</MenuItem>
                     <MenuItem value="check">CHECK</MenuItem>
@@ -153,7 +164,9 @@ const PaymentForm = ({
                     {...field}
                     fullWidth
                     error={!!errors.bank_name}
-                    helperText={<>{errors.bank_name?.message}</>}
+                    helperText={
+                      <ErrorMessage error={errors.bank_name as FieldError} />
+                    }
                   />
                 )}
               />
@@ -170,7 +183,9 @@ const PaymentForm = ({
                     {...field}
                     fullWidth
                     error={!!errors.trans_ref_no}
-                    helperText={<>{errors.trans_ref_no?.message}</>}
+                    helperText={
+                      <ErrorMessage error={errors.trans_ref_no as FieldError} />
+                    }
                   />
                 )}
               />
@@ -187,7 +202,11 @@ const PaymentForm = ({
                     {...field}
                     fullWidth
                     error={!!errors.collection_receipt_no}
-                    helperText={<>{errors.collection_receipt_no?.message}</>}
+                    helperText={
+                      <ErrorMessage
+                        error={errors.collection_receipt_no as FieldError}
+                      />
+                    }
                   />
                 )}
               />
