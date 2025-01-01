@@ -34,9 +34,7 @@ export default function DownloadPDF({ data, columns, title }: IProps) {
           product_unit,
           generic_name,
           purchase_price,
-          patient_price,
-          doctor_price,
-          agency_price,
+          unit_price,
           created_at,
         } = obj;
         const allData = Object.values({
@@ -45,9 +43,7 @@ export default function DownloadPDF({ data, columns, title }: IProps) {
           product_unit,
           generic_name,
           purchase_price,
-          patient_price,
-          doctor_price,
-          agency_price,
+          unit_price,
           created_at: dayjs(created_at).format('MM/DD/YYYY'),
         });
         return allData;

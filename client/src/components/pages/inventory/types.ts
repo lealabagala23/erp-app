@@ -6,9 +6,7 @@ export type Product = {
   product_unit: string;
   generic_name?: string;
   purchase_price: number;
-  patient_price: number;
-  doctor_price: number;
-  agency_price: number;
+  unit_price: number;
   total_quantity_on_hand: { [key: string]: number };
   created_at?: string;
 };

@@ -56,20 +56,8 @@ export default function ProductTable({
       valueGetter: formatCurrency,
     },
     {
-      field: 'patient_price',
-      headerName: 'Patient Price',
-      flex: 1,
-      valueGetter: formatCurrency,
-    },
-    {
-      field: 'doctor_price',
-      headerName: 'Doctor Price',
-      flex: 1,
-      valueGetter: formatCurrency,
-    },
-    {
-      field: 'agency_price',
-      headerName: 'Agency Price',
+      field: 'unit_price',
+      headerName: 'Unit Price',
       flex: 1,
       valueGetter: formatCurrency,
     },

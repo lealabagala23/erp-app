@@ -212,9 +212,7 @@ export default function Products() {
                   'product_unit',
                   'generic_name',
                   'purchase_price',
-                  'patient_price',
-                  'doctor_price',
-                  'agency_price',
+                  'unit_price',
                   'created_at',
                 ]}
                 title={`${activeCompany?.company_name || ''} Complete Products List`}

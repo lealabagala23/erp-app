@@ -13,9 +13,7 @@ const generatePayload = (product: Product) => {
     'product_unit',
     'generic_name',
     'purchase_price',
-    'patient_price',
-    'doctor_price',
-    'agency_price',
+    'unit_price',
   ]);
 
   return {

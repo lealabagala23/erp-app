@@ -21,15 +21,7 @@ const ProductSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  patient_price: {
-    type: Number,
-    required: true,
-  },
-  doctor_price: {
-    type: Number,
-    required: true,
-  },
-  agency_price: {
+  unit_price: {
     type: Number,
     required: true,
   },

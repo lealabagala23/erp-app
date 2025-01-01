@@ -187,62 +187,20 @@ export default function ProductForm({
         <FormControl
           fullWidth
           margin="dense"
-          error={Boolean(errors.patient_price)}
+          error={Boolean(errors.unit_price)}
           required
         >
           <FormLabel>Patient Price</FormLabel>
           <TextField
-            {...register('patient_price', {
+            {...register('unit_price', {
               required: 'Patient Price must be a number',
             })}
             variant="outlined"
             fullWidth
             type="number"
-            error={Boolean(errors.patient_price)}
+            error={Boolean(errors.unit_price)}
             helperText={
-              <ErrorMessage error={errors.patient_price as FieldError} />
-            }
-          />
-        </FormControl>
-
-        <FormControl
-          fullWidth
-          margin="dense"
-          error={Boolean(errors.doctor_price)}
-          required
-        >
-          <FormLabel>Doctor Price</FormLabel>
-          <TextField
-            {...register('doctor_price', {
-              required: 'Doctor Price must be a number',
-            })}
-            variant="outlined"
-            fullWidth
-            type="number"
-            error={Boolean(errors.doctor_price)}
-            helperText={
-              <ErrorMessage error={errors.doctor_price as FieldError} />
-            }
-          />
-        </FormControl>
-
-        <FormControl
-          fullWidth
-          margin="dense"
-          error={Boolean(errors.agency_price)}
-          required
-        >
-          <FormLabel>Agency Price</FormLabel>
-          <TextField
-            {...register('agency_price', {
-              required: 'Agency Price must be a number',
-            })}
-            variant="outlined"
-            fullWidth
-            type="number"
-            error={Boolean(errors.agency_price)}
-            helperText={
-              <ErrorMessage error={errors.agency_price as FieldError} />
+              <ErrorMessage error={errors.unit_price as FieldError} />
             }
           />
         </FormControl>

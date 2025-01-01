@@ -139,11 +139,7 @@ export default function ItemTable({
 
     if (!product_id) return item;
 
-    const unit_price = getUnitPrice(
-      products,
-      product_id,
-      customerType as string,
-    );
+    const unit_price = getUnitPrice(products, product_id);
 
     return {
       ...item,
@@ -365,7 +361,6 @@ export default function ItemTable({
       </Stack>
       <ProductSelector
         products={products}
-        customerType={customerType as string}
         open={openDialog}
         handleClose={handleCloseDialog}
         onSelectProduct={(product_id: string) => {

@@ -259,8 +259,7 @@ export default function GenerateSales() {
   const computeSubtotal = () =>
     orderItems.reduce((accum, obj) => {
       const totalPrice =
-        getUnitPrice(products, obj.product_id as string, customer_type) *
-        obj.quantity;
+        getUnitPrice(products, obj.product_id as string) * obj.quantity;
       return accum + totalPrice;
     }, 0);
 

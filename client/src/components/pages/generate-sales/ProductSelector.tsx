@@ -16,7 +16,6 @@ import toLower from 'lodash/toLower';
 
 interface IProps {
   products: Product[];
-  customerType: string;
   open: boolean;
   handleClose: () => void;
   onSelectProduct: (p: string) => void;
@@ -24,7 +23,6 @@ interface IProps {
 
 export default function ProductSelector({
   products,
-  customerType,
   open,
   handleClose,
   onSelectProduct,
@@ -71,7 +69,7 @@ export default function ProductSelector({
       headerAlign: 'right',
       align: 'right',
       valueGetter: (_, row) =>
-        formatCurrency(getUnitPrice(products, row._id as string, customerType)),
+        formatCurrency(getUnitPrice(products, row._id as string)),
     },
     {
       field: 'total_quantity_on_hand',

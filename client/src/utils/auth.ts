@@ -38,20 +38,10 @@ export const formatCurrency = (v: number | string) =>
 export const getUnitPrice = (
   products: Product[],
   product_id: string,
-  customer_type: string,
 ) => {
   // eslint-disable-next-line
   const selectedProduct = products.find(({ _id }: any) => _id === product_id);
-  switch (customer_type) {
-    case 'PATIENT':
-      return selectedProduct?.patient_price ?? 0;
-    case 'DOCTOR':
-      return selectedProduct?.doctor_price ?? 0;
-    case 'AGENCY':
-      return selectedProduct?.agency_price ?? 0;
-    default:
-      return 0;
-  }
+  return selectedProduct?.unit_price ?? 0;
 };
 
 export const formatEmptyString = (v: string) =>
