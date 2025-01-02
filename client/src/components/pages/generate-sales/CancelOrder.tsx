@@ -46,16 +46,19 @@ const CancelOrder = ({ open, handleClose, orderItems, onCancel }: IProps) => {
 
   useEffect(() => {
     if (orderItems?.length > 0) {
-      const newItems = orderItems.map(({ _id, quantity, product_id }) => ({
-        _id: _id || '',
-        // eslint-disable-next-line
-        product_id: (product_id as any)?._id,
-        checked: false,
-        // eslint-disable-next-line
-        label: `${(product_id as any)?.product_name} ${(product_id as any)?.product_description} ${(product_id as any)?.product_unit}`,
-        quantity: 1,
-        maxQty: quantity,
-      }));
+      const newItems = orderItems.map(
+        ({ _id, unit_price, quantity, product_id }) => ({
+          _id: _id || '',
+          // eslint-disable-next-line
+          product_id: (product_id as any)?._id,
+          unit_price,
+          checked: false,
+          // eslint-disable-next-line
+          label: `${(product_id as any)?.product_name} ${(product_id as any)?.product_description} ${(product_id as any)?.product_unit}`,
+          quantity: 1,
+          maxQty: quantity,
+        }),
+      );
       setItems(newItems);
     }
   }, [orderItems]);
@@ -153,7 +156,15 @@ const CancelOrder = ({ open, handleClose, orderItems, onCancel }: IProps) => {
           onClick={() =>
             productCount > 0 &&
             onCancel(
-              items.filter((i) => !!i.checked),
+              items
+                .filter((i) => !!i.checked)
+                .map(({ unit_price, quantity, maxQty, ...rest }) => ({
+                  ...rest,
+                  unit_price,
+                  maxQty,
+                  quantity,
+                  total_price: unit_price * (maxQty - quantity),
+                })),
               totalCount,
             )
           }

@@ -262,7 +262,8 @@ export default function GenerateSales() {
   const computeSubtotal = () =>
     orderItems.reduce((accum, obj) => {
       const totalPrice =
-        getUnitPrice(products, obj.product_id as string) * obj.quantity;
+        getUnitPrice(products, obj.product_id as string) *
+        (obj.quantity - (obj.cancelled_quantity || 0));
       return accum + totalPrice;
     }, 0);
 
@@ -280,7 +281,7 @@ export default function GenerateSales() {
     mutateUpdateOrder({
       _id: orderId,
       ...formValues,
-      status: order?.status || 'draft',
+      status: order?.status,
     } as Order);
   };
 
@@ -656,7 +657,7 @@ export default function GenerateSales() {
                   }
                 />
                 <Grid container spacing={2} justifyContent={'flex-end'}>
-                  <Grid size={3}>
+                  <Grid size={{ xs: 4, md: 3 }}>
                     <Item>
                       <Stack direction="row" alignItems={'center'} gap={1}>
                         <Controller
@@ -687,7 +688,11 @@ export default function GenerateSales() {
                       </Stack>
                     </Item>
                   </Grid>
-                  <Grid size={1} alignItems={'center'} textAlign={'right'}>
+                  <Grid
+                    size={{ xs: 3, md: 2, xl: 1 }}
+                    alignItems={'center'}
+                    textAlign={'right'}
+                  >
                     <Item>
                       <Typography variant="body1" fontWeight={'bold'}>
                         {`-${formatCurrency(computeVATExemptAmount())}`}
@@ -696,7 +701,7 @@ export default function GenerateSales() {
                   </Grid>
                 </Grid>
                 <Grid container spacing={2} justifyContent={'flex-end'}>
-                  <Grid size={3}>
+                  <Grid size={{ xs: 4, md: 3 }}>
                     <Item>
                       <Stack direction="row" alignItems={'center'} gap={1}>
                         <Controller
@@ -728,7 +733,11 @@ export default function GenerateSales() {
                     </Item>
                   </Grid>
 
-                  <Grid size={1} alignItems={'center'} textAlign={'right'}>
+                  <Grid
+                    size={{ xs: 3, md: 2, xl: 1 }}
+                    alignItems={'center'}
+                    textAlign={'right'}
+                  >
                     <Item>
                       <Typography variant="body1" fontWeight={'bold'}>
                         {'-'}
@@ -739,7 +748,7 @@ export default function GenerateSales() {
                 </Grid>
 
                 <Grid container spacing={2} justifyContent={'flex-end'}>
-                  <Grid size={3}>
+                  <Grid size={{ xs: 4, md: 3 }}>
                     <Item>
                       <Stack direction="row" alignItems={'center'} gap={1}>
                         <Checkbox
@@ -795,7 +804,11 @@ export default function GenerateSales() {
                       </Stack>
                     </Item>
                   </Grid>
-                  <Grid size={1} alignItems={'center'} textAlign={'right'}>
+                  <Grid
+                    size={{ xs: 3, md: 2, xl: 1 }}
+                    alignItems={'center'}
+                    textAlign={'right'}
+                  >
                     <Item>
                       <Typography variant="body1" fontWeight={'bold'}>
                         {formatCurrency(computeSpecialDiscAmount())}
@@ -804,12 +817,16 @@ export default function GenerateSales() {
                   </Grid>
                 </Grid>
                 <Grid container spacing={2} justifyContent={'flex-end'}>
-                  <Grid size={3} textAlign={'right'}>
+                  <Grid size={{ xs: 4, md: 3 }} textAlign={'right'}>
                     <Item>
                       <Typography variant="h6">TOTAL AMOUNT DUE:</Typography>
                     </Item>
                   </Grid>
-                  <Grid size={2} alignItems={'center'} textAlign={'right'}>
+                  <Grid
+                    size={{ xs: 3, md: 2, xl: 1 }}
+                    alignItems={'center'}
+                    textAlign={'right'}
+                  >
                     <Item>
                       <Typography variant="h6">
                         ₱ {formatCurrency(order?.total_amount || 0)}
@@ -819,33 +836,12 @@ export default function GenerateSales() {
                 </Grid>
               </Item>
             </Grid>
-            <Grid container size={12} alignItems={'center'}>
-              <Typography variant={'h6'}>Status:</Typography>
-              <Chip
-                icon={
-                  isLoadingUpdate ? (
-                    <Edit fontSize="inherit" />
-                  ) : (
-                    <EditNote fontSize="inherit" />
-                  )
-                }
-                color={getOrderStatusColor(order?.status)}
-                variant="filled"
-                size="medium"
-                label={order?.status?.toUpperCase().replaceAll('_', ' ')}
-              />
-              {order?.approver_id?._id && (
-                <>
-                  <Typography variant={'h6'}>Approved by:</Typography>
-                  <Chip
-                    icon={<Person />}
-                    color={'default'}
-                    variant="filled"
-                    size="medium"
-                    label={`${order?.approver_id?.first_name} ${order?.approver_id?.last_name}`}
-                  />
-                </>
-              )}
+            <Grid
+              container
+              size={12}
+              alignItems={'center'}
+              justifyContent={'center'}
+            >
               <Button
                 variant={
                   order?.status === OrderStatus.UNPAID
@@ -953,6 +949,34 @@ export default function GenerateSales() {
                 </Button>
               )}
             </Grid>
+          </Grid>
+          <Grid container size={12} alignItems={'center'} gap={2}>
+            <Typography variant={'h6'}>Status:</Typography>
+            <Chip
+              icon={
+                isLoadingUpdate ? (
+                  <Edit fontSize="inherit" />
+                ) : (
+                  <EditNote fontSize="inherit" />
+                )
+              }
+              color={getOrderStatusColor(order?.status)}
+              variant="filled"
+              size="medium"
+              label={order?.status?.toUpperCase().replaceAll('_', ' ')}
+            />
+            {order?.approver_id?._id && (
+              <>
+                <Typography variant={'h6'}>Approved by:</Typography>
+                <Chip
+                  icon={<Person />}
+                  color={'default'}
+                  variant="filled"
+                  size="medium"
+                  label={`${order?.approver_id?.first_name} ${order?.approver_id?.last_name}`}
+                />
+              </>
+            )}
           </Grid>
           <PaymentForm
             open={openPaymentForm}

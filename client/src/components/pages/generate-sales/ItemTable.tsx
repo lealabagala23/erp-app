@@ -214,6 +214,28 @@ export default function ItemTable({
         };
       },
       cellClassName: 'editable-cell',
+      // eslint-disable-next-line
+      renderCell: ({ row }: any) => (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            height: '100%',
+          }}
+        >
+          <Typography>{row.quantity}</Typography>
+          {row.cancelled_quantity && (
+            <Tooltip
+              title={`Customer returned ${row.cancelled_quantity} units`}
+            >
+              <Typography color="error" marginLeft={'4px'}>
+                (-{row.cancelled_quantity})
+              </Typography>
+            </Tooltip>
+          )}
+        </Box>
+      ),
     },
     {
       field: 'unit_price',

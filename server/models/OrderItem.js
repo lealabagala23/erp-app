@@ -10,7 +10,14 @@ const OrderItemSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Product",
   },
+  inventory_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Inventory",
+  },
   quantity: {
+    type: Number,
+  },
+  cancelled_quantity: {
     type: Number,
   },
   unit_price: {

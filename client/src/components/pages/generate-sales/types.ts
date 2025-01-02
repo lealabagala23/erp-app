@@ -4,6 +4,7 @@ export type OrderItem = {
   order_id: string;
   product_id: string | { _id: string; product_name: string; product_description: string; product_unit: string };
   quantity: number;
+  cancelled_quantity?: number;
   unit_price: number;
   total_price: number;
   created_at?: string;
@@ -14,6 +15,7 @@ export type TableItem = {
   item_number: number;
   product_id: string | null;
   quantity: number;
+  cancelled_quantity?: number;
   unit_price: number;
   total_price: number;
   _id?: string;
@@ -59,5 +61,7 @@ export type CancelItem = {
   checked: boolean;
   label: string;
   quantity: number;
+  unit_price: number;
+  total_price?: number;
   maxQty: number;
 }

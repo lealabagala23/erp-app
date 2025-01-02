@@ -348,16 +348,18 @@ router.put("/:id/status", authenticateToken, async (req, res) => {
       }
     );
 
-    const orderItems = await OrderItem.find({ order_id });
-    const promises = orderItems.map(({ product_id, quantity }) => {
-      return Inventory.findOneAndUpdate(
-        { product_id },
-        { $inc: { quantity_on_hand: -quantity } },
-        { new: true, useFindAndModify: false }
-      );
-    });
+    if (status === "approved") {
+      const orderItems = await OrderItem.find({ order_id });
+      const promises = orderItems.map(({ product_id, quantity }) => {
+        return Inventory.findOneAndUpdate(
+          { product_id },
+          { $inc: { quantity_on_hand: -quantity } },
+          { new: true, useFindAndModify: false }
+        );
+      });
 
-    await Promise.all(promises);
+      await Promise.all(promises);
+    }
 
     res.status(200).json(updatedOrder);
   } catch (err) {
@@ -373,13 +375,21 @@ router.put("/:id/cancel", authenticateToken, async (req, res) => {
     const { cancel_items, cancel_all } = req.body;
     const updatedOrder = await Order.findByIdAndUpdate(
       order_id,
-      { status: cancel_all ? "cancelled" : "partial_cancelled" },
+      { status: cancel_all ? "cancelled" : "unpaid" },
       {
         new: true,
       }
     );
 
-    const promises = cancel_items.map(({ product_id, quantity }) => {
+    const oPromises = cancel_items.map(({ _id, quantity, total_price }) => {
+      return OrderItem.findOneAndUpdate(
+        { _id },
+        { $set: { cancelled_quantity: quantity, total_price } },
+        { new: true, useFindAndModify: false }
+      );
+    });
+
+    const cPromises = cancel_items.map(({ product_id, quantity }) => {
       return Inventory.findOneAndUpdate(
         { product_id },
         { $inc: { quantity_on_hand: quantity } },
@@ -387,7 +397,7 @@ router.put("/:id/cancel", authenticateToken, async (req, res) => {
       );
     });
 
-    await Promise.all(promises);
+    await Promise.all([...oPromises, ...cPromises]);
 
     res.status(200).json(updatedOrder);
   } catch (err) {
