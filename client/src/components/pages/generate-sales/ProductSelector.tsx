@@ -136,6 +136,12 @@ export default function ProductSelector({
   // eslint-disable-next-line
   const handleStockRowClick = ({ row }: any) => {
     onSelectProduct(row.product_id, row._id);
+    onClose();
+  };
+
+  const onClose = () => {
+    setSelectedProd(null);
+    setStocksList(null);
     handleClose();
   };
 
@@ -218,7 +224,7 @@ export default function ProductSelector({
     <>
       <Dialog
         open={open}
-        onClose={handleClose}
+        onClose={onClose}
         maxWidth="md" // Options: 'xs', 'sm', 'md', 'lg', 'xl'
         fullWidth // Ensures the dialog takes up full width of `maxWidth`
         PaperProps={{
