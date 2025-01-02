@@ -280,6 +280,7 @@ export default function GenerateSales() {
   const saveHandler = (formValues: { [x: string]: any }) => {
     mutateUpdateOrder({
       _id: orderId,
+      ...order,
       ...formValues,
       status: order?.status,
     } as Order);

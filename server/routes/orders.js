@@ -412,9 +412,6 @@ router.put("/:id", authenticateToken, async (req, res) => {
     const order_id = req.params.id;
     const { order_items, ...rest } = req.body;
 
-    if (rest.status !== "draft")
-      return res.status(200).json("Only draft orders can be updated");
-
     const total_sales = order_items.reduce(
       (accum, obj) => accum + obj.total_price,
       0

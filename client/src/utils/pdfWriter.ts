@@ -129,22 +129,44 @@ const drawOrderItems = (
   });
 };
 
+const drawLessVAT = (
+  firstPage: PDFPage,
+  customFont: PDFFont,
+  order: Order,
+) => {
+  const { width, height } = firstPage.getSize();
+  const { order_items, vat_exempted } = order;
+  const total = (order_items || []).reduce(
+    (accum, item) => item.total_price + accum,
+    0,
+  );
+  const text = vat_exempted ? `-${formatCurrency(total * .12)}` : ''
+
+  firstPage.drawText(text, {
+    x: 45 + (width - 160 + (10 - text.length) * 6),
+    y: height - 555 - 19,
+    size: 10,
+    font: customFont,
+    color: rgb(0, 0, 0),
+  })
+};
+
 const drawTotalSales = (
   firstPage: PDFPage,
   customFont: PDFFont,
   order: Order,
 ) => {
   const { width, height } = firstPage.getSize();
-  const { order_items, total_amount = 0 } = order;
+  const { order_items, total_amount = 0, sc_pwd_discount, special_discount } = order;
   const total = (order_items || []).reduce(
     (accum, item) => item.total_price + accum,
     0,
   );
   const totalSales: string = `${formatCurrency(total)}`;
    
-  const lessDiscount = `${formatCurrency(total_amount - total)}`;
+  const lessSCDisc = sc_pwd_discount ? `-${formatCurrency(total * (20 / 100))}` : `-${formatCurrency(special_discount || 0)}`
 
-  const texts = [totalSales, lessDiscount, formatCurrency(total_amount || 0)];
+  const texts = [totalSales, lessSCDisc, formatCurrency(total_amount || 0)];
   texts.forEach((text, key2) =>
     firstPage.drawText(text, {
       x: 42 + (width - 160 + (10 - text.length) * 6),
@@ -222,6 +244,7 @@ export const modifyPdf = async (
     drawNameTinAddress(firstPage, customFont, order);
     drawOrderItems(firstPage, customFont, order);
     drawTotalSales(firstPage, customFont, order);
+    drawLessVAT(firstPage, customFont, order);
     drawSCDetails(firstPage, customFont, order);
     drawInitiator(firstPage, customFont, order)
 
