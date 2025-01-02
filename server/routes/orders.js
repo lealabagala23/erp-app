@@ -46,12 +46,14 @@ const getOrderPayload = ({
 const getOrderItemPayload = ({
   _id,
   product_id,
+  inventory_id,
   quantity,
   unit_price,
   total_price,
 }) => ({
   _id,
   product_id,
+  inventory_id,
   quantity,
   unit_price,
   total_price,
@@ -170,6 +172,20 @@ const orderAggregateParams = [
   {
     $unwind: {
       path: "$order_items.product_id",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $lookup: {
+      from: "inventories",
+      localField: "order_items.inventory_id",
+      foreignField: "_id",
+      as: "order_items.inventory_id",
+    },
+  },
+  {
+    $unwind: {
+      path: "$order_items.inventory_id",
       preserveNullAndEmptyArrays: true,
     },
   },
@@ -417,18 +433,15 @@ router.put("/:id", authenticateToken, async (req, res) => {
       0
     );
     const { sc_pwd_discount, vat_exempted, special_discount = 0 } = rest;
-    let total_sales_amount = vat_exempted
-      ? total_sales - total_sales * 0.12
-      : total_sales;
-    total_sales_amount = sc_pwd_discount
-      ? total_sales_amount - total_sales_amount * 0.2
-      : total_sales_amount;
+    const less_vat = vat_exempted ? total_sales * 0.12 : 0;
+    const less_sc = sc_pwd_discount ? total_sales * 0.2 : 0;
+    const total_amount = total_sales - less_vat - less_sc - special_discount;
 
     const updatedOrder = await Order.findByIdAndUpdate(
       order_id,
       {
         ...getOrderPayload(rest),
-        total_amount: total_sales_amount - special_discount,
+        total_amount,
       },
       {
         new: true,

@@ -7,6 +7,7 @@ export type Product = {
   generic_name?: string;
   purchase_price: number;
   unit_price: number;
+  stocks: { [key: string]: Inventory[] };
   total_quantity_on_hand: { [key: string]: number };
   created_at?: string;
 };
@@ -20,6 +21,7 @@ export type Inventory = {
   stock_arrival_date: string;
   quantity_on_hand?: number;
   quantity_on_order: number;
+  batch_number: string;
   expiry_date: string;
   status: string;
   company_id?: string;

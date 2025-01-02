@@ -3,7 +3,7 @@ import * as fontkit from 'fontkit'; // Import FontKit
 import { Fontkit } from 'pdf-lib/cjs/types/fontkit';
 import { Order } from '../components/pages/generate-sales/types';
 import dayjs from 'dayjs';
-import { Product } from '../components/pages/inventory/types';
+import { Inventory, Product } from '../components/pages/inventory/types';
 import { formatCurrency } from './auth';
 
 function truncateStringSafe(str: string, maxLength: number): string {
@@ -92,7 +92,8 @@ const drawOrderItems = (
   const { order_items } = order;
 
   (order_items || []).forEach((item, key) => {
-    const { product_id, quantity, unit_price, total_price } = item;
+    const { product_id, quantity, unit_price, total_price, inventory_id } =
+      item;
     const { product_name, product_description, product_unit } =
       product_id as Product;
     const texts = [
@@ -117,30 +118,37 @@ const drawOrderItems = (
       }
     };
 
-    texts.forEach((text, key2) =>
+    texts.forEach((text, key2) => {
       firstPage.drawText(text, {
         x: 42 + getXAddend(key2 as number, text),
-        y: height - (380 + 18 * key),
+        y: height - (380 + 36 * key),
         size: 8,
         font: customFont,
         color: rgb(0, 0, 0),
-      }),
+      });
+    });
+
+    firstPage.drawText(
+      `Batch No. ${(inventory_id as Inventory)?.batch_number || 'N/A'} Exp. Date: ${dayjs((inventory_id as Inventory)?.expiry_date).format('MM-DD-YYYY')}`,
+      {
+        x: 42,
+        y: height - (398 + 36 * key),
+        size: 8,
+        font: customFont,
+        color: rgb(0, 0, 0),
+      },
     );
   });
 };
 
-const drawLessVAT = (
-  firstPage: PDFPage,
-  customFont: PDFFont,
-  order: Order,
-) => {
+const drawLessVAT = (firstPage: PDFPage, customFont: PDFFont, order: Order) => {
   const { width, height } = firstPage.getSize();
   const { order_items, vat_exempted } = order;
   const total = (order_items || []).reduce(
     (accum, item) => item.total_price + accum,
     0,
   );
-  const text = vat_exempted ? `-${formatCurrency(total * .12)}` : ''
+  const text = vat_exempted ? `-${formatCurrency(total * 0.12)}` : '';
 
   firstPage.drawText(text, {
     x: 45 + (width - 160 + (10 - text.length) * 6),
@@ -148,7 +156,7 @@ const drawLessVAT = (
     size: 10,
     font: customFont,
     color: rgb(0, 0, 0),
-  })
+  });
 };
 
 const drawTotalSales = (
@@ -157,14 +165,21 @@ const drawTotalSales = (
   order: Order,
 ) => {
   const { width, height } = firstPage.getSize();
-  const { order_items, total_amount = 0, sc_pwd_discount, special_discount } = order;
+  const {
+    order_items,
+    total_amount = 0,
+    sc_pwd_discount,
+    special_discount,
+  } = order;
   const total = (order_items || []).reduce(
     (accum, item) => item.total_price + accum,
     0,
   );
   const totalSales: string = `${formatCurrency(total)}`;
-   
-  const lessSCDisc = sc_pwd_discount ? `-${formatCurrency(total * (20 / 100))}` : `-${formatCurrency(special_discount || 0)}`
+
+  const lessSCDisc = sc_pwd_discount
+    ? `-${formatCurrency(total * (20 / 100))}`
+    : `-${formatCurrency(special_discount || 0)}`;
 
   const texts = [totalSales, lessSCDisc, formatCurrency(total_amount || 0)];
   texts.forEach((text, key2) =>
@@ -198,23 +213,23 @@ const drawSCDetails = (
 };
 
 const drawInitiator = (
-    firstPage: PDFPage,
-    customFont: PDFFont,
-    order: Order,
-  ) => {
-    const { height } = firstPage.getSize();
-    const { initiator_id } = order;
-    // eslint-disable-next-line
-    const text: string = `${(initiator_id as any)?.first_name} ${(initiator_id as any)?.last_name}`;
-  
-    firstPage.drawText(text, {
-      x: 75 ,
-      y: height - 715,
-      size: 10,
-      font: customFont,
-      color: rgb(0, 0, 0),
-    });
-  };
+  firstPage: PDFPage,
+  customFont: PDFFont,
+  order: Order,
+) => {
+  const { height } = firstPage.getSize();
+  const { initiator_id } = order;
+  // eslint-disable-next-line
+  const text: string = `${(initiator_id as any)?.first_name} ${(initiator_id as any)?.last_name}`;
+
+  firstPage.drawText(text, {
+    x: 75,
+    y: height - 715,
+    size: 10,
+    font: customFont,
+    color: rgb(0, 0, 0),
+  });
+};
 
 export const modifyPdf = async (
   input: RequestInfo | URL,
@@ -246,7 +261,7 @@ export const modifyPdf = async (
     drawTotalSales(firstPage, customFont, order);
     drawLessVAT(firstPage, customFont, order);
     drawSCDetails(firstPage, customFont, order);
-    drawInitiator(firstPage, customFont, order)
+    drawInitiator(firstPage, customFont, order);
 
     const pdfBytes: Uint8Array = await pdfDoc.save();
 

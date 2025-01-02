@@ -76,6 +76,7 @@ export const Item = styled(Paper)(({ theme }) => ({
 const DEFAULT_ITEM = {
   item_number: 1,
   product_id: null,
+  inventory_id: null,
   quantity: 1,
   unit_price: 0,
   total_price: 0,
@@ -268,13 +269,13 @@ export default function GenerateSales() {
     }, 0);
 
   const computeVATExemptAmount = () =>
-    vat_exempted ? computeSubtotal() * (12 / 100) : 0;
+    order.vat_exempted ? computeSubtotal() * (12 / 100) : 0;
 
   const computeLessDiscAmount = () =>
-    sc_pwd_discount ? computeSubtotal() * (20 / 100) : 0;
+    order.sc_pwd_discount ? computeSubtotal() * (20 / 100) : 0;
 
   const computeSpecialDiscAmount = () =>
-    special_discount ? special_discount * -1 : 0;
+    order.special_discount ? special_discount * -1 : 0;
 
   // eslint-disable-next-line
   const saveHandler = (formValues: { [x: string]: any }) => {

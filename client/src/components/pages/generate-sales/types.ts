@@ -1,8 +1,10 @@
 import { Customer } from "../accounts/types";
+import { Inventory, Product } from "../inventory/types";
 
 export type OrderItem = {
   order_id: string;
-  product_id: string | { _id: string; product_name: string; product_description: string; product_unit: string };
+  product_id: string | Product;
+  inventory_id: string | Inventory;
   quantity: number;
   cancelled_quantity?: number;
   unit_price: number;
@@ -14,6 +16,7 @@ export type OrderItem = {
 export type TableItem = {
   item_number: number;
   product_id: string | null;
+  inventory_id: string | null;
   quantity: number;
   cancelled_quantity?: number;
   unit_price: number;

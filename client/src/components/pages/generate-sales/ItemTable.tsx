@@ -395,10 +395,11 @@ export default function ItemTable({
         products={products}
         open={openDialog}
         handleClose={handleCloseDialog}
-        onSelectProduct={(product_id: string) => {
+        onSelectProduct={(product_id, inventory_id: string) => {
           const newRow = formatTableItem({
             ...(selectedRow as TableItem),
             product_id,
+            inventory_id,
           });
           updateOrderItem(newRow);
         }}
