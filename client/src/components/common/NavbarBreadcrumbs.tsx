@@ -61,6 +61,14 @@ const labelRouteMapping = {
     primary: 'Accounts',
     secondary: 'Referrals',
   },
+  '/reports/sales': {
+    primary: 'Reports',
+    secondary: 'Sales Reports',
+  },
+  '/reports/products': {
+    primary: 'Reports',
+    secondary: 'Top Products',
+  },
   '/settings': {
     primary: 'Settings',
     secondary: 'Change Password',

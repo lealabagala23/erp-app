@@ -18,6 +18,7 @@ import Patients from '../pages/accounts/Patients';
 import Doctors from '../pages/accounts/Doctors';
 import Agencies from '../pages/accounts/Agencies';
 import Referrers from '../pages/accounts/Referrers';
+import SalesReports from '../pages/reports/SalesReports';
 
 export default function MainWrapper() {
   return (
@@ -38,6 +39,10 @@ export default function MainWrapper() {
           <Route path="/doctors" element={<Doctors />} />
           <Route path="/agencies" element={<Agencies />} />
           <Route path="/referrals" element={<Referrers />} />
+          <Route path="/reports">
+            <Route path="/reports/sales" element={<SalesReports />} />
+            <Route path="/reports/products" element={<Orders />} />
+          </Route>
           <Route path="/settings" element={<ChangePassword />} />
         </Routes>
       </Box>

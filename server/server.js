@@ -7,6 +7,7 @@ const customerRoutes = require("./routes/customers");
 const referrerRoutes = require("./routes/referrers");
 const supplierRoutes = require("./routes/suppliers");
 const companyRoutes = require("./routes/companies");
+const reportRoutes = require("./routes/reports");
 const authRoutes = require("./routes/auth");
 const connectDB = require("./config/db");
 const bodyParser = require("body-parser");
@@ -31,6 +32,7 @@ app.use("/api/customers", customerRoutes);
 app.use("/api/referrers", referrerRoutes);
 app.use("/api/suppliers", supplierRoutes);
 app.use("/api/companies", companyRoutes);
+app.use("/api/reports", reportRoutes);
 app.use("/api/auth", authRoutes);
 
 app.listen(PORT, () => {

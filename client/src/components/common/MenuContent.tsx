@@ -9,7 +9,7 @@ import HomeRoundedIcon from '@mui/icons-material/DashboardRounded';
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
 // import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
-import { ExpandLess, MoneyRounded } from '@mui/icons-material';
+import { Analytics, ExpandLess, MoneyRounded } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material';
 import { GridExpandMoreIcon } from '@mui/x-data-grid';
@@ -70,6 +70,21 @@ const nestedMainItems = [
       {
         text: 'Referrals',
         route: '/referrals',
+      },
+    ],
+  },
+  {
+    text: 'Reports',
+    icon: <Analytics />,
+    route: null,
+    children: [
+      {
+        text: 'Sales Reports',
+        route: '/reports/sales',
+      },
+      {
+        text: 'Top Products',
+        route: '/reports/products',
       },
     ],
   },
