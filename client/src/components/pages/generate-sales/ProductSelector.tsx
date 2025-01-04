@@ -17,7 +17,7 @@ import {
 import { formatCurrency, getUnitPrice } from '../../../utils/auth';
 import { Inventory, Product } from '../inventory/types';
 import SearchBar from '../../common/SearchBar';
-import { Close } from '@mui/icons-material';
+import { ChevronLeft, Close } from '@mui/icons-material';
 import AuthContext from '../../auth/AuthContext';
 import toLower from 'lodash/toLower';
 import dayjs from 'dayjs';
@@ -58,7 +58,7 @@ const SelectionDataGrid = ({
     getRowId={getRowId}
     getRowClassName={getRowClassName}
     initialState={{
-      // pagination: { paginationModel: { pageSize: 10 } },
+      pagination: { paginationModel: { pageSize: 10 } },
       sorting,
     }}
     onRowClick={onRowClick}
@@ -143,6 +143,11 @@ export default function ProductSelector({
     setSelectedProd(null);
     setStocksList(null);
     handleClose();
+  };
+
+  const onBackClick = () => {
+    setSelectedProd(null);
+    setStocksList(null);
   };
 
   // eslint-disable-next-line
@@ -234,6 +239,11 @@ export default function ProductSelector({
         }}
       >
         <DialogTitle>
+          {selectedProd && (
+            <IconButton sx={{ marginRight: '8px' }} onClick={onBackClick}>
+              <ChevronLeft />
+            </IconButton>
+          )}
           Select{' '}
           {selectedProd
             ? `from ${selectedProd.generic_name} ${selectedProd.product_description} ${selectedProd.product_unit} Inventory`
@@ -262,7 +272,6 @@ export default function ProductSelector({
               onRowClick={handleStockRowClick}
               // eslint-disable-next-line
               getRowClassName={(params: any) => {
-                console.log('params', params);
                 // eslint-disable-next-line
                 return `${params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}${' '}${(params.row as any).status === 'EXPIRED' ? 'data-disabled' : ''}`;
               }}
@@ -301,7 +310,7 @@ export default function ProductSelector({
                 // eslint-disable-next-line
                 getRowClassName={(params: any) =>
                   // eslint-disable-next-line
-                  `${params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}${' '}${!(params.row as any).total_quantity_on_hand[activeCompany?._id as string] ? 'data-disabled' : ''}`
+                  `${params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}${' '}${((params.row as any).total_quantity_on_hand[activeCompany?._id as string] || 0) <= 0 ? 'data-disabled' : ''}`
                 }
                 getRowId={(row) => row?._id || 0}
               />

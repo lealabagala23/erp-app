@@ -44,6 +44,11 @@ const CancelOrder = ({ open, handleClose, orderItems, onCancel }: IProps) => {
     );
   };
 
+  const onClose = () => {
+    setItems([]);
+    handleClose();
+  };
+
   useEffect(() => {
     if (orderItems?.length > 0) {
       const newItems = orderItems.map(
@@ -73,7 +78,7 @@ const CancelOrder = ({ open, handleClose, orderItems, onCancel }: IProps) => {
   const { productCount, totalCount } = getSelectedCount();
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={onClose}>
       <DialogTitle>Cancel Order Items</DialogTitle>
       <DialogContent>
         <List>
@@ -108,7 +113,7 @@ const CancelOrder = ({ open, handleClose, orderItems, onCancel }: IProps) => {
                 <IconButton
                   onClick={() =>
                     item.checked &&
-                    item.quantity < item.maxQty &&
+                    item.quantity > 0 &&
                     handleQuantityChange(item._id, -1)
                   }
                   aria-label="decrease quantity"
@@ -148,7 +153,7 @@ const CancelOrder = ({ open, handleClose, orderItems, onCancel }: IProps) => {
             {productCount} product/s ({totalCount} item/s) selected
           </Typography>
         )}
-        <Button onClick={handleClose} color="primary">
+        <Button onClick={onClose} color="primary">
           Close
         </Button>
         <Button

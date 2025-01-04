@@ -29,6 +29,14 @@ const cellClassName = (params: any) =>
 
 const COLUMNS: GridColDef<Inventory>[] = [
   {
+    field: 'batch_number',
+    headerName: 'Batch No.',
+    minWidth: 150,
+    flex: 1,
+    valueFormatter: (value) => value || 'N/A',
+    cellClassName,
+  },
+  {
     field: 'expiry_date',
     headerName: 'Expiry Date',
     valueGetter: (value, row) =>

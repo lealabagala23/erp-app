@@ -33,6 +33,8 @@ export type Order = {
   total_amount?: number;
   payment_type?: string;
   status?: string;
+  discount_card?: string;
+  discount_card_number?: string;
   sc_pwd_discount?: boolean;
   vat_exempted?: boolean;
   special_discount?: number;

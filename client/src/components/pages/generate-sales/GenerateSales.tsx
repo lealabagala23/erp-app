@@ -324,7 +324,7 @@ export default function GenerateSales() {
   }, [formValues.discount_card_number]);
 
   useEffect(() => {
-    if (order) {
+    if (order && !isLoadingOrder) {
       reset({
         customer_id: order.customer_id?._id,
         payment_type: order.payment_type,
@@ -333,6 +333,8 @@ export default function GenerateSales() {
         referrer_id: order.referrer_id?._id,
         referring_doctor_id: order.referring_doctor_id?._id,
         invoice_number: order.invoice_number,
+        discount_card: order.discount_card,
+        discount_card_number: order.discount_card_number,
         special_discount: order.special_discount,
         vat_exempted: order.vat_exempted || false,
         sc_pwd_discount: order.sc_pwd_discount || false,
@@ -351,7 +353,7 @@ export default function GenerateSales() {
   }, [order]);
 
   useEffect(() => {
-    if (isDirty) {
+    if (isDirty && !isLoadingOrder) {
       setIsSaving(true);
       handleSave({ ...formValues, order_items: orderItems });
     }

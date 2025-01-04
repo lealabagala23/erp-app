@@ -28,15 +28,16 @@ router.get("/", authenticateToken, async (req, res) => {
     ]);
     const productsWQty = products.map(({ stocks, ...rest }) => ({
       ...rest,
-      stocks: stocks.reduce((map, { company_id, ...rest }) => {
-        if (rest.status === "EXPIRED" || rest.status === "expired") return map;
-        return {
+      stocks: stocks.reduce(
+        (map, { company_id, ...rest }) => ({
           ...map,
           [company_id]: [...(map[company_id] || []), rest],
-        };
-      }, {}),
+        }),
+        {}
+      ),
       total_quantity_on_hand: stocks.reduce(
-        (map, { company_id, quantity_on_hand }) => {
+        (map, { company_id, quantity_on_hand, status }) => {
+          if (status === "expired" || status === "EXPIRED") return { ...map };
           return {
             ...map,
             [company_id]: (map[company_id] || 0) + quantity_on_hand,

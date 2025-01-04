@@ -190,10 +190,10 @@ export default function ProductForm({
           error={Boolean(errors.unit_price)}
           required
         >
-          <FormLabel>Patient Price</FormLabel>
+          <FormLabel>Unit Price</FormLabel>
           <TextField
             {...register('unit_price', {
-              required: 'Patient Price must be a number',
+              required: 'Unit Price must be a number',
             })}
             variant="outlined"
             fullWidth
