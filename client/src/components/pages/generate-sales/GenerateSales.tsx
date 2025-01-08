@@ -58,7 +58,7 @@ import {
   OrderStatus,
 } from './constants';
 import PaymentForm from './PaymentForm';
-import { modifyPdf } from '../../../utils/pdfWriter';
+import { modifyPdf } from '../../../utils/pdfInvoiceWriter';
 import PaymentsList from './PaymentsList';
 import LiveDateAndTime from '../../common/LiveDateAndTime';
 import CancelOrder from './CancelOrder';
@@ -277,14 +277,17 @@ export default function GenerateSales() {
     mutateUpdateOrderPayment({ ...payment, order_id: order?._id });
   };
 
-  const onCancelSubmit = (cancel_items: CancelItem[], total: number) => {
-    const cancel_all =
-      total >=
-      order.order_items.reduce(
-        (accum: number, obj: OrderItem) => accum + obj.quantity,
-        0,
-      );
-    mutateCancelOrder({ order_id: order?._id, cancel_items, cancel_all });
+  const onCancelSubmit = (
+    cancel_items: CancelItem[],
+    cancel_all: boolean,
+    invoice_number: string,
+  ) => {
+    mutateCancelOrder({
+      order_id: order?._id,
+      cancel_items,
+      cancel_all,
+      invoice_number,
+    });
   };
 
   useEffect(() => {

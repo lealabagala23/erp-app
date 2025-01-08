@@ -101,7 +101,7 @@ const drawOrderItems = (
         `${product_name} ${product_description} ${product_unit}`,
         55,
       ),
-      `${quantity}`,
+      `${quantity - cancelled_quantity}`,
       formatCurrency(unit_price),
       formatCurrency(unit_price * (quantity - cancelled_quantity)),
     ];

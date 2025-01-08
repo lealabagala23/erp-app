@@ -110,14 +110,17 @@ export const cancelOrder = async ({
   order_id,
   cancel_items,
   cancel_all,
+  invoice_number,
 }: {
   order_id: string;
   cancel_items: CancelItem[];
   cancel_all?: boolean;
+  invoice_number: string;
 }) => {
   const response = await axiosConfig.put(`${ORDERS_API}/${order_id}/cancel`, {
     cancel_items,
     cancel_all,
+    invoice_number,
   });
 
   return response?.data;

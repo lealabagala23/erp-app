@@ -11,6 +11,7 @@ import {
   Checkbox,
   IconButton,
   Typography,
+  TextField,
 } from '@mui/material';
 import RemoveIcon from '@mui/icons-material/RemoveCircleOutline';
 import AddIcon from '@mui/icons-material/AddCircleOutline';
@@ -20,11 +21,17 @@ interface IProps {
   open: boolean;
   handleClose: () => void;
   orderItems: OrderItem[];
-  onCancel: (s: CancelItem[], t: number) => void;
+  onCancel: (s: CancelItem[], t: boolean, i: string) => void;
 }
 
-const CancelOrder = ({ open, handleClose, orderItems, onCancel }: IProps) => {
+const CancelOrder = ({
+  open,
+  handleClose,
+  orderItems = [],
+  onCancel,
+}: IProps) => {
   const [items, setItems] = useState<CancelItem[]>([]);
+  const [invoiceNumber, setInvoiceNumber] = useState('');
 
   const handleCheckboxChange = (id: string): void => {
     setItems((prevItems) =>
@@ -46,6 +53,7 @@ const CancelOrder = ({ open, handleClose, orderItems, onCancel }: IProps) => {
 
   const onClose = () => {
     setItems([]);
+    setInvoiceNumber('');
     handleClose();
   };
 
@@ -76,6 +84,16 @@ const CancelOrder = ({ open, handleClose, orderItems, onCancel }: IProps) => {
   };
 
   const { productCount, totalCount } = getSelectedCount();
+
+  const getCancelAll = () =>
+    totalCount >=
+    orderItems.reduce(
+      (accum: number, obj: OrderItem) => accum + obj.quantity,
+      0,
+    );
+
+  const enableCancelBtn = () =>
+    productCount > 0 && (getCancelAll() ? true : !!invoiceNumber);
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -148,35 +166,42 @@ const CancelOrder = ({ open, handleClose, orderItems, onCancel }: IProps) => {
         </List>
       </DialogContent>
       <DialogActions>
-        {productCount > 0 && (
-          <Typography>
-            {productCount} product/s ({totalCount} item/s) selected
-          </Typography>
-        )}
+        <TextField
+          id="invoice_number"
+          name="invoice_number"
+          autoFocus
+          required
+          variant="outlined"
+          placeholder="New Invoice Number"
+          value={invoiceNumber}
+          onChange={(e) => setInvoiceNumber(e.target.value)}
+        />
         <Button onClick={onClose} color="primary">
           Close
         </Button>
         <Button
           variant="contained"
-          onClick={() =>
-            productCount > 0 &&
-            onCancel(
-              items
-                .filter((i) => !!i.checked)
-                .map(({ unit_price, quantity, maxQty, ...rest }) => ({
-                  ...rest,
-                  unit_price,
-                  maxQty,
-                  quantity,
-                })),
-              totalCount,
-            )
-          }
+          onClick={() => {
+            if (enableCancelBtn()) {
+              onCancel(
+                items
+                  .filter((i) => !!i.checked)
+                  .map(({ unit_price, quantity, maxQty, ...rest }) => ({
+                    ...rest,
+                    unit_price,
+                    maxQty,
+                    quantity,
+                  })),
+                getCancelAll(),
+                invoiceNumber,
+              );
+            }
+          }}
           sx={{
-            cursor: productCount > 0 ? 'pointer' : 'not-allowed',
+            cursor: enableCancelBtn() ? 'pointer' : 'not-allowed',
           }}
         >
-          Cancel Items
+          Cancel {getCancelAll() ? 'All' : ''} Items
         </Button>
       </DialogActions>
     </Dialog>

@@ -220,10 +220,10 @@ router.put("/:id/status", authenticateToken, async (req, res) => {
 router.put("/:id/cancel", authenticateToken, async (req, res) => {
   try {
     const order_id = req.params.id;
-    const { cancel_items, cancel_all } = req.body;
+    const { cancel_items, cancel_all, invoice_number } = req.body;
     const updatedOrder = await Order.findByIdAndUpdate(
       order_id,
-      { status: cancel_all ? "cancelled" : "unpaid" },
+      { status: cancel_all ? "cancelled" : "unpaid", invoice_number },
       {
         new: true,
       }
