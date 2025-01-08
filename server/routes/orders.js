@@ -96,6 +96,9 @@ router.get("/", authenticateToken, async (req, res) => {
         $match: params,
       },
       ...orderAggregateParams,
+      {
+        $sort: { created_at: -1 }, // Sort by createdAt in ascending order
+      },
     ]);
 
     res.status(200).json(orders);

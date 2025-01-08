@@ -52,6 +52,10 @@ router.get("/:time_period", authenticateToken, async (req, res) => {
         };
         group_id_field = "$_id";
         break;
+      case "month":
+        id_field = "$monthStart";
+        group_id_field = "$_id";
+        break;
       default:
         id_field = {
           date: {
@@ -79,7 +83,7 @@ router.get("/:time_period", authenticateToken, async (req, res) => {
         $addFields: {
           weekStart: {
             $dateToString: {
-              format: "%m-%d-%Y",
+              format: "%Y-%m-$d",
               date: {
                 $dateSubtract: {
                   startDate: "$created_at",
@@ -94,6 +98,12 @@ router.get("/:time_period", authenticateToken, async (req, res) => {
               },
             },
           },
+          monthStart: {
+            $dateToString: {
+              format: "%Y-%m-01", // Format to get the first day of the month
+              date: "$created_at",
+            },
+          },
         },
       },
       {
@@ -106,6 +116,7 @@ router.get("/:time_period", authenticateToken, async (req, res) => {
             },
           },
           order_count: { $sum: 1 },
+          transactions: { $addToSet: "$_id" },
           cancelled_qty: {
             $sum: { $ifNull: ["$order_items.cancelled_quantity", 0] },
           },
@@ -131,12 +142,6 @@ router.get("/:time_period", authenticateToken, async (req, res) => {
         },
       },
       {
-        $addFields: {
-          avg_order_value: { $divide: ["$net_sales", "$order_count"] },
-          ...extra_fields,
-        },
-      },
-      {
         $group: {
           _id: group_id_field,
           orders: { $first: "$orders" },
@@ -144,6 +149,13 @@ router.get("/:time_period", authenticateToken, async (req, res) => {
           order_count: { $first: "$order_count" },
           cancelled_qty: { $sum: "$cancelled_qty" },
           net_sales: { $sum: "$net_sales" },
+          transactions: { $first: "$transactions" },
+        },
+      },
+      {
+        $addFields: {
+          avg_order_value: { $divide: ["$net_sales", "$order_count"] },
+          ...extra_fields,
         },
       },
       {
@@ -179,6 +191,7 @@ router.get("/:time_period", authenticateToken, async (req, res) => {
               },
             },
           },
+          transaction_count: { $size: "$transactions" },
         },
       },
     ]);
