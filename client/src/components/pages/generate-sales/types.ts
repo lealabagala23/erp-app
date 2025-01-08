@@ -30,7 +30,6 @@ export type Order = {
   invoice_number?: string;
   tin?: string;
   billing_address?: string;
-  total_amount?: number;
   payment_type?: string;
   status?: string;
   discount_card?: string;
@@ -46,6 +45,10 @@ export type Order = {
   order_items?: OrderItem[];
   created_at?: string;
   payments?: Payment[]
+  sub_total?: number;
+  vat_exempt_amount?: number;
+  sc_pwd_disc_amount?: number;
+  net_total?: number;
 };
 
 export type Payment = {

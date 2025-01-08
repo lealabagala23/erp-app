@@ -19,7 +19,6 @@ export type Order = {
   company_id: string;
   invoice_number?: string;
   billing_address?: string;
-  total_amount?: number;
   payment_type?: string;
   payment_status?: string;
   referrer_id?: string;
@@ -51,7 +50,7 @@ const COLUMNS: GridColDef<Order>[] = [
     valueGetter: (value, row) => (row?.customer_id as any)?.customer_name,
   },
   {
-    field: 'total_amount',
+    field: 'net_total',
     headerName: 'Total Amount',
     flex: 1,
     valueGetter: (value) => formatCurrency(value || 0),

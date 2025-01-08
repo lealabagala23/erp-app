@@ -28,7 +28,7 @@ import { CancelItem, Order, OrderItem, Payment, TableItem } from './types';
 import { fetchProducts } from '../inventory/apis';
 import lhctPDF from '../../../assets/lhct_invoice.pdf';
 import lmtPDF from '../../../assets/lmt_invoice.pdf';
-import { formatCurrency, getUnitPrice } from '../../../utils/auth';
+import { formatCurrency } from '../../../utils/auth';
 import {
   Approval,
   Cancel,
@@ -210,13 +210,8 @@ export default function GenerateSales() {
     },
   });
 
-  const {
-    customer_id,
-    invoice_number,
-    vat_exempted,
-    sc_pwd_discount,
-    special_discount,
-  } = watch();
+  const { customer_id, invoice_number, vat_exempted, sc_pwd_discount } =
+    watch();
 
   const [orderItems, setOrderItems] = useState<TableItem[]>([DEFAULT_ITEM]);
 
@@ -259,23 +254,6 @@ export default function GenerateSales() {
     setOrderItems([DEFAULT_ITEM]);
     handleSave({ ...formValues, order_items: [DEFAULT_ITEM] });
   };
-
-  const computeSubtotal = () =>
-    orderItems.reduce((accum, obj) => {
-      const totalPrice =
-        getUnitPrice(products, obj.product_id as string) *
-        (obj.quantity - (obj.cancelled_quantity || 0));
-      return accum + totalPrice;
-    }, 0);
-
-  const computeVATExemptAmount = () =>
-    order.vat_exempted ? computeSubtotal() * (12 / 100) : 0;
-
-  const computeLessDiscAmount = () =>
-    order.sc_pwd_discount ? computeSubtotal() * (20 / 100) : 0;
-
-  const computeSpecialDiscAmount = () =>
-    order.special_discount ? special_discount * -1 : 0;
 
   // eslint-disable-next-line
   const saveHandler = (formValues: { [x: string]: any }) => {
@@ -572,9 +550,7 @@ export default function GenerateSales() {
                 <Typography>BALANCE DUE</Typography>
                 <Typography variant="h1">
                   ₱{' '}
-                  {formatCurrency(
-                    order?.total_amount - order?.total_amount_paid,
-                  )}
+                  {formatCurrency(order?.net_total - order?.total_amount_paid)}
                 </Typography>
                 <Typography>
                   (Amount Paid: ₱ {formatCurrency(order?.total_amount_paid)})
@@ -652,7 +628,7 @@ export default function GenerateSales() {
                   updateOrderItem={updateOrderItem}
                   deleteOrderItem={deleteOrderItem}
                   clearAllOrderItems={clearAllOrderItems}
-                  subtotal={computeSubtotal()}
+                  subtotal={order.sub_total}
                   disabled={
                     !customer_id ||
                     ![OrderStatus.DRAFT, OrderStatus.UNAPPROVED].includes(
@@ -699,7 +675,7 @@ export default function GenerateSales() {
                   >
                     <Item>
                       <Typography variant="body1" fontWeight={'bold'}>
-                        {`-${formatCurrency(computeVATExemptAmount())}`}
+                        {`-${formatCurrency(order.vat_exempt_amount)}`}
                       </Typography>
                     </Item>
                   </Grid>
@@ -745,7 +721,7 @@ export default function GenerateSales() {
                     <Item>
                       <Typography variant="body1" fontWeight={'bold'}>
                         {'-'}
-                        {formatCurrency(computeLessDiscAmount())}
+                        {formatCurrency(order.sc_pwd_disc_amount)}
                       </Typography>
                     </Item>
                   </Grid>
@@ -815,7 +791,7 @@ export default function GenerateSales() {
                   >
                     <Item>
                       <Typography variant="body1" fontWeight={'bold'}>
-                        {formatCurrency(computeSpecialDiscAmount())}
+                        {formatCurrency(order.special_discount)}
                       </Typography>
                     </Item>
                   </Grid>
@@ -827,13 +803,13 @@ export default function GenerateSales() {
                     </Item>
                   </Grid>
                   <Grid
-                    size={{ xs: 3, md: 2, xl: 1 }}
+                    size={{ xs: 4, md: 3, xl: 2 }}
                     alignItems={'center'}
                     textAlign={'right'}
                   >
                     <Item>
                       <Typography variant="h6">
-                        ₱ {formatCurrency(order?.total_amount || 0)}
+                        ₱ {formatCurrency(order?.net_total || 0)}
                       </Typography>
                     </Item>
                   </Grid>

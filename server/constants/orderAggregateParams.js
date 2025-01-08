@@ -70,6 +70,63 @@ const orderAggregateParams = [
       payments: { $first: "$payments" },
     },
   },
+  {
+    $addFields: {
+      sub_total: {
+        $reduce: {
+          input: "$order_items",
+          initialValue: 0,
+          in: {
+            $add: [
+              "$$value",
+              {
+                $multiply: [
+                  { $ifNull: ["$$this.unit_price", 0] },
+                  { $ifNull: ["$$this.quantity", 0] }, // minus cancelled_quantity
+                ],
+              },
+            ],
+          },
+        },
+      },
+    },
+  },
+  {
+    $addFields: {
+      vat_exempt_amount: {
+        $cond: {
+          if: { $eq: ["$vat_exempted", true] },
+          then: { $multiply: ["$sub_total", 0.12] },
+          else: 0,
+        },
+      },
+      sc_pwd_disc_amount: {
+        $cond: {
+          if: { $eq: ["$sc_pwd_discount", true] },
+          then: { $multiply: ["$sub_total", 0.2] },
+          else: 0,
+        },
+      },
+      special_discount: {
+        $ifNull: ["$special_discount", 0],
+      },
+    },
+  },
+  {
+    $addFields: {
+      net_total: {
+        $subtract: [
+          {
+            $subtract: [
+              { $subtract: ["$sub_total", "$vat_exempt_amount"] },
+              "$sc_pwd_disc_amount",
+            ],
+          },
+          { $ifNull: ["$special_discount", 0] },
+        ],
+      },
+    },
+  },
 ];
 
 module.exports = orderAggregateParams;
