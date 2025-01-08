@@ -14,9 +14,6 @@ const OrderSchema = new mongoose.Schema({
   billing_address: {
     type: String,
   },
-  total_amount: {
-    type: Number,
-  },
   payment_type: {
     type: String,
   },

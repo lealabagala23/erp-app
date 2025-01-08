@@ -68,8 +68,8 @@ const drawNameTinAddress = (
   const texts: string[] = [
     // eslint-disable-next-line
     (customer_id as any)?.customer_name,
-    tin,
-    billing_address,
+    tin || '',
+    billing_address || '',
   ];
 
   texts.forEach((text, key) =>
@@ -92,7 +92,7 @@ const drawOrderItems = (
   const { order_items } = order;
 
   (order_items || []).forEach((item, key) => {
-    const { product_id, quantity, unit_price, total_price, inventory_id } =
+    const { product_id, quantity, unit_price, cancelled_quantity = 0, inventory_id } =
       item;
     const { product_name, product_description, product_unit } =
       product_id as Product;
@@ -103,7 +103,7 @@ const drawOrderItems = (
       ),
       `${quantity}`,
       formatCurrency(unit_price),
-      formatCurrency(total_price),
+      formatCurrency(unit_price * (quantity - cancelled_quantity)),
     ];
     const getXAddend = (key: number, text: string) => {
       switch (key) {

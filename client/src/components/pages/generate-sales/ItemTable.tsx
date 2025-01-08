@@ -137,7 +137,7 @@ export default function ItemTable({
   );
 
   const formatTableItem = (item: TableItem) => {
-    const { product_id, quantity } = item;
+    const { product_id } = item;
 
     if (!product_id) return item;
 
@@ -146,7 +146,6 @@ export default function ItemTable({
     return {
       ...item,
       unit_price,
-      total_price: unit_price * quantity,
     };
   };
 
@@ -258,7 +257,10 @@ export default function ItemTable({
       headerAlign: 'right',
       // eslint-disable-next-line
       renderCell: ({ row }: any) => {
-        return renderPriceCell('Unit Price x Quantity', row.total_price);
+        return renderPriceCell(
+          'Unit Price x Quantity',
+          row.unit_price * (row.quantity - (row.cancelled_quantity || 0)),
+        );
       },
     },
     {

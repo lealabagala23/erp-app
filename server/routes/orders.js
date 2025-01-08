@@ -13,7 +13,6 @@ const getOrderPayload = ({
   invoice_number,
   tin,
   billing_address,
-  total_amount,
   payment_type,
   status,
   discount_card,
@@ -32,7 +31,6 @@ const getOrderPayload = ({
     invoice_number,
     tin,
     billing_address,
-    total_amount,
     payment_type,
     status,
     discount_card,
@@ -54,14 +52,12 @@ const getOrderItemPayload = ({
   inventory_id,
   quantity,
   unit_price,
-  total_price,
 }) => ({
   _id,
   product_id,
   inventory_id,
   quantity,
   unit_price,
-  total_price,
 });
 
 // Create a orders
@@ -170,12 +166,12 @@ router.put("/:id/payment", authenticateToken, async (req, res) => {
         },
       },
     ]);
-    const { payments, total_amount } = orders[0];
+    const { payments, net_total } = orders[0];
     const total_amount_paid = payments.reduce(
       (accum, obj) => accum + obj.amount_paid,
       0
     );
-    if (total_amount_paid >= total_amount) {
+    if (total_amount_paid >= net_total) {
       await Order.findByIdAndUpdate({ _id: order_id }, { status: "completed" });
     }
     res.status(200).json("Payment success");
@@ -233,10 +229,10 @@ router.put("/:id/cancel", authenticateToken, async (req, res) => {
       }
     );
 
-    const oPromises = cancel_items.map(({ _id, quantity, total_price }) => {
+    const oPromises = cancel_items.map(({ _id, quantity }) => {
       return OrderItem.findOneAndUpdate(
         { _id },
-        { $set: { cancelled_quantity: quantity, total_price } },
+        { $set: { cancelled_quantity: quantity } },
         { new: true, useFindAndModify: false }
       );
     });
@@ -264,20 +260,10 @@ router.put("/:id", authenticateToken, async (req, res) => {
     const order_id = req.params.id;
     const { order_items, ...rest } = req.body;
 
-    const total_sales = order_items.reduce(
-      (accum, obj) => accum + obj.total_price,
-      0
-    );
-    const { sc_pwd_discount, vat_exempted, special_discount = 0 } = rest;
-    const less_vat = vat_exempted ? total_sales * 0.12 : 0;
-    const less_sc = sc_pwd_discount ? total_sales * 0.2 : 0;
-    const total_amount = total_sales - less_vat - less_sc - special_discount;
-
     const updatedOrder = await Order.findByIdAndUpdate(
       order_id,
       {
         ...getOrderPayload(rest),
-        total_amount,
       },
       {
         new: true,

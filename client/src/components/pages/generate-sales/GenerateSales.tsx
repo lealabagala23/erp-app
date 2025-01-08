@@ -79,7 +79,6 @@ const DEFAULT_ITEM = {
   inventory_id: null,
   quantity: 1,
   unit_price: 0,
-  total_price: 0,
 };
 
 export default function GenerateSales() {

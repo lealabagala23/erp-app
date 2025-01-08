@@ -23,9 +23,6 @@ const OrderItemSchema = new mongoose.Schema({
   unit_price: {
     type: Number,
   },
-  total_price: {
-    type: Number,
-  },
   created_at: {
     type: Date,
     required: true,

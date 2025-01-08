@@ -50,7 +50,6 @@ const orderAggregateParams = [
       invoice_number: { $first: "$invoice_number" },
       tin: { $first: "$tin" },
       billing_address: { $first: "$billing_address" },
-      total_amount: { $first: "$total_amount" },
       total_amount_paid: { $first: "$total_amount_paid" },
       discount_card: { $first: "$discount_card" },
       discount_card_number: { $first: "$discount_card_number" },
@@ -82,7 +81,12 @@ const orderAggregateParams = [
               {
                 $multiply: [
                   { $ifNull: ["$$this.unit_price", 0] },
-                  { $ifNull: ["$$this.quantity", 0] }, // minus cancelled_quantity
+                  {
+                    $subtract: [
+                      { $ifNull: ["$$this.quantity", 0] },
+                      { $ifNull: ["$$this.cancelled_quantity", 0] },
+                    ],
+                  },
                 ],
               },
             ],

@@ -9,14 +9,12 @@ const getOrderItemPayload = ({
   inventory_id,
   quantity,
   unit_price,
-  total_price,
 }: OrderItem) => ({
   _id,
   product_id,
   inventory_id,
   quantity,
   unit_price,
-  total_price,
 });
 
 // eslint-disable-next-line

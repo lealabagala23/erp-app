@@ -168,7 +168,6 @@ const CancelOrder = ({ open, handleClose, orderItems, onCancel }: IProps) => {
                   unit_price,
                   maxQty,
                   quantity,
-                  total_price: unit_price * (maxQty - quantity),
                 })),
               totalCount,
             )
