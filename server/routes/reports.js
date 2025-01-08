@@ -19,14 +19,86 @@ router.get("/:time_period", authenticateToken, async (req, res) => {
       },
     };
 
+    let id_field = {};
+    let extra_fields = {};
+    let group_id_field = undefined;
+
+    switch (time_period) {
+      case "week":
+        id_field = "$weekStart";
+        extra_fields = {
+          week_start_date: {
+            $dateSubtract: {
+              startDate: "$first_order_date",
+              unit: "day",
+              amount: { $subtract: [{ $dayOfWeek: "$first_order_date" }, 1] },
+            },
+          },
+          week_end_date: {
+            $dateAdd: {
+              startDate: {
+                $dateSubtract: {
+                  startDate: "$first_order_date",
+                  unit: "day",
+                  amount: {
+                    $subtract: [{ $dayOfWeek: "$first_order_date" }, 1],
+                  },
+                },
+              },
+              unit: "day",
+              amount: 6,
+            },
+          },
+        };
+        group_id_field = "$_id";
+        break;
+      default:
+        id_field = {
+          date: {
+            $dateToString: {
+              format: "%m-%d-%Y",
+              date: {
+                $dateTrunc: {
+                  date: "$created_at",
+                  unit: "day",
+                },
+              },
+            },
+          },
+          order_id: "$_id",
+        };
+        group_id_field = "$_id.date";
+    }
+
     const reports = await Order.aggregate([
       {
         $match: params,
       },
       ...defaultOrderAggrParams,
       {
+        $addFields: {
+          weekStart: {
+            $dateToString: {
+              format: "%m-%d-%Y",
+              date: {
+                $dateSubtract: {
+                  startDate: "$created_at",
+                  unit: "day",
+                  amount: {
+                    $subtract: [
+                      { $dayOfWeek: "$created_at" }, // Get the day of the week (1 = Sunday, 7 = Saturday)
+                      1, // Adjust by subtracting 1 (so Sunday becomes 0)
+                    ],
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      {
         $group: {
-          _id: { $dateToString: { format: "%m-%d-%Y", date: "$created_at" } },
+          _id: id_field,
           orders: { $push: "$$ROOT" },
           total_sales: {
             $sum: {
@@ -55,11 +127,23 @@ router.get("/:time_period", authenticateToken, async (req, res) => {
               ],
             },
           },
+          first_order_date: { $min: "$created_at" },
         },
       },
       {
         $addFields: {
           avg_order_value: { $divide: ["$net_sales", "$order_count"] },
+          ...extra_fields,
+        },
+      },
+      {
+        $group: {
+          _id: group_id_field,
+          orders: { $first: "$orders" },
+          total_sales: { $sum: "$total_sales" },
+          order_count: { $first: "$order_count" },
+          cancelled_qty: { $sum: "$cancelled_qty" },
+          net_sales: { $sum: "$net_sales" },
         },
       },
       {
@@ -70,7 +154,7 @@ router.get("/:time_period", authenticateToken, async (req, res) => {
           partitionBy: null,
           sortBy: { _id: 1 },
           output: {
-            previousDaySales: {
+            previous_day_sales: {
               $shift: { output: "$net_sales", by: -1 },
             },
           },
@@ -80,14 +164,14 @@ router.get("/:time_period", authenticateToken, async (req, res) => {
         $addFields: {
           sales_growth: {
             $cond: {
-              if: { $eq: ["$previousDaySales", 0] },
+              if: { $eq: ["$previous_day_sales", 0] },
               then: 0,
               else: {
                 $multiply: [
                   {
                     $divide: [
-                      { $subtract: ["$net_sales", "$previousDaySales"] },
-                      "$previousDaySales",
+                      { $subtract: ["$net_sales", "$previous_day_sales"] },
+                      "$previous_day_sales",
                     ],
                   },
                   100,

@@ -1,23 +1,23 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React from 'react';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 interface IProps {
   options: { label: string; value: string }[];
   alignment: string;
-  setAlignment: Dispatch<SetStateAction<string>>;
+  handleAlignment: (s: string) => void;
 }
 
 export default function ColorToggleButton({
   options,
   alignment,
-  setAlignment,
+  handleAlignment,
 }: IProps) {
   const handleChange = (
     event: React.MouseEvent<HTMLElement>,
     newAlignment: string,
   ) => {
-    if (newAlignment !== null) setAlignment(newAlignment);
+    if (newAlignment !== null) handleAlignment(newAlignment);
   };
 
   return (

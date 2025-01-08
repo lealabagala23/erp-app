@@ -32,10 +32,10 @@ const TIME_PERIOD_OPTIONS = [
     label: 'Monthly',
     value: 'month',
   },
-  {
-    label: 'Yearly',
-    value: 'year',
-  },
+  // {
+  //   label: 'Yearly',
+  //   value: 'year',
+  // },
 ];
 
 export default function SalesReports() {
@@ -80,7 +80,7 @@ export default function SalesReports() {
     },
     {
       field: 'order_count',
-      headerName: 'Transactions',
+      headerName: 'Orders',
       type: 'number',
       flex: 1,
     },
@@ -120,30 +120,69 @@ export default function SalesReports() {
   const getTitle = () =>
     TIME_PERIOD_OPTIONS.find((o) => o.value === timePeriod)?.label;
 
+  const getTimePeriodForDayJS = (newTimePeriod?: string) => {
+    const value = newTimePeriod ?? timePeriod;
+    switch (value) {
+      case 'week':
+        return 'month';
+      case 'month':
+        return 'year';
+      default:
+        return 'week';
+    }
+  };
+
   const handleDateToggle = (
     event: React.MouseEvent<HTMLElement>,
     newAlignment: string,
   ) => {
-    console.log('new', newAlignment);
+    const timePeriodDayJS = getTimePeriodForDayJS();
     if (newAlignment === 'prevDateRange') {
       setStartDate((v) =>
-        dayjs(v).subtract(1, 'week').startOf('week').format('MM-DD-YYYY'),
+        dayjs(v)
+          .subtract(1, timePeriodDayJS)
+          .startOf(timePeriodDayJS)
+          .format('MM-DD-YYYY'),
       );
       setEndDate((v) =>
-        dayjs(v).subtract(1, 'week').endOf('week').format('MM-DD-YYYY'),
+        dayjs(v)
+          .subtract(1, timePeriodDayJS)
+          .endOf(timePeriodDayJS)
+          .format('MM-DD-YYYY'),
       );
     } else {
       setStartDate((v) =>
-        dayjs(v).add(1, 'week').startOf('week').format('MM-DD-YYYY'),
+        dayjs(v)
+          .add(1, timePeriodDayJS)
+          .startOf(timePeriodDayJS)
+          .format('MM-DD-YYYY'),
       );
       setEndDate((v) =>
-        dayjs(v).add(1, 'week').endOf('week').format('MM-DD-YYYY'),
+        dayjs(v)
+          .add(1, timePeriodDayJS)
+          .endOf(timePeriodDayJS)
+          .format('MM-DD-YYYY'),
       );
     }
   };
 
   const disableNextDate = () =>
-    dayjs(startDate).add(1, 'week').startOf('week').isAfter(dayjs());
+    dayjs(startDate)
+      .add(1, getTimePeriodForDayJS())
+      .startOf(getTimePeriodForDayJS())
+      .isAfter(dayjs());
+
+  const handleTimePeriodChange = (newTimePeriod: string) => {
+    setTimePeriod(newTimePeriod);
+    setStartDate(
+      dayjs()
+        .startOf(getTimePeriodForDayJS(newTimePeriod))
+        .format('MM-DD-YYYY'),
+    );
+    setEndDate(
+      dayjs().endOf(getTimePeriodForDayJS(newTimePeriod)).format('MM-DD-YYYY'),
+    );
+  };
 
   return (
     <>
@@ -165,7 +204,7 @@ export default function SalesReports() {
           >
             <ColorToggleButton
               alignment={timePeriod}
-              setAlignment={setTimePeriod}
+              handleAlignment={handleTimePeriodChange}
               options={TIME_PERIOD_OPTIONS}
             />
             <Typography variant="h6">{getTitle()} Sales Report</Typography>
