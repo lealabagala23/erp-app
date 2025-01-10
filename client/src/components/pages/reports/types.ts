@@ -1,6 +1,6 @@
 export type GetSalesReportsResponse = {
-  startDate: string;
-  endDate: string;
+  start_date: string;
+  end_date: string;
   data: {
     _id: string;
     date: string;
@@ -10,5 +10,7 @@ export type GetSalesReportsResponse = {
     sales_growth: number;
     cancelled_qty: number;
     net_sales: number;
+    start_date: string;
+    end_date: string;
   }[];
 };

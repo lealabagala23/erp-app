@@ -66,10 +66,12 @@ export default function SalesReports() {
 
   const columns: GridColDef[] = [
     {
-      field: '_id',
+      field: 'start_date',
       headerName: 'Date',
       flex: 1,
-      valueFormatter: (value: string) => dayjs(value).format('MM-DD-YYYY'),
+      // eslint-disable-next-line
+      valueGetter: (_, row: any) =>
+        `${dayjs(row.start_date).format('MM-DD-YYYY')}${timePeriod === 'day' ? '' : ` - ${dayjs(row.end_date).format('MM-DD-YYYY')}`}`,
     },
     {
       field: 'total_sales',
