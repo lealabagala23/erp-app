@@ -18,6 +18,7 @@ import { GetSalesReportsResponse } from './types';
 import { formatCurrency } from '../../../utils/auth';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import AuthContext from '../../auth/AuthContext';
+import SalesChart from './SalesChart';
 
 const TIME_PERIOD_OPTIONS = [
   {
@@ -32,10 +33,6 @@ const TIME_PERIOD_OPTIONS = [
     label: 'Monthly',
     value: 'month',
   },
-  // {
-  //   label: 'Yearly',
-  //   value: 'year',
-  // },
 ];
 
 export default function SalesReports() {
@@ -48,7 +45,7 @@ export default function SalesReports() {
     dayjs().endOf('week').format('MM-DD-YYYY'),
   );
 
-  const { data: salesData, isLoading } = useQuery(
+  const { data: salesData } = useQuery(
     ['fetchSalesReports', startDate, endDate],
     () =>
       fetchSalesReports({
@@ -301,6 +298,7 @@ export default function SalesReports() {
               }}
             />
           </Box>
+          <SalesChart data={data} timePeriod={timePeriod} />
         </>
       </PageWrapper>
     </>
