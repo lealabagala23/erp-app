@@ -144,36 +144,6 @@ router.get("/:time_period", authenticateToken, async (req, res) => {
           start_date: { $first: start_date_field },
           end_date: { $first: end_date_field },
           orders: { $push: "$$ROOT" },
-          // total_sales: {
-          //   $sum: {
-          //     $multiply: ["$order_items.unit_price", "$order_items.quantity"],
-          //   },
-          // },
-          // order_count: { $sum: 1 },
-          // transactions: { $addToSet: "$_id" },
-          // cancelled_qty: {
-          //   $sum: { $ifNull: ["$order_items.cancelled_quantity", 0] },
-          // },
-          // net_sales: {
-          //   $sum: {
-          //     $subtract: [
-          //       {
-          //         $multiply: [
-          //           "$order_items.unit_price",
-          //           "$order_items.quantity",
-          //         ],
-          //       },
-          //       {
-          //         $multiply: [
-          //           "$order_items.unit_price",
-          //           { $ifNull: ["$order_items.cancelled_quantity", 0] },
-          //         ],
-          //       },
-          //     ],
-          //   },
-          // },
-          // first_order_date: { $min: "$created_at" },
-          // order_items: { $push: "$order_items" },
         },
       },
       {
@@ -250,10 +220,10 @@ router.get("/:time_period", authenticateToken, async (req, res) => {
           orders: { $push: "$orders" },
           total_sales: { $sum: "$total_sales" },
           cancelled_qty: { $sum: "$cancelled_qty" },
-          order_count: { $sum: "$order_count" },
+          order_count: {
+            [`${time_period === "day" ? "$sum" : "$first"}`]: "$order_count",
+          },
           net_sales: { $sum: "$net_sales" },
-          // transactions: { $first: "$transactions" },
-          // order_items: { $first: "$order_items" },
         },
       },
       {
