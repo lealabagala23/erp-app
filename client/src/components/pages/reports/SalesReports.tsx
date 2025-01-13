@@ -11,14 +11,15 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import dayjs from 'dayjs';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSalesReports } from './apis';
-import { GetSalesReportsResponse } from './types';
+import { GetSalesReportsResponse, SalesReport } from './types';
 import { formatCurrency } from '../../../utils/auth';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import AuthContext from '../../auth/AuthContext';
-import SalesChart from './SalesChart';
+import SalesDataChart from './SalesDataChart';
 
 const TIME_PERIOD_OPTIONS = [
   {
@@ -36,6 +37,7 @@ const TIME_PERIOD_OPTIONS = [
 ];
 
 export default function SalesReports() {
+  const theme = useTheme();
   const { activeCompany } = useContext(AuthContext);
   const [timePeriod, setTimePeriod] = useState(TIME_PERIOD_OPTIONS[0].value);
   const [startDate, setStartDate] = useState(
@@ -183,6 +185,37 @@ export default function SalesReports() {
     );
   };
 
+  const getSalesData = (data: SalesReport[]) => {
+    return {
+      xAxis: data.map((d) => dayjs(d.start_date).format('MMM D')),
+      yAxis: [
+        {
+          id: 'totalSales',
+          label: 'Total Sales',
+          data: data.map((d) => d.total_sales),
+          color: theme.palette.primary.dark,
+        },
+        {
+          id: 'netSales',
+          label: 'Net Sales',
+          data: data.map((d) => d.net_sales),
+          color: theme.palette.primary.main,
+        },
+        {
+          id: 'avgOrderValue',
+          label: 'Avg Order Value',
+          data: data.map((d) => d.avg_order_value),
+          color: theme.palette.primary.light,
+        },
+      ],
+      average:
+        data.reduce((accum, { net_sales }) => accum + net_sales, 0) /
+        data.length,
+    };
+  };
+
+  const { xAxis, yAxis, average } = getSalesData(data);
+
   return (
     <>
       <AppNavbar title={'Home'} />
@@ -298,7 +331,63 @@ export default function SalesReports() {
               }}
             />
           </Box>
-          <SalesChart data={data} timePeriod={timePeriod} />
+          <Stack direction={'row'} gap={2} width={'100%'}>
+            <SalesDataChart
+              label={`Total and Net Sales`}
+              averageValue={`Php ${formatCurrency(average)}`}
+              unitDescription={`Net Sales`}
+              xAxisData={xAxis}
+              yAxisData={yAxis}
+              timePeriod={timePeriod}
+            />
+            <SalesDataChart
+              label={`Sales Growth`}
+              averageValue={`${(data.reduce((accum, { sales_growth = 0 }) => accum + sales_growth, 0) / data.length).toFixed(1)}%`}
+              unitDescription={`Sales Growth`}
+              xAxisData={xAxis}
+              yAxisData={[
+                {
+                  id: 'salesGrowth',
+                  label: 'Sales Growth',
+                  data: data.map((d) => d.sales_growth || 0),
+                  color: theme.palette.primary.dark,
+                },
+              ]}
+              timePeriod={timePeriod}
+            />
+          </Stack>
+          <Stack direction={'row'} gap={2} width={'100%'}>
+            <SalesDataChart
+              label={`Orders`}
+              averageValue={`${(data.reduce((accum, { order_count = 0 }) => accum + order_count, 0) / data.length).toFixed(1)}`}
+              unitDescription={`Orders`}
+              xAxisData={xAxis}
+              yAxisData={[
+                {
+                  id: 'orders',
+                  label: 'Orders',
+                  data: data.map((d) => d.order_count || 0),
+                  color: theme.palette.primary.dark,
+                },
+              ]}
+              timePeriod={timePeriod}
+            />
+            <SalesDataChart
+              label={`Item Cancellations`}
+              averageValue={`${(data.reduce((accum, { cancelled_qty = 0 }) => accum + cancelled_qty, 0) / data.length).toFixed(1)}`}
+              unitDescription={`Item Cancellations`}
+              xAxisData={xAxis}
+              yAxisData={[
+                {
+                  id: 'itemCancellations',
+                  label: 'Item Cancellations',
+                  data: data.map((d) => d.cancelled_qty || 0),
+                  color: theme.palette.primary.dark,
+                },
+              ]}
+              timePeriod={timePeriod}
+            />
+          </Stack>
         </>
       </PageWrapper>
     </>
