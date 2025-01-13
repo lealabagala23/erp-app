@@ -70,7 +70,7 @@ export const createOrder = async (order: Order) => {
   const payload = generatePayload(order);
   const response = await axiosConfig.post(`${ORDERS_API}`, {
     ...payload,
-  });
+  }, { maxRedirects: 0 });
 
   return response?.data;
 };
