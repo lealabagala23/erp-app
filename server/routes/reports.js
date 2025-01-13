@@ -6,7 +6,7 @@ const { default: mongoose } = require("mongoose");
 const defaultOrderAggrParams = require("../constants/defaultOrderAggrParams");
 
 // Get all reports
-router.get("/:time_period", authenticateToken, async (req, res) => {
+router.get("/sales/:time_period", authenticateToken, async (req, res) => {
   try {
     const time_period = req.params.time_period;
     const { start_date, end_date } = req.query;
@@ -51,7 +51,6 @@ router.get("/:time_period", authenticateToken, async (req, res) => {
       {
         $match: params,
       },
-      // ...defaultOrderAggrParams,
       {
         $lookup: {
           from: "orderitems",
@@ -81,10 +80,7 @@ router.get("/:time_period", authenticateToken, async (req, res) => {
                   startDate: "$created_at",
                   unit: "day",
                   amount: {
-                    $subtract: [
-                      { $dayOfWeek: "$created_at" }, // Get the day of the week (1 = Sunday, 7 = Saturday)
-                      1, // Adjust by subtracting 1 (so Sunday becomes 0)
-                    ],
+                    $subtract: [{ $dayOfWeek: "$created_at" }, 1],
                   },
                 },
               },
@@ -105,14 +101,14 @@ router.get("/:time_period", authenticateToken, async (req, res) => {
                     },
                   },
                   unit: "day",
-                  amount: 6, // Add 6 days to get the week end date
+                  amount: 6,
                 },
               },
             },
           },
           monthStart: {
             $dateToString: {
-              format: "%Y-%m-01", // Format to get the first day of the month
+              format: "%Y-%m-01",
               date: "$created_at",
             },
           },
@@ -268,6 +264,104 @@ router.get("/:time_period", authenticateToken, async (req, res) => {
       start_date,
       end_date,
       data: reports,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
+// Get all reports
+router.get("/top-metrics/:time_period", authenticateToken, async (req, res) => {
+  try {
+    const time_period = req.params.time_period;
+    const { start_date, end_date } = req.query;
+    const params = {
+      company_id: new mongoose.Types.ObjectId(req.query.company_id),
+      //   status: "completed",
+      created_at: {
+        $gte: new Date(start_date),
+        $lte: new Date(end_date),
+      },
+    };
+
+    const groupBy = {
+      day: { $dateToString: { format: "%Y-%m-%d", date: "$created_at" } },
+      week: { $isoWeek: "$created_at" },
+      month: { $dateToString: { format: "%Y-%m", date: "$created_at" } },
+    };
+
+    const aggregatePipeline = [
+      {
+        $match: params,
+      },
+      {
+        $lookup: {
+          from: "orderitems",
+          localField: "_id",
+          foreignField: "order_id",
+          as: "order_items",
+        },
+      },
+      { $unwind: "$order_items" },
+      {
+        $lookup: {
+          from: "products",
+          localField: "order_items.product_id",
+          foreignField: "_id",
+          as: "order_items.product_id",
+        },
+      },
+      {
+        $unwind: {
+          path: "$order_items.product_id",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+    ];
+
+    const groupPipeline = {
+      _id: {
+        period: groupBy[time_period],
+        product_id: "$order_items.product_id",
+      },
+      product_name: { $first: "$order_items.product_id.product_name" },
+    };
+
+    const products_by_quantity = await Order.aggregate([
+      ...aggregatePipeline,
+      {
+        $group: {
+          ...groupPipeline,
+          total_quantity: { $sum: "$order_items.quantity" },
+        },
+      },
+      { $sort: { total_quantity: -1 } },
+      { $limit: 5 },
+    ]);
+
+    const products_by_sales = await Order.aggregate([
+      ...aggregatePipeline,
+      {
+        $group: {
+          ...groupPipeline,
+          total_sales: {
+            $sum: {
+              $multiply: ["$order_items.unit_price", "$order_items.quantity"],
+            },
+          },
+        },
+      },
+      { $sort: { total_sales: -1 } },
+      { $limit: 5 },
+    ]);
+
+    // Top customers by quantity of orders / total sales
+    // Top referrers by quantity of customers / total sales
+
+    res.status(200).json({
+      products_by_quantity,
+      products_by_sales,
     });
   } catch (err) {
     console.log(err);

@@ -476,32 +476,35 @@ export default function GenerateSales() {
                       </TextField>
                     </FormControl>
                   </Grid>
-                  <Grid size={4}>
-                    <FormControl fullWidth margin="dense">
-                      <FormLabel>Referring Doctor</FormLabel>
-                      <FormAutocomplete
-                        options={[
-                          ...referringDoctors.map(
-                            ({ _id, customer_id }: Doctor) => ({
-                              // eslint-disable-next-line
-                              label: (customer_id as any)?.customer_name,
-                              value: _id,
-                            }),
-                          ),
-                        ]}
-                        getValues={getValues}
-                        name="referring_doctor_id"
-                        placeholder={'Select Doctor'}
-                        disabled={
-                          !customer_id ||
-                          ![OrderStatus.DRAFT, OrderStatus.UNAPPROVED].includes(
-                            order?.status,
-                          )
-                        }
-                        control={control}
-                      />
-                    </FormControl>
-                  </Grid>
+                  {customer_type === 'PATIENT' && (
+                    <Grid size={4}>
+                      <FormControl fullWidth margin="dense">
+                        <FormLabel>Referring Doctor</FormLabel>
+                        <FormAutocomplete
+                          options={[
+                            ...referringDoctors.map(
+                              ({ _id, customer_id }: Doctor) => ({
+                                // eslint-disable-next-line
+                                label: (customer_id as any)?.customer_name,
+                                value: _id,
+                              }),
+                            ),
+                          ]}
+                          getValues={getValues}
+                          name="referring_doctor_id"
+                          placeholder={'Select Doctor'}
+                          disabled={
+                            !customer_id ||
+                            ![
+                              OrderStatus.DRAFT,
+                              OrderStatus.UNAPPROVED,
+                            ].includes(order?.status)
+                          }
+                          control={control}
+                        />
+                      </FormControl>
+                    </Grid>
+                  )}
                   {customer_type === 'PATIENT' && customer_details && (
                     <>
                       <Grid size={4}>

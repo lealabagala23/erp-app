@@ -2,39 +2,17 @@ import React, { useContext, useState } from 'react';
 import AppNavbar from '../../common/AppNavbar';
 import Header from '../../common/Header';
 import PageWrapper from '../../wrappers/PageWrapper';
-import ColorToggleButton from '../../common/ColorToggleButton';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import {
-  Box,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import dayjs from 'dayjs';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSalesReports } from './apis';
 import { GetSalesReportsResponse, SalesReport } from './types';
 import { formatCurrency } from '../../../utils/auth';
-import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import AuthContext from '../../auth/AuthContext';
 import SalesDataChart from './SalesDataChart';
-
-const TIME_PERIOD_OPTIONS = [
-  {
-    label: 'Daily',
-    value: 'day',
-  },
-  {
-    label: 'Weekly',
-    value: 'week',
-  },
-  {
-    label: 'Monthly',
-    value: 'month',
-  },
-];
+import DateRangeSwitcher, { TIME_PERIOD_OPTIONS } from './DateRangeSwitcher';
 
 export default function SalesReports() {
   const theme = useTheme();
@@ -121,70 +99,6 @@ export default function SalesReports() {
   const getTitle = () =>
     TIME_PERIOD_OPTIONS.find((o) => o.value === timePeriod)?.label;
 
-  const getTimePeriodForDayJS = (newTimePeriod?: string) => {
-    const value = newTimePeriod ?? timePeriod;
-    switch (value) {
-      case 'week':
-        return 'month';
-      case 'month':
-        return 'year';
-      default:
-        return 'week';
-    }
-  };
-
-  const handleDateToggle = (
-    event: React.MouseEvent<HTMLElement>,
-    newAlignment: string,
-  ) => {
-    const timePeriodDayJS = getTimePeriodForDayJS();
-    if (newAlignment === 'prevDateRange') {
-      setStartDate((v) =>
-        dayjs(v)
-          .subtract(1, timePeriodDayJS)
-          .startOf(timePeriodDayJS)
-          .format('MM-DD-YYYY'),
-      );
-      setEndDate((v) =>
-        dayjs(v)
-          .subtract(1, timePeriodDayJS)
-          .endOf(timePeriodDayJS)
-          .format('MM-DD-YYYY'),
-      );
-    } else {
-      setStartDate((v) =>
-        dayjs(v)
-          .add(1, timePeriodDayJS)
-          .startOf(timePeriodDayJS)
-          .format('MM-DD-YYYY'),
-      );
-      setEndDate((v) =>
-        dayjs(v)
-          .add(1, timePeriodDayJS)
-          .endOf(timePeriodDayJS)
-          .format('MM-DD-YYYY'),
-      );
-    }
-  };
-
-  const disableNextDate = () =>
-    dayjs(startDate)
-      .add(1, getTimePeriodForDayJS())
-      .startOf(getTimePeriodForDayJS())
-      .isAfter(dayjs());
-
-  const handleTimePeriodChange = (newTimePeriod: string) => {
-    setTimePeriod(newTimePeriod);
-    setStartDate(
-      dayjs()
-        .startOf(getTimePeriodForDayJS(newTimePeriod))
-        .format('MM-DD-YYYY'),
-    );
-    setEndDate(
-      dayjs().endOf(getTimePeriodForDayJS(newTimePeriod)).format('MM-DD-YYYY'),
-    );
-  };
-
   const getSalesData = (data: SalesReport[]) => {
     return {
       xAxis: data.map((d) => dayjs(d.start_date).format('MMM D')),
@@ -218,50 +132,19 @@ export default function SalesReports() {
 
   return (
     <>
-      <AppNavbar title={'Home'} />
+      <AppNavbar title={'Sales Reports'} />
       <PageWrapper>
         <>
           <Header />
-          <Stack
-            direction="row"
-            sx={{
-              display: { xs: 'none', md: 'flex' },
-              width: '100%',
-              alignItems: { xs: 'flex-start', md: 'center' },
-              justifyContent: 'space-between',
-              maxWidth: { sm: '100%', md: '1700px' },
-              pt: 1.5,
-            }}
-            spacing={2}
-          >
-            <ColorToggleButton
-              alignment={timePeriod}
-              handleAlignment={handleTimePeriodChange}
-              options={TIME_PERIOD_OPTIONS}
-            />
-            <Typography variant="h6">{getTitle()} Sales Report</Typography>
-            <ToggleButtonGroup
-              color="primary"
-              exclusive
-              onChange={handleDateToggle}
-            >
-              <ToggleButton value={'prevDateRange'}>
-                <ChevronLeft />
-              </ToggleButton>
-              <ToggleButton value={''} sx={{ pointerEvents: 'none' }}>
-                {dayjs(startDate).format('MMMM D, YYYY')}
-              </ToggleButton>
-              <ToggleButton value={''} sx={{ pointerEvents: 'none' }}>
-                {dayjs(endDate).format('MMMM D, YYYY')}
-              </ToggleButton>
-              <ToggleButton
-                value={'nextDateRange'}
-                disabled={disableNextDate()}
-              >
-                <ChevronRight />
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Stack>
+          <DateRangeSwitcher
+            timePeriod={timePeriod}
+            setTimePeriod={setTimePeriod}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
+            title={`${getTitle()} Sales Report`}
+          />
           <Box
             sx={{
               height: '100%',

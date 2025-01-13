@@ -83,8 +83,8 @@ const nestedMainItems = [
         route: '/reports/sales',
       },
       {
-        text: 'Top Products',
-        route: '/reports/products',
+        text: 'Top Metrics',
+        route: '/reports/top-metrics',
       },
     ],
   },
