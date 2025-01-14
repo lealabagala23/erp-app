@@ -64,6 +64,7 @@ const TopMetrics = () => {
             direction={'row'}
             width={'100%'}
             sx={{ flexWrap: 'wrap' }}
+            maxWidth={'1700px'}
           >
             <MetricsPieChart
               title={'Top Products by Quantity'}

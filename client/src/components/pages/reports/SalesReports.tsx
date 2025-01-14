@@ -214,7 +214,7 @@ export default function SalesReports() {
               }}
             />
           </Box>
-          <Stack direction={'row'} gap={2} width={'100%'}>
+          <Stack direction={'row'} gap={2} width={'100%'} maxWidth={'1700px'}>
             <SalesDataChart
               label={`Total and Net Sales`}
               averageValue={`Php ${formatCurrency(average)}`}
@@ -225,7 +225,7 @@ export default function SalesReports() {
             />
             <SalesDataChart
               label={`Sales Growth`}
-              averageValue={`${(data.reduce((accum, { sales_growth = 0 }) => accum + sales_growth, 0) / data.length).toFixed(1)}%`}
+              averageValue={`${(data.reduce((accum, { sales_growth = 0 }) => accum + sales_growth, 0) / (data.length || 1)).toFixed(1)}%`}
               unitDescription={`Sales Growth`}
               xAxisData={xAxis}
               yAxisData={[
@@ -239,10 +239,10 @@ export default function SalesReports() {
               timePeriod={timePeriod}
             />
           </Stack>
-          <Stack direction={'row'} gap={2} width={'100%'}>
+          <Stack direction={'row'} gap={2} width={'100%'} maxWidth={'1700px'}>
             <SalesDataChart
               label={`Orders`}
-              averageValue={`${(data.reduce((accum, { order_count = 0 }) => accum + order_count, 0) / data.length).toFixed(1)}`}
+              averageValue={`${(data.reduce((accum, { order_count = 0 }) => accum + order_count, 0) / (data.length || 1)).toFixed(1)}`}
               unitDescription={`Orders`}
               xAxisData={xAxis}
               yAxisData={[
@@ -257,7 +257,7 @@ export default function SalesReports() {
             />
             <SalesDataChart
               label={`Item Cancellations`}
-              averageValue={`${(data.reduce((accum, { cancelled_qty = 0 }) => accum + cancelled_qty, 0) / data.length).toFixed(1)}`}
+              averageValue={`${(data.reduce((accum, { cancelled_qty = 0 }) => accum + cancelled_qty, 0) / (data.length || 1)).toFixed(1)}`}
               unitDescription={`Item Cancellations`}
               xAxisData={xAxis}
               yAxisData={[
