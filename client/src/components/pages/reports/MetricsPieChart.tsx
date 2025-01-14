@@ -85,6 +85,11 @@ interface IProps {
 }
 
 export default function MetricsPieChart({ title, data, totalValue }: IProps) {
+  const getPercentage = (value: number) => {
+    const total = data.reduce((accum, { value }) => accum + value, 0);
+    return `${((value / total) * 100).toFixed(1)}%`;
+  };
+
   return (
     <Card
       variant="outlined"
@@ -106,6 +111,7 @@ export default function MetricsPieChart({ title, data, totalValue }: IProps) {
             series={[
               {
                 data,
+                arcLabel: (item) => getPercentage(item.value),
                 innerRadius: 75,
                 outerRadius: 100,
                 paddingAngle: 0,

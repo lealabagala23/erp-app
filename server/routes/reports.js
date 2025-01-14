@@ -297,6 +297,20 @@ router.get("/top-metrics/:time_period", authenticateToken, async (req, res) => {
       },
       {
         $lookup: {
+          from: "customers",
+          localField: "customer_id",
+          foreignField: "_id",
+          as: "customer_id",
+        },
+      },
+      {
+        $unwind: {
+          path: "$customer_id",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
           from: "orderitems",
           localField: "_id",
           foreignField: "order_id",
@@ -356,12 +370,30 @@ router.get("/top-metrics/:time_period", authenticateToken, async (req, res) => {
       { $limit: 5 },
     ]);
 
-    // Top customers by quantity of orders / total sales
+    const top_customers = await Order.aggregate([
+      ...aggregatePipeline,
+      {
+        $group: {
+          _id: "$customer_id._id",
+          customer_name: { $first: "$customer_id.customer_name" },
+          total_quantity: { $sum: "$order_items.quantity" },
+          total_sales: {
+            $sum: {
+              $multiply: ["$order_items.unit_price", "$order_items.quantity"],
+            },
+          },
+        },
+      },
+      { $sort: { total_sales: -1 } },
+      { $limit: 5 },
+    ]);
+
     // Top referrers by quantity of customers / total sales
 
     res.status(200).json({
       products_by_quantity,
       products_by_sales,
+      top_customers,
     });
   } catch (err) {
     console.log(err);
