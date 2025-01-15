@@ -829,16 +829,20 @@ export default function GenerateSales() {
             >
               <Button
                 variant={
-                  order?.status === OrderStatus.UNPAID
+                  [OrderStatus.UNPAID, OrderStatus.PARTIALLY_PAID].includes(
+                    order?.status,
+                  )
                     ? 'contained'
                     : 'outlined'
                 }
                 startIcon={<MoneyOutlined />}
                 sx={{
-                  cursor:
-                    order?.status === OrderStatus.UNPAID
-                      ? undefined
-                      : 'not-allowed',
+                  cursor: [
+                    OrderStatus.UNPAID,
+                    OrderStatus.PARTIALLY_PAID,
+                  ].includes(order?.status)
+                    ? undefined
+                    : 'not-allowed',
                 }}
                 onClick={() =>
                   (order?.payments || []).length > 0
@@ -924,6 +928,7 @@ export default function GenerateSales() {
                 OrderStatus.COMPLETED,
                 OrderStatus.APPROVED,
                 OrderStatus.UNPAID,
+                OrderStatus.PARTIALLY_PAID,
               ].includes(order.status) && (
                 <Button
                   variant={'contained'}

@@ -57,6 +57,10 @@ const labelRouteMapping = {
     primary: 'Accounts',
     secondary: 'Agencies',
   },
+  '/billing-statements': {
+    primary: 'Accounts',
+    secondary: 'Billing Statements',
+  },
   '/referrals': {
     primary: 'Accounts',
     secondary: 'Referrals',

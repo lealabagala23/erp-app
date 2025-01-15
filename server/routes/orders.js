@@ -171,9 +171,12 @@ router.put("/:id/payment", authenticateToken, async (req, res) => {
       (accum, obj) => accum + obj.amount_paid,
       0
     );
-    if (total_amount_paid >= net_total) {
-      await Order.findByIdAndUpdate({ _id: order_id }, { status: "completed" });
-    }
+    await Order.findByIdAndUpdate(
+      { _id: order_id },
+      {
+        status: total_amount_paid >= net_total ? "completed" : "partially_paid",
+      }
+    );
     res.status(200).json("Payment success");
   } catch (err) {
     console.log(err);

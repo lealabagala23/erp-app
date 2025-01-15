@@ -1,3 +1,5 @@
+import { Order } from "../orders/Orders";
+
 export type Customer = {
   _id?: string;
   customer_name: string;
@@ -44,3 +46,13 @@ export type Referrer = {
   contact_info: string;
   created_at?: string;
 };
+
+
+export type BillingStatement = {
+  _id?: string;
+  customer_name: string;
+  total_balance: number;
+  order_count: number;
+  min_created_at: string;
+  orders: Order[]
+}

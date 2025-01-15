@@ -6,6 +6,7 @@ export enum OrderStatus {
   UNAPPROVED = 'unapproved',
   APPROVED = 'approved',
   UNPAID = 'unpaid',
+  PARTIALLY_PAID = 'partially_paid',
   COMPLETED = 'completed',
   CANCELLED = 'cancelled',
 }
@@ -19,6 +20,8 @@ export const getOrderStatusColor = (status: OrderStatus) => {
     case OrderStatus.APPROVED:
       return 'primary';
     case OrderStatus.UNPAID:
+      return 'warning';
+    case OrderStatus.PARTIALLY_PAID:
       return 'warning';
     case OrderStatus.COMPLETED:
       return 'success';

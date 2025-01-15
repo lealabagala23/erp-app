@@ -3,6 +3,7 @@ import { Customer, Referrer } from './types';
 
 const CUSTOMERS_API = '/api/customers';
 const REFERRERS_API = '/api/referrers';
+const BILLINGS_API = '/api/billings';
 
 const generatePayload = (customer: Customer) => {
   return { ...customer };
@@ -18,9 +19,7 @@ export const fetchCustomerType = async ({
 }: {
   customer_type: string;
 }) => {
-  const response = await axiosConfig.get(
-    `${CUSTOMERS_API}/${customer_type}`,
-  );
+  const response = await axiosConfig.get(`${CUSTOMERS_API}/${customer_type}`);
   return response?.data;
 };
 
@@ -63,11 +62,17 @@ export const fetchReferrers = async () => {
   return response?.data;
 };
 
-
 export const createReferrer = async (payload: Referrer) => {
   const response = await axiosConfig.post(`${CUSTOMERS_API}`, {
     ...payload,
   });
 
+  return response?.data;
+};
+
+export const fetchBillings = async ({ company_id }: { company_id: string }) => {
+  const response = await axiosConfig.get(`${BILLINGS_API}`, {
+    params: { company_id },
+  });
   return response?.data;
 };

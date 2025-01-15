@@ -68,8 +68,8 @@ const nestedMainItems = [
         route: '/agencies',
       },
       {
-        text: 'Referrals',
-        route: '/referrals',
+        text: 'Billing Statements',
+        route: '/billing-statements',
       },
     ],
   },

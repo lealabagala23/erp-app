@@ -3,7 +3,6 @@ const router = express.Router();
 const Order = require("../models/Order");
 const authenticateToken = require("../middleware/auth");
 const { default: mongoose } = require("mongoose");
-const defaultOrderAggrParams = require("../constants/defaultOrderAggrParams");
 
 // Get all reports
 router.get("/sales/:time_period", authenticateToken, async (req, res) => {

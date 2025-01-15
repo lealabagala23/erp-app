@@ -49,6 +49,14 @@ export type Order = {
   net_total?: number;
 };
 
+export type CompanyBankDetails = {
+  bank_name: string;
+  bank_account_name: string;
+  bank_account_number: string;
+  customer_name: string;
+  min_created_at: string;
+}
+
 export type Payment = {
   _id?: string;
   order_id: string;

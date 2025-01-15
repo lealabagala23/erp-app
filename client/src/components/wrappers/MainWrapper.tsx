@@ -20,6 +20,7 @@ import Agencies from '../pages/accounts/Agencies';
 import Referrers from '../pages/accounts/Referrers';
 import SalesReports from '../pages/reports/SalesReports';
 import TopMetrics from '../pages/reports/TopMetrics';
+import BillingStatements from '../pages/accounts/BillingStatements';
 
 export default function MainWrapper() {
   return (
@@ -39,6 +40,7 @@ export default function MainWrapper() {
           <Route path="/patients" element={<Patients />} />
           <Route path="/doctors" element={<Doctors />} />
           <Route path="/agencies" element={<Agencies />} />
+          <Route path="/billing-statements" element={<BillingStatements />} />
           <Route path="/referrals" element={<Referrers />} />
           <Route path="/reports">
             <Route path="/reports/sales" element={<SalesReports />} />

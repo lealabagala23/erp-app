@@ -25,6 +25,8 @@ export default function FormDrawer({
   title,
   tabs,
 }: IProps) {
+  if (tabs.length === 0) return <></>;
+
   const [selectedTab, setSelectedTab] = useState(tabs[0].label);
 
   const selectedStyles = {
