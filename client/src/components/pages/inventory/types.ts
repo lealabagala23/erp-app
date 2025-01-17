@@ -14,10 +14,7 @@ export type Product = {
 
 export type Inventory = {
   _id?: string;
-  product_id?: {
-    _id: string;
-    product_name: string;
-  } | string
+  product_id?: string | Product;
   stock_arrival_date: string;
   quantity_on_hand?: number;
   quantity_on_order: number;

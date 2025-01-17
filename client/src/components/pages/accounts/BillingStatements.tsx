@@ -43,7 +43,7 @@ const COLUMNS: GridColDef<BillingStatement>[] = [
 ];
 
 export default function BillingStatements() {
-  const { activeCompany } = useContext(AuthContext);
+  const { activeCompany, userInfo } = useContext(AuthContext);
 
   return (
     <>
@@ -53,7 +53,7 @@ export default function BillingStatements() {
         viewItem={
           // eslint-disable-next-line
           (item: any) => {
-            generateBillingPDF(item);
+            generateBillingPDF(item, userInfo);
           }
         }
         queryKey={FETCH_BILLINGS_QUERY_KEY}

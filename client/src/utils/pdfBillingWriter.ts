@@ -6,8 +6,14 @@ import {
 } from '../components/pages/generate-sales/types';
 import { toUpper } from 'lodash';
 import dayjs from 'dayjs';
+import { Inventory, Product } from '../components/pages/inventory/types';
+import { formatCurrency } from './auth';
+import { UserInfo } from '../components/auth/types';
 
-export const generateBillingPDF = (order: Order & CompanyBankDetails) => {
+export const generateBillingPDF = (
+  order: Order & CompanyBankDetails,
+  userInfo: UserInfo | null,
+) => {
   // eslint-disable-next-line
   const doc = new jsPDF() as any;
   const accountName = toUpper(order.bank_account_name);
@@ -73,29 +79,80 @@ export const generateBillingPDF = (order: Order & CompanyBankDetails) => {
     { header: 'AMOUNT', dataKey: 'amount' },
   ];
 
-  const rows = [
-    {
-      sales_invoice_no: '0342',
-      description: '6 Vials Paclitaxel',
-      unit_price: '12,000',
-      amount: '12,000',
-    },
-  ];
+  // eslint-disable-next-line
+  let billingRows: any[] = [];
+
+  order.orders.forEach((o) => {
+    const newRows = o.order_items?.map((oItem, idx) => {
+      const { quantity = 0 } = oItem;
+      const {
+        product_name,
+        product_description,
+        product_unit,
+        unit_price = 0,
+      } = (oItem.product_id || {}) as Product;
+      const { batch_number, expiry_date } = (oItem.inventory_id ||
+        {}) as Inventory;
+      return {
+        sales_invoice_no:
+          idx === 0
+            ? `${o.invoice_number || ''}\n\n${dayjs(o.created_at).format('MM-DD-YYYY')}`
+            : '',
+        description: `${product_name} ${product_description} (${oItem.quantity} ${product_unit})\n\n
+           B No.: ${batch_number || ''}\n
+           Exp Date: ${dayjs(expiry_date).format('MM-DD-YYYY')}
+        `,
+        unit_price: formatCurrency(unit_price),
+        amount: formatCurrency(unit_price * quantity),
+        amountInt: unit_price * quantity,
+      };
+    });
+    // eslint-disable-next-line
+    billingRows = [...billingRows, ...(newRows as any[])];
+  });
+
+  billingRows.push({
+    sales_invoice_number: '',
+    description: '',
+    unit_price: 'Grand Total',
+    amount: formatCurrency(
+      billingRows.reduce((accum, { amountInt }) => accum + amountInt, 0) || 0,
+    ),
+  });
 
   doc.autoTable({
     columns,
-    body: rows,
+    body: billingRows,
     startY: 90,
     theme: 'grid',
     headStyles: { fillColor: [39, 60, 117], fontSize: 10 },
     bodyStyles: { fontSize: 10 },
     columnStyles: {
-    //   sales_invoice_no: { cellWidth: 30 },
+      sales_invoice_no: { halign: 'center' },
       description: { cellWidth: 100 },
-    //   unit_price: { cellWidth: 70 },
-    //   amount: { cellWidth: 30 },
+      unit_price: { halign: 'right' },
+      amount: { halign: 'right' },
+    },
+    // eslint-disable-next-line
+    didParseCell: (data: any) => {
+      if (data.row.index === billingRows.length - 1) {
+        data.cell.styles.fontStyle = 'bold';
+      }
     },
   });
+
+  const finalY = doc.lastAutoTable.finalY;
+  doc.text(
+    `Prepared By:\n${userInfo?.first_name} ${userInfo?.last_name}`,
+    14,
+    finalY + 24,
+  );
+
+  doc.text(
+    `Concurred By:\nLuigi Hendersen Te`,
+    pageWidth - 100,
+    finalY + 24,
+  );
 
   // Convert the PDF to a Blob
   const pdfBlob = doc.output('blob');

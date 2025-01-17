@@ -1,5 +1,5 @@
-import { Customer } from "../accounts/types";
-import { Inventory, Product } from "../inventory/types";
+import { Customer } from '../accounts/types';
+import { Inventory, Product } from '../inventory/types';
 
 export type OrderItem = {
   order_id: string;
@@ -42,7 +42,7 @@ export type Order = {
   approver_id?: string | { _id: string; first_name: string; last_name: string };
   order_items?: OrderItem[];
   created_at?: string;
-  payments?: Payment[]
+  payments?: Payment[];
   sub_total?: number;
   vat_exempt_amount?: number;
   sc_pwd_disc_amount?: number;
@@ -55,7 +55,8 @@ export type CompanyBankDetails = {
   bank_account_number: string;
   customer_name: string;
   min_created_at: string;
-}
+  orders: Order[];
+};
 
 export type Payment = {
   _id?: string;
@@ -77,4 +78,4 @@ export type CancelItem = {
   quantity: number;
   unit_price: number;
   maxQty: number;
-}
+};
