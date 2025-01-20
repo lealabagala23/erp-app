@@ -92,8 +92,13 @@ const drawOrderItems = (
   const { order_items } = order;
 
   (order_items || []).forEach((item, key) => {
-    const { product_id, quantity, unit_price, cancelled_quantity = 0, inventory_id } =
-      item;
+    const {
+      product_id,
+      quantity,
+      unit_price,
+      cancelled_quantity = 0,
+      inventory_id,
+    } = item;
     const { product_name, product_description, product_unit } =
       product_id as Product;
     const texts = [
@@ -261,9 +266,8 @@ export const modifyPdf = async (
 
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    // eslint-disable-next-line
-    link.download = `Invoice-${order.invoice_number || ''}-${(order.customer_id as any)?.customer_name}.pdf`;
-    link.click();
+
+    window.open(link.href, '_blank');
   } catch (error) {
     console.error('Error modifying the PDF:', error);
   }

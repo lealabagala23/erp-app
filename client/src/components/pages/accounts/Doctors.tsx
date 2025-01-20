@@ -54,7 +54,7 @@ export default function Doctors() {
       itemName="doctor"
       searchAttr="customer_name"
       sortField="customer_name"
-      menuActions={['View']}
+      menuActions={['Show']}
       columns={COLUMNS}
       drawerTabs={[
         {

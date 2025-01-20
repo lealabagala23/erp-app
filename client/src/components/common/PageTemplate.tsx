@@ -197,11 +197,13 @@ export default function PageTemplate({
     }
   };
 
-  const onActionClick = (action: string) => {
+  // eslint-disable-next-line
+  const onActionClick = (action: string, row?: any) => {
     switch (action) {
       case 'View':
+      case 'Show':
         // eslint-disable-next-line
-        viewItem && viewItem(selectedRow);
+        viewItem && viewItem(selectedRow || row);
         break;
       case 'Edit':
         toggleDrawer();

@@ -11,7 +11,6 @@ const LiveDateAndTime = () => {
       setCurrentTime(dayjs().format('YYYY-MM-DD HH:mm A'));
     }, 1000);
 
-    // Cleanup timer on component unmount
     return () => clearInterval(timer);
   }, []);
 

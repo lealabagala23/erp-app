@@ -17,7 +17,8 @@ interface IProps {
   isLoading: boolean;
   // eslint-disable-next-line
   setSelectedRow: Dispatch<SetStateAction<any | null>>;
-  onActionClick: (action: string) => void;
+  // eslint-disable-next-line
+  onActionClick: (action: string, row?: any) => void;
   searchAttr: string;
   sortField: string;
   sortDir?: string;
@@ -64,6 +65,7 @@ export default function DataTable({
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     row: unknown,
   ) => {
+    event.stopPropagation();
     setAnchorEl(event.currentTarget);
     // eslint-disable-next-line
     setSelectedRow(row as any);
@@ -73,8 +75,9 @@ export default function DataTable({
     setAnchorEl(null);
   };
 
-  const handleActionClick = (action: string) => {
-    onActionClick(action);
+  // eslint-disable-next-line
+  const handleActionClick = (action: string, row?: any) => {
+    onActionClick(action, row);
     handleMenuClose();
   };
 
@@ -86,6 +89,15 @@ export default function DataTable({
         rows={data}
         columns={tableColumns}
         getRowId={(row) => row._id || 0}
+        onRowClick={({ row }) => {
+          if (menuActions?.includes('Edit') || menuActions?.includes('View')) {
+            setSelectedRow(row);
+            handleActionClick(
+              menuActions?.includes('Edit') ? 'Edit' : 'View',
+              row,
+            );
+          }
+        }}
         getRowClassName={(params) =>
           params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
         }
@@ -144,6 +156,12 @@ export default function DataTable({
           <MenuItem onClick={() => handleActionClick('View')}>
             <RemoveRedEye sx={{ width: 20, height: 20, marginRight: '8px' }} />{' '}
             View
+          </MenuItem>
+        )}
+        {menuActions?.includes('Show') && (
+          <MenuItem onClick={() => handleActionClick('Show')}>
+            <RemoveRedEye sx={{ width: 20, height: 20, marginRight: '8px' }} />{' '}
+            Show
           </MenuItem>
         )}
         {menuActions?.includes('Edit') && (

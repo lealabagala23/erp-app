@@ -55,7 +55,7 @@ export default function Agencies() {
       searchAttr="customer_name"
       sortField="customer_name"
       columns={COLUMNS}
-      menuActions={['View']}
+      menuActions={['Show']}
       drawerTabs={[
         {
           label: 'Info',

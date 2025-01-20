@@ -42,10 +42,10 @@ const CSVUploader = ({ open, handleClose, uploadAPI }: IProps) => {
     if (file) {
       setFileName(file.name);
       Papa.parse(file, {
-        header: true, // Converts rows to JSON objects
+        header: true,
         // eslint-disable-next-line
         complete: (result: any) => {
-          setCsvData(result.data); // Parsed data
+          setCsvData(result.data);
         },
         skipEmptyLines: true,
       });
@@ -58,7 +58,6 @@ const CSVUploader = ({ open, handleClose, uploadAPI }: IProps) => {
       return;
     }
 
-    // Send data to the server
     await mutateUploadCSV(csvData);
     handleClose(true);
     clearInput();

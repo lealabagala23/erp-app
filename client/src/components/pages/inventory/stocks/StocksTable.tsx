@@ -214,6 +214,10 @@ export default function StocksTable({
               )
             : inventory
         }
+        onRowClick={({ row }) => {
+          setSelectedRow(row);
+          handleActionClick('Edit');
+        }}
         columns={columns}
         getRowId={(row) => row._id || 0}
         getRowClassName={(params) =>

@@ -90,10 +90,6 @@ export default function Orders() {
     <PageTemplate
       fetchAPI={fetchOrders}
       fetchParams={{ company_id: activeCompany?._id as string }}
-      // createAPI={createCustomer}
-      // updateAPI={updateCustomer}
-      // deleteAPI={deleteCustomer}
-      // uploadCSVAPI={uploadCustomersCSV}
       // eslint-disable-next-line
       viewItem={(item: any) => navigate(`/orders/${item._id}`)}
       queryKey={FETCH_ORDERS_QUERY_KEY}

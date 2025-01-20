@@ -67,7 +67,7 @@ export default function Patients() {
       itemName="patient"
       searchAttr="customer_name"
       sortField="customer_name"
-      menuActions={['View']}
+      menuActions={['Show']}
       columns={COLUMNS}
       drawerTabs={[
         {

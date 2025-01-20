@@ -48,17 +48,16 @@ export default function DownloadPDF({ data, columns, title }: IProps) {
         });
         return allData;
       }),
-      margin, // Define margins
-      theme: 'grid', // Optional: "striped", "grid", or "plain"
-      tableWidth: 'auto', // Dynamically adjusts table width
+      margin,
+      theme: 'grid',
+      tableWidth: 'auto',
       styles: {
         fontSize: 10,
       },
       columnStyles: {
-        // Adjust specific columns (optional)
-        0: { cellWidth: 'auto' }, // Fixed width for the first column (ID)
-        1: { cellWidth: 'auto' }, // Auto-scale the "Description" column
-        2: { cellWidth: 'auto' }, // Auto-scale the "Description" column
+        0: { cellWidth: 'auto' },
+        1: { cellWidth: 'auto' },
+        2: { cellWidth: 'auto' },
       },
     });
     doc.save(`${dayjs().format('MM-DD-YYYY')}-${snakeCase(title)}.pdf`);

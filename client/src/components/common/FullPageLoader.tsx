@@ -10,11 +10,11 @@ const FullPageLoader = () => {
         left: 0,
         width: '100vw',
         height: '100vh',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 1300, // Higher than typical components
+        zIndex: 1300,
       }}
     >
       <CircularProgress color="inherit" />

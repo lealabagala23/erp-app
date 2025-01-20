@@ -124,6 +124,10 @@ export default function ProductTable({
               )
             : products
         }
+        onRowClick={({ row }) => {
+          setSelectedRow(row);
+          handleActionClick('Edit');
+        }}
         columns={columns}
         getRowId={(row) => row._id || 0}
         getRowClassName={(params) =>

@@ -154,10 +154,7 @@ export const generateBillingPDF = (
     finalY + 24,
   );
 
-  // Convert the PDF to a Blob
   const pdfBlob = doc.output('blob');
-
-  // Create a URL for the Blob and open it in a new tab
   const pdfUrl = URL.createObjectURL(pdfBlob);
   window.open(pdfUrl, '_blank');
 };

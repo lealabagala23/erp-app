@@ -124,9 +124,9 @@ export default function MenuContent() {
               disableGutters
               elevation={0}
               sx={{
-                boxShadow: 'none', // Remove shadow
-                backgroundColor: 'transparent', // Remove background color
-                border: 'none', // Remove border
+                boxShadow: 'none',
+                backgroundColor: 'transparent',
+                border: 'none',
                 padding: 0,
                 '& .MuiAccordionSummary-root': {
                   minHeight: 'unset',
