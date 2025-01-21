@@ -92,6 +92,9 @@ export default function Stocks() {
 
   const toggleDrawer = () => {
     setOpenDrawer(!openDrawer);
+    if (openDrawer && !!selectedRow) {
+      setSelectedRow(null);
+    }
   };
 
   const toggleSnackbar = () => {

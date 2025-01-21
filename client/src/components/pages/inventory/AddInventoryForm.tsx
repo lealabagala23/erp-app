@@ -20,6 +20,7 @@ import { useQuery } from '@tanstack/react-query';
 import { FETCH_PRODUCTS_QUERY_KEY } from './constants';
 import { fetchProducts } from './apis';
 import ErrorMessage from '../../common/ErrorMessage';
+import FormAutocomplete from '../../common/FormAutocomplete';
 
 interface IProps {
   onFormSubmit: (d: Inventory) => void;
@@ -42,11 +43,10 @@ export default function AddInventoryForm({
     formState: { errors, isValid },
     reset,
     setValue,
+    getValues,
   } = useForm();
-  const [productId, setProductId] = useState('');
   const [supplierId, setSupplierId] = useState('');
-
-  const { data: products = [], isLoading: isLoadingProducts } = useQuery(
+  const { data: products = [] } = useQuery(
     [FETCH_PRODUCTS_QUERY_KEY],
     () => fetchProducts(),
     {
@@ -58,7 +58,6 @@ export default function AddInventoryForm({
   const onSubmit = (data: unknown) => {
     onFormSubmit({
       ...(data as Inventory),
-      product_id: productId,
       supplier_id: supplierId,
     });
     reset();
@@ -86,8 +85,8 @@ export default function AddInventoryForm({
         supplier_id: (supplier_id as any)?._id,
         status,
       });
-      // eslint-disable-next-line
-      setProductId((product_id as any)?._id);
+
+      // setProductId((product_id as any)?._id);
       // eslint-disable-next-line
       setSupplierId((supplier_id as any)?._id);
     }
@@ -96,6 +95,23 @@ export default function AddInventoryForm({
   return (
     <Box component={Card} width={'100%'}>
       <Stack component="form" onSubmit={handleSubmit(onSubmit)}>
+        {!initialData?.product_id && (
+          <FormControl fullWidth margin="dense">
+            <FormLabel>Product</FormLabel>
+            <FormAutocomplete
+              options={products.map((s: Product) => ({
+                label: `${s.product_name} ${s.product_description} ${s.product_unit}`,
+                value: s._id,
+              }))}
+              getValues={getValues}
+              name="product_id"
+              placeholder={'Select Product'}
+              control={control}
+              autoFocus
+            />
+          </FormControl>
+        )}
+
         <FormControl fullWidth>
           <FormLabel>Arrival Date</FormLabel>
           <Controller
@@ -109,7 +125,6 @@ export default function AddInventoryForm({
                   textField: (textFieldProps) => (
                     <TextField
                       {...textFieldProps}
-                      autoFocus
                       error={Boolean(errors.stock_arrival_date)}
                       helperText={
                         <ErrorMessage
@@ -131,38 +146,6 @@ export default function AddInventoryForm({
             )}
           />
         </FormControl>
-
-        {!initialData?.product_id && (
-          <FormControl fullWidth margin="dense">
-            <FormLabel>Product</FormLabel>
-            <TextField
-              select
-              {...register('product_id', {
-                required: 'Product is required',
-              })}
-              value={productId}
-              onChange={(e) => {
-                setProductId(e.target.value);
-                setValue('product_id', e.target.value);
-              }}
-              placeholder={
-                isLoadingProducts ? 'Loading Products...' : 'Select Product'
-              }
-              variant="outlined"
-              fullWidth
-              error={Boolean(errors.product_id)}
-              helperText={
-                <ErrorMessage error={errors.product_id as FieldError} />
-              }
-            >
-              {products.map((s: Product) => (
-                <MenuItem key={s._id} value={s._id}>
-                  {s.product_name}
-                </MenuItem>
-              ))}
-            </TextField>
-          </FormControl>
-        )}
 
         <FormControl fullWidth margin="dense">
           <FormLabel>Expiry Date</FormLabel>

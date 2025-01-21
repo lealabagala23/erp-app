@@ -113,7 +113,7 @@ export default function PageTemplate({
     {
       mutationFn: createAPI,
       onSuccess: ({ _id }) => {
-        if (redirectOnCreate) {
+        if (redirectOnCreate && location.search?.includes('id')) {
           return redirectOnCreate(_id);
         }
         setSnackbarProps({
@@ -182,6 +182,9 @@ export default function PageTemplate({
 
   const toggleDrawer = () => {
     setOpenDrawer(!openDrawer);
+    if (openDrawer && !!selectedRow) {
+      setSelectedRow(null);
+    }
   };
 
   const toggleSnackbar = () => {

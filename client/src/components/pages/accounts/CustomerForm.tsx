@@ -1,5 +1,11 @@
 import React, { useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import {
+  useForm,
+  Controller,
+  UseFormGetValues,
+  FieldValues,
+  Control,
+} from 'react-hook-form';
 import {
   TextField,
   MenuItem,
@@ -18,6 +24,7 @@ import pick from 'lodash/pick';
 import dayjs from 'dayjs';
 import { fetchCustomerType } from './apis';
 import { useQuery } from '@tanstack/react-query';
+import FormAutocomplete from '../../common/FormAutocomplete';
 
 interface IProps {
   onCancel: () => void;
@@ -38,6 +45,7 @@ export default function CustomerForm({
     reset,
     formState: { isValid },
     watch,
+    getValues,
   } = useForm({
     defaultValues: {
       customer_name: '',
@@ -48,7 +56,7 @@ export default function CustomerForm({
       date_of_birth: null,
       discount_card: '',
       discount_card_number: '',
-      referring_doctor_id: null,
+      referring_doctor_id: undefined,
       status: null,
       specialization: '',
       license_number: '',
@@ -258,26 +266,20 @@ export default function CustomerForm({
 
             <FormControl fullWidth margin="dense">
               <FormLabel>Referring Doctor</FormLabel>
-              <Controller
+              <FormAutocomplete
+                options={[
+                  ...referringDoctors.map(({ _id, customer_id }: Doctor) => ({
+                    // eslint-disable-next-line
+                    label: (customer_id as any)?.customer_name,
+                    value: _id,
+                  })),
+                ]}
+                getValues={
+                  getValues as unknown as UseFormGetValues<FieldValues>
+                }
                 name="referring_doctor_id"
-                control={control}
-                render={({ field }) => (
-                  <TextField select {...field} variant="outlined">
-                    {referringDoctors.map((doc: Doctor) => (
-                      <MenuItem
-                        // eslint-disable-next-line
-                        key={(doc.customer_id as any)?._id}
-                        // eslint-disable-next-line
-                        value={(doc.customer_id as any)?._id}
-                      >
-                        {
-                          // eslint-disable-next-line
-                          (doc.customer_id as any)?.customer_name
-                        }
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                )}
+                placeholder={'Select Doctor'}
+                control={control as unknown as Control<FieldValues>}
               />
             </FormControl>
 

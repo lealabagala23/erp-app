@@ -25,6 +25,9 @@ router.get("/", authenticateToken, async (req, res) => {
           as: "stocks",
         },
       },
+      {
+        $sort: { product_name: 1 },
+      },
     ]);
     const productsWQty = products.map(({ stocks, ...rest }) => ({
       ...rest,
