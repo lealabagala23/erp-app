@@ -23,26 +23,24 @@ export const generateBillingPDF = (
 
   // Title
   doc.setFont('Helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.text(accountName, 14, 20);
-  doc.text('BILLING STATEMENT', pageWidth - 20, 20, { align: 'right' });
-
   doc.setFontSize(12);
+  doc.text(`${accountName || ''}`, 14, 20);
+  doc.text('BILLING STATEMENT', pageWidth - 14, 20, { align: 'right' });
   doc.text('Make all checks payable to', 14, 32);
-  doc.text(accountName, 14, 38);
-  doc.text(order.bank_name, 14, 50);
-  doc.text(`Account Name: ${accountName}`, 14, 56);
-  doc.text(`Account No: ${order.bank_account_number}`, 14, 62);
+  doc.text(`${accountName || ''}`, 14, 38);
+  doc.text(`${order.bank_name || ''}`, 14, 50);
+  doc.text(`Account Name: ${accountName || ''}`, 14, 56);
+  doc.text(`Account No: ${order.bank_account_number || ''}`, 14, 62);
 
   doc.setFont('Helvetica', 'normal');
-  doc.text(`To: ${toUpper(order.customer_name)}`, pageWidth - 20, 32, {
+  doc.text(`To: ${toUpper(order.customer_name)}`, pageWidth - 14, 32, {
     align: 'right',
   });
   const multilineAddress = doc.splitTextToSize(
     toUpper(order.billing_address),
     70,
   );
-  doc.text(multilineAddress || '', pageWidth - 20, 50, { align: 'right' });
+  doc.text(multilineAddress || '', pageWidth - 14, 50, { align: 'right' });
 
   const paymentColumns = [
     { header: 'SALESPERSON', dataKey: 'salesperson' },
@@ -96,12 +94,9 @@ export const generateBillingPDF = (
       return {
         sales_invoice_no:
           idx === 0
-            ? `${o.invoice_number || ''}\n\n${dayjs(o.created_at).format('MM-DD-YYYY')}`
+            ? `${o.invoice_number || ''}\n${dayjs(o.created_at).format('MM-DD-YYYY')}`
             : '',
-        description: `${product_name} ${product_description} (${oItem.quantity} ${product_unit})\n\n
-           B No.: ${batch_number || ''}\n
-           Exp Date: ${dayjs(expiry_date).format('MM-DD-YYYY')}
-        `,
+        description: `${product_name} ${product_description} (${oItem.quantity} ${product_unit})\n\nB No.: ${batch_number || ''}\nExp Date: ${dayjs(expiry_date).format('MM-DD-YYYY')}`,
         unit_price: formatCurrency(unit_price),
         amount: formatCurrency(unit_price * quantity),
         amountInt: unit_price * quantity,
