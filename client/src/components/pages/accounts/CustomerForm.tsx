@@ -209,7 +209,17 @@ export default function CustomerForm({
 
         {customerType === 'PATIENT' && (
           <>
-            <FormControl fullWidth margin="dense">
+            <FormControl
+              fullWidth
+              margin="dense"
+              sx={{
+                '.MuiIconButton-root': {
+                  border: 0,
+                  width: '38px',
+                  height: '38px',
+                },
+              }}
+            >
               <FormLabel>Date of Birth</FormLabel>
               <Controller
                 name="date_of_birth"
@@ -217,16 +227,22 @@ export default function CustomerForm({
                 render={({ field }) => (
                   <DatePicker
                     {...field}
-                    slots={{
-                      textField: (textFieldProps) => (
-                        <TextField {...textFieldProps} />
-                      ),
-                    }}
                     sx={{
                       '.MuiIconButton-root': {
                         border: 0,
                         width: '38px',
                         height: '38px',
+                      },
+                    }}
+                    slotProps={{
+                      calendarHeader: {
+                        sx: {
+                          '.MuiIconButton-root': {
+                            border: 0,
+                            width: '38px',
+                            height: '38px',
+                          },
+                        },
                       },
                     }}
                   />

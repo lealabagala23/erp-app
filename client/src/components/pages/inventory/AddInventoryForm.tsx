@@ -121,25 +121,23 @@ export default function AddInventoryForm({
             render={({ field: { onChange, ...restField } }) => (
               <DatePicker
                 onChange={onChange}
-                slots={{
-                  textField: (textFieldProps) => (
-                    <TextField
-                      {...textFieldProps}
-                      error={Boolean(errors.stock_arrival_date)}
-                      helperText={
-                        <ErrorMessage
-                          error={errors.stock_arrival_date as FieldError}
-                        />
-                      }
-                    />
-                  ),
-                }}
                 {...restField}
                 sx={{
                   '.MuiIconButton-root': {
                     border: 0,
                     width: '38px',
                     height: '38px',
+                  },
+                }}
+                slotProps={{
+                  calendarHeader: {
+                    sx: {
+                      '.MuiIconButton-root': {
+                        border: 0,
+                        width: '38px',
+                        height: '38px',
+                      },
+                    },
                   },
                 }}
               />
@@ -156,25 +154,23 @@ export default function AddInventoryForm({
             render={({ field: { onChange, ...restField } }) => (
               <DatePicker
                 onChange={onChange}
-                slots={{
-                  textField: (textFieldProps) => (
-                    <TextField
-                      {...textFieldProps}
-                      error={Boolean(errors.expiry_date)}
-                      helperText={
-                        <ErrorMessage
-                          error={errors.expiry_date as FieldError}
-                        />
-                      }
-                    />
-                  ),
-                }}
                 {...restField}
                 sx={{
                   '.MuiIconButton-root': {
                     border: 0,
                     width: '38px',
                     height: '38px',
+                  },
+                }}
+                slotProps={{
+                  calendarHeader: {
+                    sx: {
+                      '.MuiIconButton-root': {
+                        border: 0,
+                        width: '38px',
+                        height: '38px',
+                      },
+                    },
                   },
                 }}
               />

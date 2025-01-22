@@ -65,26 +65,23 @@ const PaymentForm = ({
                   render={({ field: { onChange, ...restField } }) => (
                     <DatePicker
                       onChange={onChange}
-                      slots={{
-                        textField: (textFieldProps) => (
-                          <TextField
-                            {...textFieldProps}
-                            autoFocus
-                            error={Boolean(errors.payment_date)}
-                            helperText={
-                              <ErrorMessage
-                                error={errors.payment_date as FieldError}
-                              />
-                            }
-                          />
-                        ),
-                      }}
                       {...restField}
                       sx={{
                         '.MuiIconButton-root': {
                           border: 0,
                           width: '38px',
                           height: '38px',
+                        },
+                      }}
+                      slotProps={{
+                        calendarHeader: {
+                          sx: {
+                            '.MuiIconButton-root': {
+                              border: 0,
+                              width: '38px',
+                              height: '38px',
+                            },
+                          },
                         },
                       }}
                     />
