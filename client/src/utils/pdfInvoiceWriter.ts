@@ -22,7 +22,7 @@ const drawPaymentType = (
   const text: string = '✓';
   firstPage.drawText(text, {
     x: 52,
-    y: height - (order?.payment_type === 'cash' ? 234 : 250),
+    y: height - (order?.payment_type === 'cash' ? 129 : 145),
     size: 14,
     font: customFont,
     color: rgb(0, 0, 0),
@@ -37,8 +37,8 @@ const drawInvoiceNumber = (
   const { height } = firstPage.getSize();
   const text: string = `${order?.invoice_number || ''}`;
   firstPage.drawText(text, {
-    x: 390,
-    y: height - 210,
+    x: 410,
+    y: height - 105,
     size: 10,
     font: customFont,
     color: rgb(0, 0, 0),
@@ -49,8 +49,8 @@ const drawDate = (firstPage: PDFPage, customFont: PDFFont, order: Order) => {
   const { height } = firstPage.getSize();
   const text: string = `${dayjs(order?.created_at || '').format('MMMM D, YYYY')}`;
   firstPage.drawText(text, {
-    x: 380,
-    y: height - 242,
+    x: 400,
+    y: height - 137,
     size: 10,
     font: customFont,
     color: rgb(0, 0, 0),
@@ -74,8 +74,8 @@ const drawNameTinAddress = (
 
   texts.forEach((text, key) =>
     firstPage.drawText(text, {
-      x: 135,
-      y: height - (288 + 23 * key),
+      x: 145,
+      y: height - (187 + 23 * key),
       size: 10,
       font: customFont,
       color: rgb(0, 0, 0),
@@ -115,18 +115,18 @@ const drawOrderItems = (
         case 0:
           return 0;
         case 1:
-          return 272;
+          return 290;
         case 2:
-          return width - 250 + (10 - text.length) * 4;
+          return width - 230 + (10 - text.length) * 4;
         default:
-          return width - 150 + (10 - text.length) * 4;
+          return width - 125 + (10 - text.length) * 4;
       }
     };
 
     texts.forEach((text, key2) => {
       firstPage.drawText(text, {
         x: 42 + getXAddend(key2 as number, text),
-        y: height - (380 + 36 * key),
+        y: height - (283 + 37 * key),
         size: 8,
         font: customFont,
         color: rgb(0, 0, 0),
@@ -137,7 +137,7 @@ const drawOrderItems = (
       `Batch No. ${(inventory_id as Inventory)?.batch_number || 'N/A'} Exp. Date: ${dayjs((inventory_id as Inventory)?.expiry_date).format('MM-DD-YYYY')}`,
       {
         x: 42,
-        y: height - (398 + 36 * key),
+        y: height - (301 + 37 * key),
         size: 8,
         font: customFont,
         color: rgb(0, 0, 0),
@@ -152,8 +152,8 @@ const drawLessVAT = (firstPage: PDFPage, customFont: PDFFont, order: Order) => {
   const text = vat_exempted ? `-${formatCurrency(vat_exempt_amount || 0)}` : '';
 
   firstPage.drawText(text, {
-    x: 45 + (width - 160 + (10 - text.length) * 6),
-    y: height - 555 - 19,
+    x: 45 + (width - 135 + (10 - text.length) * 6),
+    y: height - 464 - 20,
     size: 10,
     font: customFont,
     color: rgb(0, 0, 0),
@@ -182,8 +182,8 @@ const drawTotalSales = (
   const texts = [totalSales, lessSCDisc, formatCurrency(net_total || 0)];
   texts.forEach((text, key2) =>
     firstPage.drawText(text, {
-      x: 42 + (width - 160 + (10 - text.length) * 6),
-      y: height - 555 - key2 * 57,
+      x: 42 + (width - 135 + (10 - text.length) * 6),
+      y: height - 464 - key2 * 61,
       size: 10,
       font: customFont,
       color: rgb(0, 0, 0),
@@ -201,8 +201,8 @@ const drawSCDetails = (
   const text: string = `${discount_card_number || ''}`;
 
   firstPage.drawText(text, {
-    x: 42 + (width - 160 + (10 - text.length) * 6),
-    y: height - 707,
+    x: 42 + (width - 135 + (10 - text.length) * 6),
+    y: height - 623,
     size: 10,
     font: customFont,
     color: rgb(0, 0, 0),
@@ -221,7 +221,7 @@ const drawInitiator = (
 
   firstPage.drawText(text, {
     x: 75,
-    y: height - 715,
+    y: height - 630,
     size: 10,
     font: customFont,
     color: rgb(0, 0, 0),
