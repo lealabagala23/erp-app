@@ -3,7 +3,7 @@ import AppNavbar from '../../common/AppNavbar';
 import Header from '../../common/Header';
 import PageWrapper from '../../wrappers/PageWrapper';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { Box, Stack } from '@mui/material';
+import { Box, Button, Stack } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import dayjs from 'dayjs';
 import { useQuery } from '@tanstack/react-query';
@@ -13,6 +13,8 @@ import { formatCurrency } from '../../../utils/auth';
 import AuthContext from '../../auth/AuthContext';
 import SalesDataChart from './SalesDataChart';
 import DateRangeSwitcher, { TIME_PERIOD_OPTIONS } from './DateRangeSwitcher';
+import { RemoveRedEye } from '@mui/icons-material';
+import { generateSalesReportPDF } from '../../../utils/pdfSalesReportWriter';
 
 export default function SalesReports() {
   const theme = useTheme();
@@ -40,6 +42,13 @@ export default function SalesReports() {
       retry: 1,
     },
   );
+
+  const getTitle = () =>
+    TIME_PERIOD_OPTIONS.find((o) => o.value === timePeriod)?.label;
+
+  const redirectToReportPDF = (data: SalesReport) => {
+    generateSalesReportPDF(data, getTitle() || '', activeCompany);
+  };
 
   const columns: GridColDef[] = [
     {
@@ -92,12 +101,22 @@ export default function SalesReports() {
       flex: 1,
       valueFormatter: formatCurrency,
     },
+    {
+      field: 'actions',
+      headerName: '',
+      width: 200,
+      align: 'right',
+      // eslint-disable-next-line
+      renderCell: ({ row }: any) => (
+        <Button onClick={() => redirectToReportPDF(row)} size="small">
+          <RemoveRedEye sx={{ width: 20, height: 20, marginRight: '8px' }} />{' '}
+          View {getTitle()} Report
+        </Button>
+      ),
+    },
   ];
 
   const { data = [] } = (salesData || {}) as GetSalesReportsResponse;
-
-  const getTitle = () =>
-    TIME_PERIOD_OPTIONS.find((o) => o.value === timePeriod)?.label;
 
   const getSalesData = (data: SalesReport[]) => {
     return {
@@ -181,7 +200,7 @@ export default function SalesReports() {
               pageSizeOptions={[10, 20, 50]}
               disableColumnResize
               disableRowSelectionOnClick
-              density="compact"
+              density="standard"
               slotProps={{
                 loadingOverlay: {
                   variant: 'skeleton',

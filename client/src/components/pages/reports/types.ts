@@ -1,3 +1,5 @@
+import { Order } from "../orders/Orders";
+
 export type SalesReport = {
   _id: string;
   date: string;
@@ -9,6 +11,7 @@ export type SalesReport = {
   net_sales: number;
   start_date: string;
   end_date: string;
+  orders: Order[];
 }
 
 export type GetSalesReportsResponse = {
