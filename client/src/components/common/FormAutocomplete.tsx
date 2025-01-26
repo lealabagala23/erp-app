@@ -87,13 +87,22 @@ export default function FormAutocomplete({
                 {...params}
                 autoFocus={autoFocus}
                 placeholder={placeholder}
-                sx={{
+                // eslint-disable-next-line
+                sx={(theme: any) => ({
                   '.MuiButtonBase-root': {
                     border: 0,
                     height: '38px',
                     width: '38px',
                   },
-                }}
+                  ...{
+                    '.MuiInputBase-root':
+                      value === null || value === undefined || value === ''
+                        ? {
+                            outline: '3px solid hsl(210, 98%, 42%, 0.5)',
+                          }
+                        : theme['.MuiInputBase-root'],
+                  },
+                })}
               />
             )}
           />

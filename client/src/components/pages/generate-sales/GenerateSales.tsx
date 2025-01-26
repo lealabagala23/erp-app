@@ -15,6 +15,7 @@ import {
   Paper,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -218,6 +219,12 @@ export default function GenerateSales() {
   const getCustomer = () =>
     customers.find(({ _id }: Customer) => _id === customer_id);
 
+  const disableSendForApproval = () =>
+    order.status !== OrderStatus.DRAFT ||
+    !order.invoice_number ||
+    !order.customer_id ||
+    !order.order_items.some((oItem: OrderItem) => !!oItem.product_id);
+
   const { customer_type, customer_details } = getCustomer() || {};
 
   const addOrderItem = () => {
@@ -345,6 +352,7 @@ export default function GenerateSales() {
       mutateCreateOrder({
         company_id: activeCompany?._id,
         initiator_id: userInfo?._id,
+        payment_type: 'cash',
       });
     }
   }, [orderId, activeCompany, userInfo]);
@@ -570,9 +578,22 @@ export default function GenerateSales() {
                     {...register('invoice_number')}
                     placeholder={'Enter Invoice Number'}
                     variant="outlined"
-                    sx={{ '.MuiInputBase-input': { textAlign: 'right' } }}
+                    autoFocus
+                    // eslint-disable-next-line
+                    sx={(theme: any) => ({
+                      '.MuiInputBase-input': { textAlign: 'right' },
+                      ...{
+                        '.MuiInputBase-root':
+                          invoice_number === null ||
+                          invoice_number === undefined ||
+                          invoice_number === ''
+                            ? {
+                                outline: '3px solid hsl(210, 98%, 42%, 0.5)',
+                              }
+                            : theme['.MuiInputBase-root'],
+                      },
+                    })}
                     disabled={
-                      !customer_id ||
                       ![OrderStatus.DRAFT, OrderStatus.UNAPPROVED].includes(
                         order?.status,
                       )
@@ -904,27 +925,28 @@ export default function GenerateSales() {
               >
                 Generate Sales Invoice
               </Button>
-              <Button
-                variant={
-                  order.status !== OrderStatus.DRAFT ? 'outlined' : 'contained'
-                }
-                startIcon={
-                  isLoadingUpdateStatus ? (
-                    <CircularProgress color="inherit" size={16} />
-                  ) : (
-                    <Send />
-                  )
-                }
-                onClick={() => onUpdateOrderStatus(OrderStatus.UNAPPROVED)}
-                sx={{
-                  cursor:
-                    order.status !== OrderStatus.DRAFT
+              <Tooltip
+                title={`Invoice No., Customer, and Order Items are required fields.`}
+              >
+                <Button
+                  variant={disableSendForApproval() ? 'outlined' : 'contained'}
+                  startIcon={
+                    isLoadingUpdateStatus ? (
+                      <CircularProgress color="inherit" size={16} />
+                    ) : (
+                      <Send />
+                    )
+                  }
+                  onClick={() => onUpdateOrderStatus(OrderStatus.UNAPPROVED)}
+                  sx={{
+                    cursor: disableSendForApproval()
                       ? 'not-allowed'
                       : undefined,
-                }}
-              >
-                Send Order for Approval
-              </Button>
+                  }}
+                >
+                  Send Order for Approval
+                </Button>
+              </Tooltip>
               {[
                 OrderStatus.COMPLETED,
                 OrderStatus.APPROVED,
