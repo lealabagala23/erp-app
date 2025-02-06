@@ -17,6 +17,14 @@ const defaultOrderAggrParams = [
   },
   {
     $lookup: {
+      from: "users",
+      localField: "cancel_initiator_id",
+      foreignField: "_id",
+      as: "cancel_initiator_id",
+    },
+  },
+  {
+    $lookup: {
       from: "companies",
       localField: "company_id",
       foreignField: "_id",
@@ -72,6 +80,12 @@ const defaultOrderAggrParams = [
   {
     $unwind: {
       path: "$initiator_id",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $unwind: {
+      path: "$cancel_initiator_id",
       preserveNullAndEmptyArrays: true,
     },
   },

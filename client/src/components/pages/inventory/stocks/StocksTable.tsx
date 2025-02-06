@@ -125,6 +125,26 @@ const COLUMNS: GridColDef<Inventory>[] = [
     cellClassName,
     flex: 1,
   },
+  {
+    field: 'updated_at',
+    headerName: 'Updated at',
+    valueGetter: (value, row) =>
+      row.updated_at
+        ? `${new Date(row.updated_at || '').toLocaleDateString('en-US')}`
+        : 'N/A',
+    cellClassName,
+    flex: 1,
+  },
+  {
+    field: 'last_updated_by',
+    headerName: 'Updated by',
+    valueGetter: (_, row) =>
+      row.last_updated_by
+        ? `${row.last_updated_by?.first_name} ${row.last_updated_by?.last_name}`
+        : 'N/A',
+    cellClassName,
+    flex: 1,
+  },
 ];
 
 interface IProps {

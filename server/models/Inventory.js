@@ -39,7 +39,15 @@ const InventorySchema = new mongoose.Schema({
     ref: "Company",
     required: true,
   },
+  last_updated_by: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
   created_at: {
+    type: Date,
+    required: true,
+  },
+  updated_at: {
     type: Date,
     required: true,
   },

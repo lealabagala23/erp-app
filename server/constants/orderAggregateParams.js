@@ -59,6 +59,7 @@ const orderAggregateParams = [
       payment_type: { $first: "$payment_type" },
       status: { $first: "$status" },
       initiator_id: { $first: "$initiator_id" },
+      cancel_initiator_id: { $first: "$cancel_initiator_id" },
       customer_id: { $first: "$customer_id" },
       company_id: { $first: "$company_id" },
       referrer_id: { $first: "$referrer_id" },

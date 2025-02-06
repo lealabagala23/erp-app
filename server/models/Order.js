@@ -25,6 +25,10 @@ const OrderSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  cancel_initiator_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
   discount_card: {
     type: String,
   },

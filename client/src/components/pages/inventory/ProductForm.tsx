@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { FieldError, useForm } from 'react-hook-form';
 import {
   Button,
@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { Product } from './types';
 import ErrorMessage from '../../common/ErrorMessage';
+import AuthContext from '../../auth/AuthContext';
 
 const PRODUCT_UNIT_OPTIONS = [
   'AMPULE',
@@ -40,6 +41,7 @@ export default function ProductForm({
   initialData,
   onCancel,
 }: IProps) {
+  const { userInfo } = useContext(AuthContext);
   const {
     register,
     handleSubmit,
@@ -181,6 +183,7 @@ export default function ProductForm({
             helperText={
               <ErrorMessage error={errors.purchase_price as FieldError} />
             }
+            disabled={userInfo?.role !== 'admin'}
           />
         </FormControl>
 
@@ -202,6 +205,7 @@ export default function ProductForm({
             helperText={
               <ErrorMessage error={errors.unit_price as FieldError} />
             }
+            disabled={userInfo?.role !== 'admin'}
           />
         </FormControl>
 

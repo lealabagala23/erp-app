@@ -1,3 +1,5 @@
+import { UserInfo } from "../../auth/types";
+
 export type Product = {
   _id?: string;
   barcode?: string;
@@ -27,4 +29,6 @@ export type Inventory = {
     supplier_name: string;
   } | string;
   created_at?: string;
+  updated_at?: string;
+  last_updated_by?: UserInfo;
 }

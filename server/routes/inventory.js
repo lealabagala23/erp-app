@@ -5,7 +5,12 @@ const authenticateToken = require("../middleware/auth");
 const Inventory = require("../models/Inventory");
 
 router.post("/", authenticateToken, async (req, res) => {
-  const newInventory = new Inventory({ ...req.body, created_at: new Date() });
+  const newInventory = new Inventory({
+    ...req.body,
+    created_at: new Date(),
+    updated_at: new Date(),
+    last_updated_by: req.user.id,
+  });
   try {
     const savedInventory = await newInventory.save();
     res.status(201).json(savedInventory);
@@ -39,7 +44,8 @@ router.get("/", authenticateToken, async (req, res) => {
         "product_description",
         "product_unit",
       ])
-      .populate("supplier_id", ["_id", "supplier_name"]);
+      .populate("supplier_id", ["_id", "supplier_name"])
+      .populate("last_updated_by", ["_id", "first_name", "last_name"]);
     res.status(200).json(inventory);
   } catch (err) {
     res.status(500).json(err);
@@ -50,7 +56,7 @@ router.put("/:id", authenticateToken, async (req, res) => {
   try {
     const updatedInventory = await Inventory.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      { ...req.body, updated_at: new Date(), last_updated_by: req.user.id },
       {
         new: true,
       }

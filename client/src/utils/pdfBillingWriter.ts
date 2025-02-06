@@ -52,7 +52,7 @@ export const generateBillingPDF = (
     {
       salesperson: 'LUIGI HENDERSEN TE',
       payment_terms: '30',
-      due_date: dayjs(order.min_created_at).format('MM-DD-YYYY'),
+      due_date: dayjs(order.min_created_at).add(30, 'day').format('MM-DD-YYYY'),
     },
   ];
 

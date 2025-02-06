@@ -990,6 +990,18 @@ export default function GenerateSales() {
                 />
               </>
             )}
+            {order?.cancel_initiator_id?._id && (
+              <>
+                <Typography variant={'h6'}>Cancelled by:</Typography>
+                <Chip
+                  icon={<Person />}
+                  color={'default'}
+                  variant="filled"
+                  size="medium"
+                  label={`${order?.cancel_initiator_id?.first_name} ${order?.cancel_initiator_id?.last_name}`}
+                />
+              </>
+            )}
           </Grid>
           <PaymentForm
             open={openPaymentForm}

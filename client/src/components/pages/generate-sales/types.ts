@@ -36,6 +36,7 @@ export type Order = {
   vat_exempted?: boolean;
   special_discount?: number;
   initiator_id: string | { _id: string; first_name: string; last_name: string };
+  cancel_initiator_id?: string | { _id: string; first_name: string; last_name: string };
   company_id: string | { _id: string; company_name: string };
   referrer_id?: string | { _id: string; referrer_name: string };
   referring_doctor_id?: string;
