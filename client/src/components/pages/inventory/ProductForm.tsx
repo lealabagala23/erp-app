@@ -149,13 +149,10 @@ export default function ProductForm({
           fullWidth
           margin="dense"
           error={Boolean(errors.generic_name)}
-          required
         >
           <FormLabel>Generic Name</FormLabel>
           <TextField
-            {...register('generic_name', {
-              required: 'Generic Name is required',
-            })}
+            {...register('generic_name')}
             variant="outlined"
             fullWidth
             error={Boolean(errors.generic_name)}
@@ -169,13 +166,10 @@ export default function ProductForm({
           fullWidth
           margin="dense"
           error={Boolean(errors.purchase_price)}
-          required
         >
           <FormLabel>Purchase Price</FormLabel>
           <TextField
-            {...register('purchase_price', {
-              required: 'Purchase Price must be a number',
-            })}
+            {...register('purchase_price')}
             variant="outlined"
             fullWidth
             type="number"

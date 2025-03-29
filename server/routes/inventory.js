@@ -67,4 +67,29 @@ router.put("/:id", authenticateToken, async (req, res) => {
   }
 });
 
+router.post("/bulk", authenticateToken, async (req, res) => {
+  try {
+    const data = req.body; // Assuming JSON data from the client
+    const existingInventory = await Inventory.find();
+    const dataWithCreatedAt = data
+      .filter((d) => {
+        const { batch_number } = d;
+        const existing = existingInventory.some((e) =>
+          e.batch_number.includes(batch_number)
+        );
+        return !existing;
+      })
+      .map((d) => ({
+        ...d,
+        created_at: new Date(),
+        updated_at: new Date(),
+      }));
+    await Inventory.insertMany(dataWithCreatedAt); // Insert multiple records
+    res.status(200).send("Data uploaded successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error uploading data");
+  }
+});
+
 module.exports = router;

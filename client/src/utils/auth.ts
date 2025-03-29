@@ -31,7 +31,7 @@ export const convertNaNToZero = (v: number | string) => {
 };
 
 export const formatCurrency = (v: number | string) =>
-  convertNaNToZero(v)
+  convertNaNToZero(v || 0)
     .toFixed(2)
     .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 

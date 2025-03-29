@@ -19,7 +19,6 @@ const ProductSchema = new mongoose.Schema({
   },
   purchase_price: {
     type: Number,
-    required: true,
   },
   unit_price: {
     type: Number,

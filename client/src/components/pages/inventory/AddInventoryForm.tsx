@@ -181,9 +181,7 @@ export default function AddInventoryForm({
         <FormControl fullWidth margin="dense">
           <FormLabel>Batch No.</FormLabel>
           <TextField
-            {...register('batch_number', {
-              required: 'Batch No. is required',
-            })}
+            {...register('batch_number')}
             placeholder="Enter batch number"
             variant="outlined"
             fullWidth
@@ -197,9 +195,7 @@ export default function AddInventoryForm({
         <FormControl fullWidth margin="dense">
           <FormLabel>Quantity on Order</FormLabel>
           <TextField
-            {...register('quantity_on_order', {
-              required: 'Quantity on Order is required',
-            })}
+            {...register('quantity_on_order')}
             type="number"
             placeholder="20"
             variant="outlined"
@@ -215,9 +211,7 @@ export default function AddInventoryForm({
           <FormLabel>Supplier</FormLabel>
           <TextField
             select
-            {...register('supplier_id', {
-              required: 'Supplier is required',
-            })}
+            {...register('supplier_id')}
             value={supplierId}
             onChange={(e) => {
               setSupplierId(e.target.value);
@@ -243,9 +237,7 @@ export default function AddInventoryForm({
           <FormLabel>Status</FormLabel>
           <TextField
             select
-            {...register('status', {
-              required: 'Status is required',
-            })}
+            {...register('status')}
             onChange={(e) => {
               setValue('status', e.target.value);
             }}

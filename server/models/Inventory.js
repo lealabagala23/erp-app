@@ -11,33 +11,26 @@ const InventorySchema = new mongoose.Schema({
   },
   quantity_on_hand: {
     type: Number,
-    required: true,
   },
   quantity_on_order: {
     type: Number,
-    required: true,
   },
   expiry_date: {
     type: Date,
-    required: true,
   },
   batch_number: {
     type: String,
-    required: true,
   },
   status: {
     type: String,
-    required: true,
   },
   supplier_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Supplier",
-    required: true,
   },
   company_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Company",
-    required: true,
   },
   last_updated_by: {
     type: mongoose.Schema.Types.ObjectId,
