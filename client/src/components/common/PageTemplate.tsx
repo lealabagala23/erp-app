@@ -113,7 +113,7 @@ export default function PageTemplate({
     {
       mutationFn: createAPI,
       onSuccess: ({ _id }) => {
-        if (redirectOnCreate && location.search?.includes('id')) {
+        if (redirectOnCreate && toLower(location.search)?.includes('id')) {
           return redirectOnCreate(_id);
         }
         setSnackbarProps({
