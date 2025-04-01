@@ -57,7 +57,7 @@ export default function CustomerForm({
       discount_card: '',
       discount_card_number: '',
       referring_doctor_id: undefined,
-      status: null,
+      status: 'ACTIVE',
       specialization: '',
       license_number: '',
       clinic_address: '',
