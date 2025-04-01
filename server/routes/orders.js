@@ -157,6 +157,7 @@ router.put("/:id/payment", authenticateToken, async (req, res) => {
           _id: new mongoose.Types.ObjectId(req.params.id),
         },
       },
+      ...orderAggregateParams,
       {
         $lookup: {
           from: "payments",
