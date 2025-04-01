@@ -10,6 +10,7 @@ interface IProps {
   setSearchText: Dispatch<SetStateAction<string>>;
   fullWidth?: boolean;
   placeholder?: string;
+  autoFocus?: boolean;
 }
 
 export default function SearchBar({
@@ -18,6 +19,7 @@ export default function SearchBar({
   setSearchText,
   fullWidth,
   placeholder,
+  autoFocus,
 }: IProps) {
   return (
     <FormControl
@@ -27,6 +29,7 @@ export default function SearchBar({
       <OutlinedInput
         size="small"
         id="search"
+        autoFocus={autoFocus}
         placeholder={placeholder || `Search ${itemName} name…`}
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}

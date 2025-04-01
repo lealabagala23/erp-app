@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   DataGrid,
   GridColDef,
@@ -225,6 +225,12 @@ export default function ProductSelector({
     },
   ];
 
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => document.getElementById('search')?.focus(), 200);
+    }
+  }, [open]);
+
   return (
     <>
       <Dialog
@@ -285,6 +291,7 @@ export default function ProductSelector({
               searchText={searchText}
               setSearchText={setSearchText}
               fullWidth
+              autoFocus
             />
             <Box
               style={{
