@@ -1,15 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const Product = require("../models/Product");
 const authenticateToken = require("../middleware/auth");
 const Inventory = require("../models/Inventory");
+const { default: mongoose } = require("mongoose");
 
 router.post("/", authenticateToken, async (req, res) => {
   const newInventory = new Inventory({
     ...req.body,
     created_at: new Date(),
     updated_at: new Date(),
-    last_updated_by: req.user.id,
+    last_updated_by: new mongoose.Types.ObjectId(req.user.id),
   });
   try {
     const savedInventory = await newInventory.save();
@@ -56,7 +56,11 @@ router.put("/:id", authenticateToken, async (req, res) => {
   try {
     const updatedInventory = await Inventory.findByIdAndUpdate(
       req.params.id,
-      { ...req.body, updated_at: new Date(), last_updated_by: req.user.id },
+      {
+        ...req.body,
+        updated_at: new Date(),
+        last_updated_by: new mongoose.Types.ObjectId(req.user.id),
+      },
       {
         new: true,
       }

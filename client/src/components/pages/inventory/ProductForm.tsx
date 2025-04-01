@@ -199,7 +199,6 @@ export default function ProductForm({
             helperText={
               <ErrorMessage error={errors.unit_price as FieldError} />
             }
-            disabled={userInfo?.role !== 'admin'}
           />
         </FormControl>
 

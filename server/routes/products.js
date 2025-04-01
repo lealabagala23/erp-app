@@ -3,9 +3,15 @@ const router = express.Router();
 const Product = require("../models/Product");
 const authenticateToken = require("../middleware/auth");
 const Inventory = require("../models/Inventory");
+const { default: mongoose } = require("mongoose");
 
 router.post("/", authenticateToken, async (req, res) => {
-  const newProduct = new Product({ ...req.body, created_at: new Date() });
+  const newProduct = new Product({
+    ...req.body,
+    created_at: new Date(),
+    updated_at: new Date(),
+    last_updated_by: new mongoose.Types.ObjectId(req.user.id),
+  });
   try {
     const savedProduct = await newProduct.save();
     res.status(201).json(savedProduct);
@@ -23,6 +29,20 @@ router.get("/", authenticateToken, async (req, res) => {
           localField: "_id",
           foreignField: "product_id",
           as: "stocks",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "last_updated_by",
+          foreignField: "_id",
+          as: "last_updated_by",
+        },
+      },
+      {
+        $unwind: {
+          path: "$last_updated_by",
+          preserveNullAndEmptyArrays: true, // Optional: Keeps documents even if there's no match
         },
       },
       {
@@ -72,6 +92,8 @@ router.post("/bulk", authenticateToken, async (req, res) => {
       .map((d) => ({
         ...d,
         created_at: new Date(),
+        updated_at: new Date(),
+        last_updated_by: new mongoose.Types.ObjectId(req.user.id),
       }));
     await Product.insertMany(dataWithCreatedAt); // Insert multiple records
     res.status(200).send("Data uploaded successfully");
@@ -85,7 +107,11 @@ router.put("/:id", authenticateToken, async (req, res) => {
   try {
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      {
+        ...req.body,
+        updated_at: new Date(),
+        last_updated_by: new mongoose.Types.ObjectId(req.user.id),
+      },
       {
         new: true,
       }
@@ -113,6 +139,8 @@ router.post("/:id/inventory", authenticateToken, async (req, res) => {
     expiry_date: new Date(expiry_date),
     ...rest,
     created_at: new Date(),
+    updated_at: new Date(),
+    last_updated_by: req.user.id,
   });
   try {
     const savedInventory = await newInventory.save();
@@ -145,6 +173,8 @@ router.put(
         product_id: req.params.id,
         stock_arrival_date: new Date(stock_arrival_date),
         expiry_date: new Date(expiry_date),
+        updated_at: new Date(),
+        last_updated_by: req.user.id,
         ...rest,
       },
       {
