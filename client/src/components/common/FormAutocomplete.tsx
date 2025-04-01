@@ -16,6 +16,7 @@ interface IProps {
   placeholder?: string;
   disabled?: boolean;
   onCreateNew?: () => void;
+  required?: boolean;
 }
 
 export default function FormAutocomplete({
@@ -27,6 +28,7 @@ export default function FormAutocomplete({
   disabled,
   control,
   onCreateNew,
+  required,
 }: IProps) {
   const [inputValue, setInputValue] = useState<string | null>(null);
   const value = getValues(name);
@@ -58,7 +60,7 @@ export default function FormAutocomplete({
       <Controller
         name={name}
         control={control}
-        rules={{ required: 'This field is required' }}
+        rules={required ? { required: 'This field is required' } : undefined}
         render={({ field }) => (
           <Autocomplete
             {...field}
@@ -96,7 +98,8 @@ export default function FormAutocomplete({
                   },
                   ...{
                     '.MuiInputBase-root':
-                      value === null || value === undefined || value === ''
+                      (value === null || value === undefined || value === '') &&
+                      required
                         ? {
                             outline: '3px solid hsl(210, 98%, 42%, 0.5)',
                           }

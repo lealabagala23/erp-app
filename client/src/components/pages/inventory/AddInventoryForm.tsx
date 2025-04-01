@@ -108,6 +108,7 @@ export default function AddInventoryForm({
               placeholder={'Select Product'}
               control={control}
               autoFocus
+              required
             />
           </FormControl>
         )}

@@ -300,6 +300,7 @@ export default function GenerateSales() {
 
   useEffect(() => {
     if (customer_details) {
+      setValue('co_doctor_name', customer_details?.co_doctor_name);
       setValue('discount_card', customer_details?.discount_card);
       setValue('discount_card_number', customer_details?.discount_card_number);
     }
@@ -425,6 +426,7 @@ export default function GenerateSales() {
                             order?.status,
                           )
                         }
+                        required
                       />
                     </FormControl>
                   </Grid>
@@ -540,6 +542,28 @@ export default function GenerateSales() {
                           <TextField
                             {...register('discount_card_number')}
                             placeholder={'Enter Discount Card Number'}
+                            variant="outlined"
+                            fullWidth
+                            disabled={
+                              !customer_id ||
+                              ![
+                                OrderStatus.DRAFT,
+                                OrderStatus.UNAPPROVED,
+                              ].includes(order?.status)
+                            }
+                          />
+                        </FormControl>
+                      </Grid>
+                    </>
+                  )}
+                  {customer_type === 'CO_DOCTOR' && (
+                    <>
+                      <Grid size={4}>
+                        <FormControl fullWidth margin="dense">
+                          <FormLabel>C/O Doctor Name</FormLabel>
+                          <TextField
+                            {...register('co_doctor_name')}
+                            placeholder={'Enter Doctor Name:'}
                             variant="outlined"
                             fullWidth
                             disabled={

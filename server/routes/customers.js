@@ -3,6 +3,7 @@ const router = express.Router();
 const Customer = require("../models/Customer");
 const authenticateToken = require("../middleware/auth");
 const Doctor = require("../models/Doctor");
+const CODoctor = require("../models/CODoctor");
 const Agency = require("../models/Agency");
 const Patient = require("../models/Patient");
 
@@ -44,7 +45,9 @@ const getAgencyPayload = ({
 router.post("/", authenticateToken, async (req, res) => {
   const { customer_details, ...rest } = req.body;
 
-  if (!["PATIENT", "DOCTOR", "AGENCY"].includes(rest.customer_type)) {
+  if (
+    !["PATIENT", "DOCTOR", "CO_DOCTOR", "AGENCY"].includes(rest.customer_type)
+  ) {
     return res
       .status(422)
       .json("customer_type should be PATIENT/DOCTOR/AGENCY only");
@@ -69,6 +72,14 @@ router.post("/", authenticateToken, async (req, res) => {
           created_at: new Date(),
         });
         await newDoctor.save();
+        break;
+      case "CO_DOCTOR":
+        const newCODoctor = new CODoctor({
+          customer_id: savedCustomer._id,
+          co_doctor_name: customer_details.co_doctor_name,
+          created_at: new Date(),
+        });
+        await newCODoctor.save();
         break;
       default:
         const newAgency = new Agency({
@@ -189,6 +200,14 @@ router.get("/", authenticateToken, async (req, res) => {
       },
       {
         $lookup: {
+          from: "codoctors",
+          localField: "_id",
+          foreignField: "customer_id",
+          as: "codoctors",
+        },
+      },
+      {
+        $lookup: {
           from: "agencies",
           localField: "_id",
           foreignField: "customer_id",
@@ -197,12 +216,14 @@ router.get("/", authenticateToken, async (req, res) => {
       },
     ]);
     const formatted = customers.reduce((arr, obj) => {
-      const { patients, doctors, agencies, ...rest } = obj;
+      const { patients, doctors, codoctors, agencies, ...rest } = obj;
       const customer_details =
         (rest.customer_type === "PATIENT"
           ? patients[0]
           : rest.customer_type === "DOCTOR"
           ? doctors[0]
+          : rest.customer_type === "CO_DOCTOR"
+          ? codoctors[0]
           : agencies[0]) || {};
       return [...arr, { ...rest, customer_details }];
     }, []);
@@ -278,6 +299,17 @@ router.put("/:id", authenticateToken, async (req, res) => {
             { new: true, useFindAndModify: false }
           );
           break;
+        case "CO_DOCTOR":
+          await CODoctor.findOneAndUpdate(
+            { customer_id },
+            {
+              $set: {
+                co_doctor_name: customer_details.co_doctor_name,
+              },
+            },
+            { new: true, useFindAndModify: false }
+          );
+          break;
         default:
           await Agency.findOneAndUpdate(
             { customer_id },
@@ -316,6 +348,11 @@ router.delete("/:id", authenticateToken, async (req, res) => {
         break;
       case "DOCTOR":
         await Doctor.findOneAndDelete({
+          customer_id: customer._id,
+        });
+        break;
+      case "CO_DOCTOR":
+        await CODoctor.findOneAndDelete({
           customer_id: customer._id,
         });
         break;

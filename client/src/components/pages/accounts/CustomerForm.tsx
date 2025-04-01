@@ -64,6 +64,7 @@ export default function CustomerForm({
       agency_address: '',
       industry_type: '',
       contact_person_name: '',
+      co_doctor_name: '',
     },
   });
 
@@ -113,6 +114,7 @@ export default function CustomerForm({
       'agency_address',
       'industry_type',
       'contact_person_name',
+      'co_doctor_name',
     ]);
     if (onFormSubmit) {
       onFormSubmit({
@@ -201,6 +203,7 @@ export default function CustomerForm({
               <TextField select {...field} variant="outlined">
                 <MenuItem value="PATIENT">PATIENT</MenuItem>
                 <MenuItem value="DOCTOR">DOCTOR</MenuItem>
+                <MenuItem value="CO_DOCTOR">C/O</MenuItem>
                 <MenuItem value="AGENCY">AGENCY</MenuItem>
               </TextField>
             )}
@@ -357,6 +360,25 @@ export default function CustomerForm({
                     {...field}
                     variant="outlined"
                     placeholder="Enter Clinic Address"
+                  />
+                )}
+              />
+            </FormControl>
+          </>
+        )}
+
+        {customerType === 'CO_DOCTOR' && (
+          <>
+            <FormControl fullWidth margin="dense">
+              <FormLabel>C/O Doctor Name</FormLabel>
+              <Controller
+                name="co_doctor_name"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    variant="outlined"
+                    placeholder="Enter Doctor Name"
                   />
                 )}
               />
