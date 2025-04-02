@@ -61,7 +61,15 @@ const OrderSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
+  last_updated_by: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
   created_at: {
+    type: Date,
+    required: true,
+  },
+  updated_at: {
     type: Date,
     required: true,
   },

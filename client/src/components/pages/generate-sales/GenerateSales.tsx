@@ -1014,6 +1014,18 @@ export default function GenerateSales() {
                 />
               </>
             )}
+            {order?.last_updated_by?._id && (
+              <>
+                <Typography variant={'h6'}>Last Updated by:</Typography>
+                <Chip
+                  icon={<Person />}
+                  color={'default'}
+                  variant="filled"
+                  size="medium"
+                  label={`${order?.last_updated_by?.first_name} ${order?.last_updated_by?.last_name}`}
+                />
+              </>
+            )}
             {order?.cancel_initiator_id?._id && (
               <>
                 <Typography variant={'h6'}>Cancelled by:</Typography>

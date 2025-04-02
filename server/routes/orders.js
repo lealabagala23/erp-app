@@ -67,6 +67,8 @@ router.post("/", authenticateToken, async (req, res) => {
     ...payload,
     status: "draft",
     created_at: new Date(),
+    updated_at: new Date(),
+    last_updated_by: new mongoose.Types.ObjectId(req.user.id),
   });
   try {
     const savedOrder = await newOrder.save();
@@ -176,6 +178,8 @@ router.put("/:id/payment", authenticateToken, async (req, res) => {
       { _id: order_id },
       {
         status: total_amount_paid >= net_total ? "completed" : "partially_paid",
+        updated_at: new Date(),
+        last_updated_by: new mongoose.Types.ObjectId(req.user.id),
       }
     );
     res.status(200).json("Payment success");
@@ -194,7 +198,12 @@ router.put("/:id/status", authenticateToken, async (req, res) => {
       status === "approved" ? { approver_id: req.user.id } : {};
     const updatedOrder = await Order.findByIdAndUpdate(
       order_id,
-      { status, ...approverParams },
+      {
+        status,
+        updated_at: new Date(),
+        last_updated_by: new mongoose.Types.ObjectId(req.user.id),
+        ...approverParams,
+      },
       {
         new: true,
       }
@@ -229,6 +238,8 @@ router.put("/:id/cancel", authenticateToken, async (req, res) => {
       order_id,
       {
         status: cancel_all ? "cancelled" : "unpaid",
+        updated_at: new Date(),
+        last_updated_by: new mongoose.Types.ObjectId(req.user.id),
         invoice_number,
         cancel_initiator_id: req.user.id,
       },
@@ -272,6 +283,8 @@ router.put("/:id", authenticateToken, async (req, res) => {
       order_id,
       {
         ...getOrderPayload(rest),
+        updated_at: new Date(),
+        last_updated_by: new mongoose.Types.ObjectId(req.user.id),
       },
       {
         new: true,

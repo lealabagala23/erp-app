@@ -41,6 +41,14 @@ const defaultOrderAggrParams = [
   },
   {
     $lookup: {
+      from: "users",
+      localField: "last_updated_by",
+      foreignField: "_id",
+      as: "last_updated_by",
+    },
+  },
+  {
+    $lookup: {
       from: "referrers",
       localField: "referrer_id",
       foreignField: "_id",
@@ -98,6 +106,12 @@ const defaultOrderAggrParams = [
   {
     $unwind: {
       path: "$approver_id",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $unwind: {
+      path: "$last_updated_by",
       preserveNullAndEmptyArrays: true,
     },
   },

@@ -134,13 +134,13 @@ router.delete("/:id", authenticateToken, async (req, res) => {
 router.post("/:id/inventory", authenticateToken, async (req, res) => {
   const { stock_arrival_date, expiry_date, ...rest } = req.body;
   const newInventory = new Inventory({
+    ...rest,
     product_id: req.params.id,
     stock_arrival_date: new Date(stock_arrival_date),
     expiry_date: new Date(expiry_date),
-    ...rest,
     created_at: new Date(),
     updated_at: new Date(),
-    last_updated_by: req.user.id,
+    last_updated_by: new mongoose.Types.ObjectId(req.user.id),
   });
   try {
     const savedInventory = await newInventory.save();
@@ -174,7 +174,7 @@ router.put(
         stock_arrival_date: new Date(stock_arrival_date),
         expiry_date: new Date(expiry_date),
         updated_at: new Date(),
-        last_updated_by: req.user.id,
+        last_updated_by: new mongoose.Types.ObjectId(req.user.id),
         ...rest,
       },
       {
