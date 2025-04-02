@@ -25,6 +25,7 @@ const getOrderPayload = ({
   referrer_id,
   referring_doctor_id,
   approver_id,
+  transaction_date,
 }) => {
   return {
     customer_id,
@@ -43,6 +44,9 @@ const getOrderPayload = ({
     referrer_id,
     referring_doctor_id,
     approver_id,
+    transaction_date: transaction_date
+      ? new Date(transaction_date)
+      : new Date(),
   };
 };
 
@@ -66,6 +70,7 @@ router.post("/", authenticateToken, async (req, res) => {
   const newOrder = new Order({
     ...payload,
     status: "draft",
+    transaction_date: new Date(),
     created_at: new Date(),
     updated_at: new Date(),
     last_updated_by: new mongoose.Types.ObjectId(req.user.id),

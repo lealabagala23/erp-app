@@ -47,7 +47,7 @@ const drawInvoiceNumber = (
 
 const drawDate = (firstPage: PDFPage, customFont: PDFFont, order: Order) => {
   const { height } = firstPage.getSize();
-  const text: string = `${dayjs(order?.created_at || '').format('MMMM D, YYYY')}`;
+  const text: string = `${dayjs(order?.transaction_date || '').format('MMMM D, YYYY')}`;
   firstPage.drawText(text, {
     x: 400,
     y: height - 137,

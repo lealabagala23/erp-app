@@ -65,6 +65,10 @@ const OrderSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
+  transaction_date: {
+    type: Date,
+    required: true,
+  },
   created_at: {
     type: Date,
     required: true,

@@ -62,8 +62,9 @@ import {
 import PaymentForm from './PaymentForm';
 import { modifyPdf } from '../../../utils/pdfInvoiceWriter';
 import PaymentsList from './PaymentsList';
-import LiveDateAndTime from '../../common/LiveDateAndTime';
 import CancelOrder from './CancelOrder';
+import { DatePicker } from '@mui/x-date-pickers';
+import dayjs from 'dayjs';
 
 export const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#fff',
@@ -325,6 +326,7 @@ export default function GenerateSales() {
         discount_card: order.discount_card,
         discount_card_number: order.discount_card_number,
         special_discount: order.special_discount,
+        transaction_date: dayjs(order.transaction_date),
         vat_exempted: order.vat_exempted || false,
         sc_pwd_discount: order.sc_pwd_discount || false,
       });
@@ -376,19 +378,52 @@ export default function GenerateSales() {
           <Grid container spacing={2} width={'100%'}>
             <Grid size={12}>
               <Item>
-                <Stack direction="row" justifyContent="space-between">
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems={'center'}
+                >
                   <Typography variant="h3" fontWeight="bold">
                     Invoice #{invoice_number}
                   </Typography>
-                  {isSaving ? (
-                    <Typography variant="h6" fontStyle={'italic'}>
-                      Saving...
+                  <Stack direction="row" alignItems={'center'}>
+                    <Typography
+                      variant="h6"
+                      fontWeight="bold"
+                      marginRight="4px"
+                    >
+                      Transaction Date:
                     </Typography>
-                  ) : (
-                    <Typography variant="h6" fontWeight="bold">
-                      Date: <LiveDateAndTime />
-                    </Typography>
-                  )}
+                    <Controller
+                      name="transaction_date"
+                      control={control}
+                      rules={{ required: 'Transaction Date is required' }}
+                      render={({ field: { onChange, ...restField } }) => (
+                        <DatePicker
+                          onChange={onChange}
+                          {...restField}
+                          sx={{
+                            '.MuiIconButton-root': {
+                              border: 0,
+                              width: '38px',
+                              height: '38px',
+                            },
+                          }}
+                          slotProps={{
+                            calendarHeader: {
+                              sx: {
+                                '.MuiIconButton-root': {
+                                  border: 0,
+                                  width: '38px',
+                                  height: '38px',
+                                },
+                              },
+                            },
+                          }}
+                        />
+                      )}
+                    />
+                  </Stack>
                 </Stack>
               </Item>
             </Grid>
@@ -1000,7 +1035,11 @@ export default function GenerateSales() {
               color={getOrderStatusColor(order?.status)}
               variant="filled"
               size="medium"
-              label={order?.status?.toUpperCase().replaceAll('_', ' ')}
+              label={
+                isSaving
+                  ? 'SAVING...'
+                  : order?.status?.toUpperCase().replaceAll('_', ' ')
+              }
             />
             {order?.approver_id?._id && (
               <>

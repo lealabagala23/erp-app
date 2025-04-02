@@ -48,6 +48,7 @@ export type Order = {
   vat_exempt_amount?: number;
   sc_pwd_disc_amount?: number;
   net_total?: number;
+  transaction_date?: string;
 };
 
 export type CompanyBankDetails = {

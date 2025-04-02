@@ -68,6 +68,7 @@ const orderAggregateParams = [
       last_updated_by: { $first: "$last_updated_by" },
       created_at: { $first: "$created_at" },
       updated_at: { $first: "$updated_at" },
+      transaction_date: { $first: "$transaction_date" },
       order_items: { $push: "$order_items" },
       payments: { $first: "$payments" },
     },

@@ -42,6 +42,7 @@ const generatePayload = ({
   referrer_id,
   referring_doctor_id,
   approver_id,
+  transaction_date,
   order_items,
 }: Order) => {
   return removeEmptyStrings({
@@ -62,6 +63,7 @@ const generatePayload = ({
     referrer_id,
     referring_doctor_id,
     approver_id,
+    transaction_date,
     order_items: (order_items || []).map(getOrderItemPayload),
   });
 };
