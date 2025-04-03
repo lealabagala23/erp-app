@@ -192,6 +192,7 @@ export default function ProductForm({
             {...register('unit_price', {
               required: 'Unit Price must be a number',
             })}
+            id="unitPrice"
             variant="outlined"
             fullWidth
             type="number"

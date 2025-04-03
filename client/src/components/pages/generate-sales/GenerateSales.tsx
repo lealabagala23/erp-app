@@ -707,6 +707,7 @@ export default function GenerateSales() {
             <Grid size={12}>
               <Item>
                 <ItemTable
+                  orderId={order?._id}
                   customerType={customer_type}
                   products={products}
                   orderItems={orderItems}

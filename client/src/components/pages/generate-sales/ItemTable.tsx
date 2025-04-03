@@ -1,4 +1,4 @@
-import { DeleteOutlineRounded } from '@mui/icons-material';
+import { DeleteOutlineRounded, EditOutlined } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -15,15 +15,17 @@ import {
   GridCellParams,
   GridColDef,
 } from '@mui/x-data-grid';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { TableItem } from './types';
 import { formatCurrency, getUnitPrice } from '../../../utils/auth';
 import { Product } from '../inventory/types';
 import ProductSelector from './ProductSelector';
 import AuthContext from '../../auth/AuthContext';
 import { Item } from './GenerateSales';
+import { useNavigate } from 'react-router-dom';
 
 interface IProps {
+  orderId: string;
   products: Product[];
   orderItems: TableItem[];
   addOrderItem: () => void;
@@ -36,21 +38,24 @@ interface IProps {
 }
 
 export default function ItemTable({
+  orderId,
   products,
   orderItems,
   addOrderItem,
   updateOrderItem,
   deleteOrderItem,
   clearAllOrderItems,
-  customerType,
   subtotal,
   disabled,
 }: IProps) {
+  const navigate = useNavigate();
   const { activeCompany } = useContext(AuthContext);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState<TableItem | null>(null);
   const [cellModesModel, setCellModesModel] =
     React.useState<GridCellModesModel>({});
+  const queryParams = new URLSearchParams(location.search);
+  const inventoryId = queryParams.get('inventoryId');
 
   const handleCloseDialog = () => setOpenDialog(false);
 
@@ -115,14 +120,18 @@ export default function ItemTable({
     [],
   );
 
-  const renderPriceCell = (tooltipMsg: string, value: number) => (
+  const renderPriceCell = (
+    tooltipMsg: string,
+    value: number,
+    // eslint-disable-next-line
+    row?: any,
+  ) => (
     <Box
       sx={{
         display: 'flex',
         justifyContent: 'flex-end',
         alignItems: 'center',
         height: '100%',
-        cursor: 'not-allowed',
       }}
     >
       <Tooltip title={tooltipMsg}>
@@ -133,6 +142,23 @@ export default function ItemTable({
           {formatCurrency(value)}
         </Typography>
       </Tooltip>
+
+      {row && (
+        <Tooltip title={tooltipMsg}>
+          <IconButton
+            aria-label="expand row"
+            size="small"
+            onClick={() =>
+              navigate(
+                `/products?id=${row.product_id}&inventoryId=${row._id}&orderId=${orderId}`,
+              )
+            }
+            sx={{ marginLeft: 2 }}
+          >
+            <EditOutlined />
+          </IconButton>
+        </Tooltip>
+      )}
     </Box>
   );
 
@@ -245,8 +271,9 @@ export default function ItemTable({
       // eslint-disable-next-line
       renderCell: ({ row }: any) =>
         renderPriceCell(
-          `This is the ${customerType || ''} price set on Products page`,
+          `Edit this price on Products page`,
           row.unit_price,
+          row,
         ),
     },
     {
@@ -293,6 +320,17 @@ export default function ItemTable({
       ),
     },
   ];
+
+  useEffect(() => {
+    if (inventoryId && orderItems.length > 0) {
+      const newRow = orderItems.find((row) => row._id === inventoryId);
+      if (newRow) {
+        const updatedRow = formatTableItem(newRow);
+        updateOrderItem(updatedRow);
+        navigate({ search: '' });
+      }
+    }
+  }, [inventoryId, orderItems]);
 
   return (
     <Box

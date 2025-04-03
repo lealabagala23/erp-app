@@ -50,6 +50,11 @@ export default function Products() {
   const [selectedRow, setSelectedRow] = useState<Product | null>(null);
   const { activeCompany } = useContext(AuthContext);
 
+  const queryParams = new URLSearchParams(location.search);
+  const id = queryParams.get('id');
+  const inventoryId = queryParams.get('inventoryId');
+  const orderId = queryParams.get('orderId');
+
   const { data = [], isLoading: isLoadingProducts } = useQuery(
     [FETCH_PRODUCTS_QUERY_KEY],
     () => fetchProducts(),
@@ -90,6 +95,9 @@ export default function Products() {
           message: 'Updated product successfully.',
           type: 'success',
         });
+        if (inventoryId && orderId) {
+          navigate(`/orders/${orderId}?inventoryId=${inventoryId}`);
+        }
         toggleDrawer();
         queryClient.invalidateQueries([FETCH_PRODUCTS_QUERY_KEY]);
       },
@@ -167,15 +175,13 @@ export default function Products() {
   };
 
   useEffect(() => {
-    if (location.search?.includes('id') && data.length > 0) {
-      const id = location.search.split('=')[1];
+    if (!!id && data.length > 0) {
       // eslint-disable-next-line
       const selected = data.find(({ _id }: any) => _id === id);
-
       if (selected) {
         setSelectedRow(selected);
         toggleDrawer();
-        navigate({ search: '' });
+        setTimeout(() => document.getElementById('unitPrice')?.focus(), 200);
       }
     }
   }, [location, data]);
