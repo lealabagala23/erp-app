@@ -82,10 +82,15 @@ export const AuthProvider = ({ children }: IProps) => {
   }, []);
 
   useEffect(() => {
+    const companyName = localStorage.getItem('company');
     const activeCompanyId = localStorage.getItem('active_company_id');
     if (companies.length > 0) {
-      if (activeCompanyId) {
-        const company = companies.find(({ _id }) => _id === activeCompanyId);
+      if (activeCompanyId || companyName) {
+        const company = companies.find(({ _id, company_display_name }) =>
+          activeCompanyId
+            ? _id === activeCompanyId
+            : company_display_name?.includes(companyName || ''),
+        );
         if (company) {
           setActiveCompany(company);
         } else {

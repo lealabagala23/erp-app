@@ -19,10 +19,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 import { fetchLogin } from './apis';
 import { useMutation } from '@tanstack/react-query';
-import lhctLogo from '../../assets/lhct.png';
-
+import lhctLogo from '../../assets/lhct_small.png';
 import lamorenetaLogo from '../../assets/la_moreneta.png';
 import AlertSnackbar from '../common/AlertSnackbar';
+import LoginSelectorButtons from './LoginSelectorButtons';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -76,6 +76,7 @@ export default function Login() {
   const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
   const [open, setOpen] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
   // const [open, setOpen] = React.useState(false);
 
   // const handleClickOpen = () => {
@@ -154,51 +155,63 @@ export default function Login() {
     <LoginContainer direction="column" justifyContent="space-between">
       <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
       <Card variant="outlined">
-        {/* <SitemarkIcon /> */}
-        <Stack direction={'row'} gap={2}>
-          <img src={lamorenetaLogo} style={{ width: 250 }} />
-          <img src={lhctLogo} style={{ width: 100 }} />
-        </Stack>
-        <Typography
-          component="h1"
-          variant="h4"
-          sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-        >
-          Log in
-        </Typography>
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          noValidate
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            width: '100%',
-            gap: 2,
-          }}
-        >
-          <FormControl>
-            <FormLabel htmlFor="username">Username</FormLabel>
-            <TextField
-              error={usernameError}
-              helperText={usernameErrorMessage}
-              id="username"
-              type="username"
-              name="username"
-              autoComplete="username"
-              autoFocus
-              required
-              fullWidth
-              variant="outlined"
-              color={usernameError ? 'error' : 'primary'}
-              sx={{ ariaLabel: 'username' }}
-              disabled={isLoading}
-            />
-          </FormControl>
-          <FormControl>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <FormLabel htmlFor="password">Password</FormLabel>
-              {/* <Link
+        {!selectedCompany ? (
+          <LoginSelectorButtons
+            onClick={(v) => {
+              setSelectedCompany(v);
+              localStorage.setItem('company', v);
+            }}
+          />
+        ) : (
+          <>
+            <Stack direction={'row'} gap={2}>
+              <img
+                src={
+                  selectedCompany === 'La Moreneta' ? lamorenetaLogo : lhctLogo
+                }
+                style={{ width: 250 }}
+              />
+              <Typography
+                component="h1"
+                variant="h4"
+                sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+              >
+                Log in
+              </Typography>
+            </Stack>
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              noValidate
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                width: '100%',
+                gap: 2,
+              }}
+            >
+              <FormControl>
+                <FormLabel htmlFor="username">Username</FormLabel>
+                <TextField
+                  error={usernameError}
+                  helperText={usernameErrorMessage}
+                  id="username"
+                  type="username"
+                  name="username"
+                  autoComplete="username"
+                  autoFocus
+                  required
+                  fullWidth
+                  variant="outlined"
+                  color={usernameError ? 'error' : 'primary'}
+                  sx={{ ariaLabel: 'username' }}
+                  disabled={isLoading}
+                />
+              </FormControl>
+              <FormControl>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <FormLabel htmlFor="password">Password</FormLabel>
+                  {/* <Link
                   component="button"
                   type="button"
                   onClick={handleClickOpen}
@@ -207,55 +220,55 @@ export default function Login() {
                 >
                   Forgot your password?
                 </Link> */}
-            </Box>
-            <TextField
-              error={passwordError}
-              helperText={passwordErrorMessage}
-              name="password"
-              placeholder="••••••"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              required
-              fullWidth
-              variant="outlined"
-              color={passwordError ? 'error' : 'primary'}
-              disabled={isLoading}
-            />
-          </FormControl>
-          {/* <FormControlLabel
+                </Box>
+                <TextField
+                  error={passwordError}
+                  helperText={passwordErrorMessage}
+                  name="password"
+                  placeholder="••••••"
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                  required
+                  fullWidth
+                  variant="outlined"
+                  color={passwordError ? 'error' : 'primary'}
+                  disabled={isLoading}
+                />
+              </FormControl>
+              {/* <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
             />
             <ForgotPassword open={open} handleClose={handleClose} /> */}
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            onClick={validateInputs}
-            endIcon={
-              isLoading ? (
-                <CircularProgress size={16} color="inherit" />
-              ) : undefined
-            }
-          >
-            {isLoading ? 'Logging in...' : 'Log in'}
-          </Button>
-          <Typography sx={{ textAlign: 'center' }}>
-            Don&apos;t have an account?{' '}
-            <span>
-              <Link
-                href="/sign-up"
-                variant="body2"
-                sx={{ alignSelf: 'center' }}
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                onClick={validateInputs}
+                endIcon={
+                  isLoading ? (
+                    <CircularProgress size={16} color="inherit" />
+                  ) : undefined
+                }
               >
-                Sign up
-              </Link>
-            </span>
-          </Typography>
-        </Box>
-        {/* <Divider>or</Divider> */}
-        {/* <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {isLoading ? 'Logging in...' : 'Log in'}
+              </Button>
+              <Typography sx={{ textAlign: 'center' }}>
+                Don&apos;t have an account?{' '}
+                <span>
+                  <Link
+                    href="/sign-up"
+                    variant="body2"
+                    sx={{ alignSelf: 'center' }}
+                  >
+                    Sign up
+                  </Link>
+                </span>
+              </Typography>
+            </Box>
+            {/* <Divider>or</Divider> */}
+            {/* <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Button
               fullWidth
               variant="outlined"
@@ -273,6 +286,8 @@ export default function Login() {
               Log in with Facebook
             </Button>
           </Box> */}
+          </>
+        )}
       </Card>
       <AlertSnackbar
         open={open}
