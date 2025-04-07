@@ -155,7 +155,9 @@ router.get("/:id/inventory", authenticateToken, async (req, res) => {
     const inventory = await Inventory.find({
       product_id: req.params.id,
       company_id: req.query.company_id,
-    }).populate("supplier_id", ["_id", "supplier_name"]);
+    })
+      .populate("supplier_id", ["_id", "supplier_name"])
+      .populate("last_updated_by");
     res.status(200).json(inventory);
   } catch (err) {
     res.status(500).json(err);

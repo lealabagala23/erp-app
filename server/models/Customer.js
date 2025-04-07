@@ -23,6 +23,14 @@ const CustomerSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  updated_at: {
+    type: Date,
+    required: true,
+  },
+  last_updated_by: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
 });
 
 module.exports = mongoose.model("Customer", CustomerSchema);

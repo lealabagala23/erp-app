@@ -110,34 +110,18 @@ const COLUMNS: GridColDef<Inventory>[] = [
     cellClassName,
   },
   {
-    field: 'supplier_id',
-    headerName: 'Supplier Name',
-    flex: 1,
-    // eslint-disable-next-line
-    valueGetter: (value, row) => (row as any).supplier_id.supplier_name,
-    cellClassName,
-  },
-  {
-    field: 'created_at',
-    headerName: 'Created at',
-    valueGetter: (value, row) =>
-      `${new Date(row.created_at || '').toLocaleDateString('en-US')}`,
-    cellClassName,
-    flex: 1,
-  },
-  {
     field: 'updated_at',
     headerName: 'Updated at',
     valueGetter: (value, row) =>
       row.updated_at
-        ? `${new Date(row.updated_at || '').toLocaleDateString('en-US')}`
+        ? `${new Date(row.updated_at || row.created_at || '').toLocaleDateString('en-US')}`
         : 'N/A',
     cellClassName,
     flex: 1,
   },
   {
     field: 'last_updated_by',
-    headerName: 'Updated by',
+    headerName: 'Last Updated by',
     valueGetter: (_, row) =>
       row.last_updated_by
         ? `${row.last_updated_by?.first_name} ${row.last_updated_by?.last_name}`

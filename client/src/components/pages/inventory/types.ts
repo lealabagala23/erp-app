@@ -12,6 +12,8 @@ export type Product = {
   stocks: { [key: string]: Inventory[] };
   total_quantity_on_hand: { [key: string]: number };
   created_at?: string;
+  updated_at?: string;
+  last_updated_by?: UserInfo
 };
 
 export type Inventory = {

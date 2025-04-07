@@ -10,6 +10,7 @@ import { Chip } from '@mui/material';
 import { getOrderStatusColor } from '../generate-sales/constants';
 import { formatCurrency } from '../../../utils/auth';
 import toLower from 'lodash/toLower';
+import { UserInfo } from '../../auth/types';
 
 export const FETCH_ORDERS_QUERY_KEY = 'fetchOrders';
 
@@ -25,6 +26,8 @@ export type Order = {
   referring_doctor_id?: string;
   approver_id?: string;
   created_at?: string;
+  transaction_date?: string;
+  last_updated_by?: UserInfo;
 };
 
 const COLUMNS: GridColDef<Order>[] = [
@@ -32,7 +35,7 @@ const COLUMNS: GridColDef<Order>[] = [
     field: 'created_at',
     headerName: 'Transaction Date',
     valueGetter: (value, row) =>
-      `${new Date(row.created_at || '').toLocaleDateString('en-US')}`,
+      `${new Date(row.transaction_date || row.created_at || '').toLocaleDateString('en-US')}`,
     sortComparator: (v1, v2) => new Date(v1).getTime() - new Date(v2).getTime(),
     flex: 1,
   },
@@ -80,6 +83,14 @@ const COLUMNS: GridColDef<Order>[] = [
     valueGetter: (value, row) =>
       // eslint-disable-next-line
       `${(row?.initiator_id as any)?.first_name} ${(row?.initiator_id as any)?.last_name}`,
+  },
+  {
+    field: 'last_updated_by',
+    headerName: 'Last Updated By',
+    flex: 1,
+    valueGetter: (value, row) =>
+      // eslint-disable-next-line
+      `${(row?.last_updated_by as any)?.first_name || ''} ${(row?.last_updated_by as any)?.last_name || ''}`,
   },
 ];
 

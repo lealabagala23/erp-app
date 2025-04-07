@@ -1,3 +1,4 @@
+import { UserInfo } from "../../auth/types";
 import { Order } from "../orders/Orders";
 
 export type Customer = {
@@ -8,6 +9,8 @@ export type Customer = {
   tin?: string;
   address?: string;
   created_at?: string;
+  updated_at?: string;
+  last_updated_by?: UserInfo;
   // eslint-disable-next-line
   customer_details?: any;
 };

@@ -45,11 +45,6 @@ export default function ProductTable({
       flex: 1,
     },
     {
-      field: 'generic_name',
-      headerName: 'Generic Name',
-      flex: 1,
-    },
-    {
       field: 'purchase_price',
       headerName: 'Purchase Price',
       flex: 1,
@@ -69,10 +64,17 @@ export default function ProductTable({
         row.total_quantity_on_hand[activeCompany?._id as string] || 0,
     },
     {
-      field: 'created_at',
-      headerName: 'Created at',
+      field: 'updated_at',
+      headerName: 'Updated at',
       valueGetter: (value, row) =>
-        `${new Date(row.created_at || '').toLocaleDateString('en-US')}`,
+        `${new Date(row.updated_at || row.created_at || '').toLocaleDateString('en-US')}`,
+      flex: 1,
+    },
+    {
+      field: 'last_updated_by',
+      headerName: 'Last Updated By',
+      valueGetter: (value, row) =>
+        `${row.last_updated_by?.first_name || ''} ${row.last_updated_by?.last_name || ''}`,
       flex: 1,
     },
     {

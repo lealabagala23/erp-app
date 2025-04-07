@@ -6,6 +6,7 @@ const Doctor = require("../models/Doctor");
 const CODoctor = require("../models/CODoctor");
 const Agency = require("../models/Agency");
 const Patient = require("../models/Patient");
+const { default: mongoose } = require("mongoose");
 
 const getPatientPayload = ({
   date_of_birth,
@@ -53,7 +54,12 @@ router.post("/", authenticateToken, async (req, res) => {
       .json("customer_type should be PATIENT/DOCTOR/AGENCY only");
   }
 
-  const newCustomer = new Customer({ ...rest, created_at: new Date() });
+  const newCustomer = new Customer({
+    ...rest,
+    created_at: new Date(),
+    updated_at: new Date(),
+    last_updated_by: new mongoose.Types.ObjectId(req.user.id),
+  });
   try {
     const savedCustomer = await newCustomer.save();
     switch (savedCustomer.customer_type) {
@@ -123,6 +129,8 @@ router.post("/bulk", authenticateToken, async (req, res) => {
         ...d,
         customer_name: capitalize(customer_name),
         created_at: new Date(),
+        updated_at: new Date(),
+        last_updated_by: new mongoose.Types.ObjectId(req.user.id),
       }));
 
     let newCustomers = [...existingCustomers];
@@ -214,9 +222,24 @@ router.get("/", authenticateToken, async (req, res) => {
           as: "agencies",
         },
       },
+      {
+        $lookup: {
+          from: "users",
+          localField: "last_updated_by",
+          foreignField: "_id",
+          as: "last_updated_by",
+        },
+      },
     ]);
     const formatted = customers.reduce((arr, obj) => {
-      const { patients, doctors, codoctors, agencies, ...rest } = obj;
+      const {
+        patients,
+        doctors,
+        codoctors,
+        agencies,
+        last_updated_by,
+        ...rest
+      } = obj;
       const customer_details =
         (rest.customer_type === "PATIENT"
           ? patients[0]
@@ -225,7 +248,10 @@ router.get("/", authenticateToken, async (req, res) => {
           : rest.customer_type === "CO_DOCTOR"
           ? codoctors[0]
           : agencies[0]) || {};
-      return [...arr, { ...rest, customer_details }];
+      return [
+        ...arr,
+        { ...rest, last_updated_by: last_updated_by[0], customer_details },
+      ];
     }, []);
 
     res.status(200).json(formatted);
@@ -270,7 +296,11 @@ router.put("/:id", authenticateToken, async (req, res) => {
     const customer_id = req.params.id;
     await Customer.findByIdAndUpdate(
       customer_id,
-      { ...rest },
+      {
+        ...rest,
+        updated_at: new Date(),
+        last_updated_by: new mongoose.Types.ObjectId(req.user.id),
+      },
       {
         new: true,
       }

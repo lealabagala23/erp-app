@@ -42,10 +42,18 @@ const COLUMNS: GridColDef<Customer>[] = [
     flex: 1,
   },
   {
-    field: 'created_at',
-    headerName: 'Created at',
+    field: 'updated_at',
+    headerName: 'Updated at',
     valueGetter: (value, row) =>
-      `${new Date(row.created_at || '').toLocaleDateString('en-US')}`,
+      `${new Date(row.updated_at || row.created_at || '').toLocaleDateString('en-US')}`,
+    flex: 1,
+  },
+  {
+    field: 'last_updated_by',
+    headerName: 'Last Updated By',
+    valueGetter: (value, row) =>
+      // eslint-disable-next-line
+      `${(row?.last_updated_by as any)?.first_name || ''} ${(row?.last_updated_by as any)?.last_name || ''}`,
     flex: 1,
   },
 ];
