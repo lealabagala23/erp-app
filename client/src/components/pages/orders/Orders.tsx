@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import PageTemplate from '../../common/PageTemplate';
 import { fetchOrders } from './apis';
 import AuthContext from '../../auth/AuthContext';
@@ -6,7 +6,7 @@ import { GridColDef } from '@mui/x-data-grid';
 import { InfoOutlined } from '@mui/icons-material';
 import CustomerForm from '../accounts/CustomerForm';
 import { useNavigate } from 'react-router-dom';
-import { Chip } from '@mui/material';
+import { Checkbox, Chip, FormControlLabel } from '@mui/material';
 import { getOrderStatusColor } from '../generate-sales/constants';
 import { formatCurrency } from '../../../utils/auth';
 import toLower from 'lodash/toLower';
@@ -97,26 +97,46 @@ const COLUMNS: GridColDef<Order>[] = [
 export default function Orders() {
   const { activeCompany } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [hideEmptyInvoices, setHideEmptyInvoices] = useState(true);
+
+  const renderCheckbox = () => (
+    <FormControlLabel
+      control={
+        <Checkbox
+          checked={hideEmptyInvoices}
+          onChange={() => setHideEmptyInvoices(!hideEmptyInvoices)}
+          color="success"
+          sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
+        />
+      }
+      label={'Hide Empty Invoices'}
+    />
+  );
+
   return (
     <PageTemplate
       fetchAPI={fetchOrders}
-      fetchParams={{ company_id: activeCompany?._id as string }}
+      fetchParams={{
+        company_id: activeCompany?._id as string,
+        hideEmptyInvoices,
+      }}
       // eslint-disable-next-line
       viewItem={(item: any) => navigate(`/orders/${item._id}`)}
       queryKey={FETCH_ORDERS_QUERY_KEY}
       itemName="order"
       searchPlaceholder="Search by invoice number or customer name..."
       searchAttr="invoice_number"
-      searchFunc={(data: Order[], value: string) =>
-        data.filter(
+      searchFunc={(data: Order[], value: string) => {
+        const filtered = data.filter(
           ({ invoice_number, customer_id }) =>
             toLower(invoice_number).includes(toLower(value)) ||
             // eslint-disable-next-line
             toLower((customer_id as any)?.customer_name).includes(
               toLower(value),
             ),
-        )
-      }
+        );
+        return filtered;
+      }}
       sortField="status"
       sortDir="desc"
       columns={COLUMNS}
@@ -128,6 +148,7 @@ export default function Orders() {
           Component: CustomerForm,
         },
       ]}
+      renderCustomComponent={renderCheckbox}
     />
   );
 }

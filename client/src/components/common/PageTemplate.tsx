@@ -53,6 +53,7 @@ interface IProps {
   searchPlaceholder?: string;
   // eslint-disable-next-line
   searchFunc?: (d: any[], v: string) => any[];
+  renderCustomComponent?: () => React.ReactNode;
 }
 
 export default function PageTemplate({
@@ -75,6 +76,7 @@ export default function PageTemplate({
   redirectOnCreate,
   searchPlaceholder,
   searchFunc,
+  renderCustomComponent,
 }: IProps) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -296,6 +298,7 @@ export default function PageTemplate({
                   Add New {capitalize(itemName)}
                 </Button>
               )}
+              {renderCustomComponent && renderCustomComponent()}
             </Stack>
             <FormDrawer
               open={openDrawer}
