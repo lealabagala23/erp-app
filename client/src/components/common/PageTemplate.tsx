@@ -376,7 +376,6 @@ export default function PageTemplate({
               label: 'Delete',
               // eslint-disable-next-line
               action: () => mutateDelete(selectedRow as any),
-              danger: true,
             }}
           />
         </>

@@ -736,6 +736,10 @@ export default function GenerateSales() {
                               {...field}
                               checked={field.value}
                               sx={{ padding: 0 }}
+                              onClick={() => {
+                                setHasSpecialDisc(false);
+                                setValue('special_discount', 0);
+                              }}
                             />
                           )}
                           disabled={
@@ -780,6 +784,10 @@ export default function GenerateSales() {
                               {...field}
                               checked={field.value}
                               sx={{ padding: 0 }}
+                              onClick={() => {
+                                setHasSpecialDisc(false);
+                                setValue('special_discount', 0);
+                              }}
                             />
                           )}
                           disabled={
@@ -878,6 +886,7 @@ export default function GenerateSales() {
                   >
                     <Item>
                       <Typography variant="body1" fontWeight={'bold'}>
+                        {'-'}
                         {formatCurrency(order.special_discount)}
                       </Typography>
                     </Item>

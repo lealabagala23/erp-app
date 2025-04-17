@@ -1,4 +1,5 @@
 import axiosConfig from '../../../utils/axiosConfig';
+import { Order } from './Orders';
 
 const ORDERS_API = '/api/orders';
 
@@ -22,4 +23,10 @@ export const fetchOrders = async ({
           Object.keys(customer_id).length !== 0,
       )
     : data;
+};
+
+export const deleteOrder = async (order: Order) => {
+  const response = await axiosConfig.delete(`${ORDERS_API}/${order._id}`);
+
+  return response?.data;
 };

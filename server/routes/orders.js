@@ -341,7 +341,22 @@ router.put("/:id", authenticateToken, async (req, res) => {
 // Delete a Order
 router.delete("/:id", authenticateToken, async (req, res) => {
   try {
-    await Order.findByIdAndDelete(req.params.id);
+    const order_id = req.params.id;
+    const dbOrderItems = await OrderItem.find({ order_id });
+    const dbPayments = await Payment.find({ order_id });
+    if (dbOrderItems.length > 0) {
+      const idsToDelete = dbOrderItems.map(
+        ({ _id }) => new mongoose.Types.ObjectId(_id)
+      );
+      await OrderItem.deleteMany({ _id: { $in: idsToDelete } });
+    }
+    if (dbPayments.length > 0) {
+      const idsToDelete = dbPayments.map(
+        ({ _id }) => new mongoose.Types.ObjectId(_id)
+      );
+      await Payment.deleteMany({ _id: { $in: idsToDelete } });
+    }
+    await Order.findByIdAndDelete(order_id);
     res.status(200).json("Order deleted");
   } catch (err) {
     res.status(500).json(err);

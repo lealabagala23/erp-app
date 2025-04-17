@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import PageTemplate from '../../common/PageTemplate';
-import { fetchOrders } from './apis';
+import { fetchOrders, deleteOrder } from './apis';
 import AuthContext from '../../auth/AuthContext';
 import { GridColDef } from '@mui/x-data-grid';
 import { InfoOutlined } from '@mui/icons-material';
@@ -15,6 +15,7 @@ import { UserInfo } from '../../auth/types';
 export const FETCH_ORDERS_QUERY_KEY = 'fetchOrders';
 
 export type Order = {
+  _id?: string;
   customer_id: string;
   initiator_id: string;
   company_id: string;
@@ -116,6 +117,7 @@ export default function Orders() {
   return (
     <PageTemplate
       fetchAPI={fetchOrders}
+      deleteAPI={deleteOrder}
       fetchParams={{
         company_id: activeCompany?._id as string,
         hideEmptyInvoices,
@@ -137,10 +139,10 @@ export default function Orders() {
         );
         return filtered;
       }}
-      sortField="status"
+      sortField="invoice_number"
       sortDir="desc"
       columns={COLUMNS}
-      menuActions={['View']}
+      menuActions={['View', 'Delete']}
       drawerTabs={[
         {
           label: 'Info',
