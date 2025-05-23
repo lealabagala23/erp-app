@@ -277,7 +277,12 @@ router.get("/:customer_type", authenticateToken, async (req, res) => {
       },
     ];
     if (customer_type === "PATIENT")
-      populateParams.push({ path: "referring_doctor_id" });
+      populateParams.push({
+        path: "referring_doctor_id",
+        populate: {
+          path: "customer_id",
+        },
+      });
     const result = await ItemModel.find()
       .populate(populateParams)
       .sort({ "customer_id.customer_name": 1 });

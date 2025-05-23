@@ -38,7 +38,7 @@ const COLUMNS: GridColDef<Patient>[] = [
     flex: 1,
     valueGetter: (value, row) =>
       // eslint-disable-next-line
-      (row?.referring_doctor_id as any)?.customer_name,
+      (row?.referring_doctor_id as any)?.customer_id?.customer_name,
   },
   {
     field: 'status',
