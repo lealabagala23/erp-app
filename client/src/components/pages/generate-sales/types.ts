@@ -49,6 +49,7 @@ export type Order = {
   sc_pwd_disc_amount?: number;
   net_total?: number;
   transaction_date?: string;
+  co_doctor_name?: string;
 };
 
 export type CompanyBankDetails = {

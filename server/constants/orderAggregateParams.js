@@ -45,6 +45,20 @@ const orderAggregateParams = [
     },
   },
   {
+    $lookup: {
+      from: "codoctors",
+      localField: "customer_id._id",
+      foreignField: "customer_id",
+      as: "customer_id.codoctors",
+    },
+  },
+  {
+    $unwind: {
+      path: "$customer_id.codoctors",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
     $group: {
       _id: "$_id",
       invoice_number: { $first: "$invoice_number" },

@@ -33,7 +33,7 @@ export const generateBillingPDF = (
   doc.text(`Account No: ${order.bank_account_number || ''}`, 14, 62);
 
   doc.setFont('Helvetica', 'normal');
-  doc.text(`To: ${toUpper(order.customer_name)}`, pageWidth - 14, 32, {
+  doc.text(`To: ${toUpper(order.co_doctor_name || order.customer_name)}`, pageWidth - 14, 32, {
     align: 'right',
   });
   const multilineAddress = doc.splitTextToSize(

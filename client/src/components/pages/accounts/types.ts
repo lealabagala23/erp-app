@@ -13,6 +13,8 @@ export type Customer = {
   last_updated_by?: UserInfo;
   // eslint-disable-next-line
   customer_details?: any;
+  // eslint-disable-next-line
+  codoctors?: any;
 };
 
 export type Patient = {

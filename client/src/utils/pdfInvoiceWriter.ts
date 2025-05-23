@@ -64,13 +64,14 @@ const drawNameTinAddress = (
 ) => {
   const { height } = firstPage.getSize();
   const { customer_id, tin, billing_address } = order;
-
+  // eslint-disable-next-line
+  const co_doctor_name = (customer_id as any)?.codoctors?.co_doctor_name
   const texts: string[] = [
     // eslint-disable-next-line
     (customer_id as any)?.customer_name,
     tin || '',
-    billing_address || '',
-  ];
+    (co_doctor_name ? `${co_doctor_name} - ` : '') + (billing_address || ''),
+  ]; 
 
   texts.forEach((text, key) =>
     firstPage.drawText(text, {

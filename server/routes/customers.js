@@ -342,7 +342,7 @@ router.put("/:id", authenticateToken, async (req, res) => {
                 co_doctor_name: customer_details.co_doctor_name,
               },
             },
-            { new: true, useFindAndModify: false }
+            { new: true, useFindAndModify: false, upsert: true }
           );
           break;
         default:

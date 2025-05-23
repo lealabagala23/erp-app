@@ -38,6 +38,18 @@ router.get("/", authenticateToken, async (req, res) => {
         },
       },
       {
+        $addFields: {
+          order: {
+            $first: "$orders",
+          },
+        },
+      },
+      {
+        $addFields: {
+          co_doctor_name: "$order.customer_id.codoctors.co_doctor_name",
+        },
+      },
+      {
         $sort: { min_created_at: -1 },
       },
     ]);
