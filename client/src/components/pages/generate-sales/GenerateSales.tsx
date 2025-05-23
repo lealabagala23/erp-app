@@ -556,11 +556,15 @@ export default function GenerateSales() {
                       <Grid size={4}>
                         <FormControl fullWidth margin="dense">
                           <FormLabel>Discount Card</FormLabel>
-                          <TextField
-                            {...register('discount_card')}
-                            placeholder={'Enter Discount Card'}
-                            variant="outlined"
-                            fullWidth
+                          <Controller
+                            name="discount_card"
+                            control={control}
+                            render={({ field }) => (
+                              <TextField select {...field} variant="outlined">
+                                <MenuItem value="SENIOR">SENIOR</MenuItem>
+                                <MenuItem value="PWD">PWD</MenuItem>
+                              </TextField>
+                            )}
                             disabled={
                               !customer_id ||
                               ![

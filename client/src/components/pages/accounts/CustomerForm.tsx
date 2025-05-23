@@ -259,11 +259,10 @@ export default function CustomerForm({
                 name="discount_card"
                 control={control}
                 render={({ field }) => (
-                  <TextField
-                    {...field}
-                    variant="outlined"
-                    placeholder="Enter Discount Card"
-                  />
+                  <TextField select {...field} variant="outlined">
+                    <MenuItem value="SENIOR">SENIOR</MenuItem>
+                    <MenuItem value="PWD">PWD</MenuItem>
+                  </TextField>
                 )}
               />
             </FormControl>
