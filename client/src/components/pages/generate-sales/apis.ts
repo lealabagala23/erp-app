@@ -95,6 +95,8 @@ export const updateOrder = async (order: Order) => {
 export const updateOrderStatus = async (order: Order) => {
   const response = await axiosConfig.put(`${ORDERS_API}/${order._id}/status`, {
     status: order.status,
+    // eslint-disable-next-line
+    company_id: (order.company_id as any)?._id,
   });
 
   return response?.data;

@@ -198,7 +198,7 @@ router.put("/:id/payment", authenticateToken, async (req, res) => {
 router.put("/:id/status", authenticateToken, async (req, res) => {
   try {
     const order_id = req.params.id;
-    const { status } = req.body;
+    const { status, company_id } = req.body;
     const approverParams =
       status === "approved" ? { approver_id: req.user.id } : {};
     const updatedOrder = await Order.findByIdAndUpdate(
@@ -218,7 +218,7 @@ router.put("/:id/status", authenticateToken, async (req, res) => {
       const orderItems = await OrderItem.find({ order_id });
       const promises = orderItems.map(({ product_id, quantity }) => {
         return Inventory.findOneAndUpdate(
-          { product_id },
+          { product_id, company_id },
           { $inc: { quantity_on_hand: -quantity } },
           { new: true, useFindAndModify: false }
         );
