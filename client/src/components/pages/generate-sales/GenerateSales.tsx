@@ -308,12 +308,6 @@ export default function GenerateSales() {
   }, [customer_details]);
 
   useEffect(() => {
-    if (formValues.discount_card_number && !sc_pwd_discount) {
-      setValue('sc_pwd_discount', true);
-    }
-  }, [formValues.discount_card_number]);
-
-  useEffect(() => {
     if (order && !isLoadingOrder) {
       reset({
         customer_id: order.customer_id?._id,
