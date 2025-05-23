@@ -63,18 +63,20 @@ export default function OrderApprovals() {
               <CircularProgress color="inherit" />
             </Box>
           ) : (
-            <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-              {data.map((order: Order, key: number) => (
-                <ListItem key={key}>
-                  <ListItemText
-                    // eslint-disable-next-line
-                    primary={`Invoice #${order.invoice_number || ''} ${(order.customer_id as any)?.customer_name}`}
-                    secondary={`Created at ${dayjs(order.created_at).format('MM/DD/YYYY')}`}
-                    sx={{ color: 'var(--template-palette-error-main)' }}
-                  />
-                </ListItem>
-              ))}
-            </List>
+            <Box sx={{ maxHeight: '500px', overflow: 'auto' }}>
+              <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+                {data.map((order: Order, key: number) => (
+                  <ListItem key={key}>
+                    <ListItemText
+                      // eslint-disable-next-line
+                      primary={`Invoice #${order.invoice_number || ''} ${(order.customer_id as any)?.customer_name}`}
+                      secondary={`Created at ${dayjs(order.created_at).format('MM/DD/YYYY')}`}
+                      sx={{ color: 'var(--template-palette-error-main)' }}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Box>
           )}
         </Stack>
       </CardContent>
