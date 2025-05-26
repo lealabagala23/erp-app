@@ -73,7 +73,7 @@ export const generateSalesReportPDF = (
     { header: 'AMOUNT SALE', dataKey: 'amount_sale' },
   ];
 
-  const rows = report.orders.map(
+  const rows = report.orders.filter(({ net_total = 0 }: Order) => net_total !== 0).map(
     ({
       created_at,
       invoice_number,
