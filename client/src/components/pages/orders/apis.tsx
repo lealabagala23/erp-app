@@ -19,8 +19,8 @@ export const fetchOrders = async ({
   return hideEmptyInvoices
     ? data.filter(
         // eslint-disable-next-line
-        ({ customer_id }: { customer_id: any }) =>
-          Object.keys(customer_id).length !== 0,
+        ({ customer_id, status }: { customer_id: any; status: string }) =>
+          Object.keys(customer_id).length !== 0 && status !== 'archived',
       )
     : data;
 };

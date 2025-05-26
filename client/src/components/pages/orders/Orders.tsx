@@ -11,6 +11,7 @@ import { getOrderStatusColor } from '../generate-sales/constants';
 import { formatCurrency } from '../../../utils/auth';
 import toLower from 'lodash/toLower';
 import { UserInfo } from '../../auth/types';
+import { updateOrderStatus } from '../generate-sales/apis';
 
 export const FETCH_ORDERS_QUERY_KEY = 'fetchOrders';
 
@@ -117,7 +118,8 @@ export default function Orders() {
   return (
     <PageTemplate
       fetchAPI={fetchOrders}
-      deleteAPI={deleteOrder}
+      // eslint-disable-next-line
+      archiveAPI={(o: any) => updateOrderStatus({ ...o, status: 'archived' })}
       fetchParams={{
         company_id: activeCompany?._id as string,
         hideEmptyInvoices,
@@ -142,7 +144,7 @@ export default function Orders() {
       sortField="invoice_number"
       sortDir="desc"
       columns={COLUMNS}
-      menuActions={['View', 'Delete']}
+      menuActions={['View', 'Archive']}
       drawerTabs={[
         {
           label: 'Info',

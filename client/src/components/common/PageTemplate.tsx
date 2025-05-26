@@ -28,6 +28,8 @@ interface IProps {
   // eslint-disable-next-line
   deleteAPI?: (p: any) => Promise<any>;
   // eslint-disable-next-line
+  archiveAPI?: (p: any) => Promise<any>;
+  // eslint-disable-next-line
   uploadCSVAPI?: (p: any) => Promise<any>;
   // eslint-disable-next-line
   viewItem?: (i: any) => void;
@@ -60,6 +62,7 @@ export default function PageTemplate({
   fetchAPI,
   createAPI,
   updateAPI,
+  archiveAPI,
   deleteAPI,
   uploadCSVAPI,
   viewItem,
@@ -182,6 +185,17 @@ export default function PageTemplate({
     },
   );
 
+  const { mutateAsync: mutateArchive, isLoading: isLoadingArchive } =
+    useMutation({
+      mutationFn: archiveAPI,
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKey]);
+      },
+      onError: (err) => {
+        console.error(err);
+      },
+    });
+
   const toggleDrawer = () => {
     setOpenDrawer(!openDrawer);
     if (openDrawer && !!selectedRow) {
@@ -218,6 +232,13 @@ export default function PageTemplate({
           open: true,
           title: `Delete ${itemName}`,
           message: `Are you sure you want to delete this ${itemName}? (Note: This action cannot be reversed.)`,
+        });
+        break;
+      case 'Archive':
+        setDialogProps({
+          open: true,
+          title: `Archive ${itemName}`,
+          message: `Are you sure you want to archive this ${itemName}?`,
         });
         break;
       default:
@@ -333,7 +354,7 @@ export default function PageTemplate({
                     )
                 : data
             }
-            isLoading={isLoadingFetch || isLoadingDelete}
+            isLoading={isLoadingFetch || isLoadingDelete || isLoadingArchive}
             setSelectedRow={setSelectedRow}
             onActionClick={onActionClick}
             searchAttr={searchAttr}
@@ -373,9 +394,13 @@ export default function PageTemplate({
               action: () => handleCloseDialog(),
             }}
             proceedBtnProps={{
-              label: 'Delete',
-              // eslint-disable-next-line
-              action: () => mutateDelete(selectedRow as any),
+              label: archiveAPI ? 'Archive' : 'Delete',
+              action: () =>
+                archiveAPI
+                  ? // eslint-disable-next-line
+                    mutateArchive(selectedRow as any)
+                  : // eslint-disable-next-line
+                    mutateDelete(selectedRow as any),
             }}
           />
         </>

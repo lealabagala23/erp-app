@@ -179,6 +179,15 @@ export default function DataTable({
             Delete
           </MenuItem>
         )}
+        {menuActions?.includes('Archive') && (
+          <MenuItem
+            onClick={() => handleActionClick('Archive')}
+            sx={{ color: 'var(--template-palette-error-main)' }}
+          >
+            <DeleteOutline sx={{ width: 20, height: 20, marginRight: '8px' }} />{' '}
+            Archive
+          </MenuItem>
+        )}
       </Menu>
     </Box>
   );
