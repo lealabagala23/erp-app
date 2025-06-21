@@ -10,6 +10,7 @@ import {
   FormControl,
   FormLabel,
   Grid2 as Grid,
+  IconButton,
   InputAdornment,
   MenuItem,
   Paper,
@@ -30,12 +31,18 @@ import { fetchProducts } from '../inventory/apis';
 import lhctPDF from '../../../assets/lhct_invoice.pdf';
 import lmtPDF from '../../../assets/lmt_invoice.pdf';
 // import blankPDF from '../../../assets/blank.pdf';
-import { formatCurrency } from '../../../utils/auth';
+import {
+  formatCurrency,
+  formatCurrencyWithoutDecimal,
+  unformatCurrency,
+} from '../../../utils/auth';
 import {
   Approval,
   Cancel,
+  CheckOutlined,
   Edit,
   EditNote,
+  EditOutlined,
   MoneyOutlined,
   Person,
   Print,
@@ -109,6 +116,8 @@ export default function GenerateSales() {
   const [openCancelOrder, setOpenCancelOrder] = useState(false);
   const [hasSpecialDisc, setHasSpecialDisc] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [editSpecialDisc, setEditSpecialDisc] = useState(false);
+  const [specialDisc, setSpecialDisc] = useState('');
 
   const { data: order = {}, isLoading: isLoadingOrder } = useQuery(
     [FETCH_ORDER_BY_ID_QUERY_KEY, orderId],
@@ -264,6 +273,22 @@ export default function GenerateSales() {
   };
 
   // eslint-disable-next-line
+  const handleSpecialDiscountChange = (e: any) => {
+    const input = e.target.value;
+
+    // Allow only digits and one decimal point
+    const cleaned = input.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1'); // keep only first decimal point
+
+    const parts = cleaned.split('.');
+    let normalized = parts[0];
+    if (parts.length > 1) {
+      normalized += '.' + parts[1].slice(0, 2);
+    }
+
+    setSpecialDisc(formatCurrencyWithoutDecimal(normalized));
+  };
+
+  // eslint-disable-next-line
   const saveHandler = (formValues: { [x: string]: any }) => {
     mutateUpdateOrder({
       _id: orderId,
@@ -325,6 +350,8 @@ export default function GenerateSales() {
         sc_pwd_discount: order.sc_pwd_discount || false,
       });
       setPaymentType(order.payment_type);
+      setSpecialDisc(formatCurrencyWithoutDecimal(order.special_discount));
+      setHasSpecialDisc(!!order.special_discount);
       setOrderItems(
         (order.order_items || []).map((item: OrderItem, key: number) => ({
           ...DEFAULT_ITEM,
@@ -359,6 +386,14 @@ export default function GenerateSales() {
       setValue('customer_id', loadCustomerId);
     }
   }, [loadCustomerId]);
+
+  useEffect(() => {
+    if (!editSpecialDisc && specialDisc) {
+      setValue('special_discount', unformatCurrency(specialDisc), {
+        shouldDirty: true,
+      });
+    }
+  }, [editSpecialDisc]);
 
   return (
     <>
@@ -736,6 +771,7 @@ export default function GenerateSales() {
                               sx={{ padding: 0 }}
                               onClick={() => {
                                 setHasSpecialDisc(false);
+                                setSpecialDisc('0');
                                 setValue('special_discount', 0);
                               }}
                             />
@@ -758,7 +794,7 @@ export default function GenerateSales() {
                     </Item>
                   </Grid>
                   <Grid
-                    size={{ xs: 3, md: 2, xl: 1 }}
+                    size={{ xs: 4, md: 3, xl: 2 }}
                     alignItems={'center'}
                     textAlign={'right'}
                   >
@@ -784,6 +820,7 @@ export default function GenerateSales() {
                               sx={{ padding: 0 }}
                               onClick={() => {
                                 setHasSpecialDisc(false);
+                                setSpecialDisc('0');
                                 setValue('special_discount', 0);
                               }}
                             />
@@ -807,7 +844,7 @@ export default function GenerateSales() {
                   </Grid>
 
                   <Grid
-                    size={{ xs: 3, md: 2, xl: 1 }}
+                    size={{ xs: 4, md: 3, xl: 2 }}
                     alignItems={'center'}
                     textAlign={'right'}
                   >
@@ -827,6 +864,7 @@ export default function GenerateSales() {
                         <Checkbox
                           checked={hasSpecialDisc}
                           onClick={() => {
+                            if (!hasSpecialDisc) setEditSpecialDisc(true);
                             setHasSpecialDisc((v) => !v);
                             setValue('vat_exempted', false);
                             setValue('sc_pwd_discount', false);
@@ -846,47 +884,94 @@ export default function GenerateSales() {
                         >
                           Special Discount:
                         </Typography>
-
-                        <FormControl margin="dense">
-                          <TextField
-                            {...register('special_discount')}
-                            sx={{ width: '150px' }}
-                            inputProps={{
-                              style: { textAlign: 'right' },
-                            }}
-                            type={'number'}
-                            disabled={
-                              !customer_id ||
-                              ![
-                                OrderStatus.DRAFT,
-                                OrderStatus.UNAPPROVED,
-                              ].includes(order?.status) ||
-                              !hasSpecialDisc
-                            }
-                            slotProps={{
-                              input: {
-                                startAdornment: (
-                                  <InputAdornment position="start">
-                                    ₱
-                                  </InputAdornment>
-                                ),
-                              },
-                            }}
-                          />
-                        </FormControl>
                       </Stack>
                     </Item>
                   </Grid>
                   <Grid
-                    size={{ xs: 3, md: 2, xl: 1 }}
+                    size={{ xs: 4, md: 3, xl: 2 }}
                     alignItems={'center'}
                     textAlign={'right'}
                   >
                     <Item>
-                      <Typography variant="body1" fontWeight={'bold'}>
-                        {'-'}
-                        {formatCurrency(order.special_discount)}
-                      </Typography>
+                      <Stack
+                        direction="row"
+                        alignItems={'center'}
+                        justifyContent={'flex-end'}
+                        gap={1}
+                      >
+                        {hasSpecialDisc && editSpecialDisc ? (
+                          <>
+                            <IconButton
+                              aria-label="expand row"
+                              size="small"
+                              onClick={() => {
+                                setEditSpecialDisc(false);
+                              }}
+                            >
+                              <CheckOutlined />
+                            </IconButton>
+                            <FormControl margin="none">
+                              <TextField
+                                value={specialDisc}
+                                onChange={handleSpecialDiscountChange}
+                                inputProps={{
+                                  style: { textAlign: 'right' },
+                                }}
+                                sx={{
+                                  height: '36px',
+                                  width: '120px',
+                                }}
+                                disabled={
+                                  !customer_id ||
+                                  ![
+                                    OrderStatus.DRAFT,
+                                    OrderStatus.UNAPPROVED,
+                                  ].includes(order?.status) ||
+                                  !hasSpecialDisc
+                                }
+                                slotProps={{
+                                  input: {
+                                    startAdornment: (
+                                      <InputAdornment position="start">
+                                        ₱
+                                      </InputAdornment>
+                                    ),
+                                  },
+                                }}
+                              />
+                            </FormControl>
+                          </>
+                        ) : (
+                          <>
+                            <IconButton
+                              aria-label="expand row"
+                              size="small"
+                              onClick={() => setEditSpecialDisc(true)}
+                              sx={{
+                                marginLeft: 2,
+                                pointerEvents: hasSpecialDisc
+                                  ? undefined
+                                  : 'none',
+                                cursor: hasSpecialDisc
+                                  ? undefined
+                                  : 'not-allowed',
+                              }}
+                              disabled={!hasSpecialDisc}
+                            >
+                              <EditOutlined />
+                            </IconButton>
+                            <Typography
+                              variant="body1"
+                              fontWeight={'bold'}
+                              fontStyle={isLoadingUpdate ? 'italic' : 'normal'}
+                            >
+                              {isLoadingUpdate
+                                ? 'Saving...'
+                                : `-${formatCurrency(order.special_discount)}`}
+                            </Typography>
+                          </>
+                        )}
+                      </Stack>
                     </Item>
                   </Grid>
                 </Grid>

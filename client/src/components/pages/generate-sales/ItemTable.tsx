@@ -134,15 +134,6 @@ export default function ItemTable({
         height: '100%',
       }}
     >
-      <Tooltip title={tooltipMsg}>
-        <Typography
-          fontWeight={'bold'}
-          color={'var(--template-palette-grey-500)'}
-        >
-          {formatCurrency(value)}
-        </Typography>
-      </Tooltip>
-
       {row && (
         <Tooltip title={tooltipMsg}>
           <IconButton
@@ -153,12 +144,20 @@ export default function ItemTable({
                 `/products?id=${row.product_id}&inventoryId=${row._id}&orderId=${orderId}`,
               )
             }
-            sx={{ marginLeft: 2 }}
+            sx={{ marginRight: 2 }}
           >
             <EditOutlined />
           </IconButton>
         </Tooltip>
       )}
+      <Tooltip title={tooltipMsg}>
+        <Typography
+          fontWeight={'bold'}
+          color={'var(--template-palette-grey-500)'}
+        >
+          {formatCurrency(value)}
+        </Typography>
+      </Tooltip>
     </Box>
   );
 

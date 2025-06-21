@@ -35,10 +35,19 @@ export const formatCurrency = (v: number | string) =>
     .toFixed(2)
     .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-export const getUnitPrice = (
-  products: Product[],
-  product_id: string,
-) => {
+export const formatCurrencyWithoutDecimal = (value: string | number): string => {
+  if (value === "") return "";
+  const [intPart, decimalPart] = `${value}`.split(".");
+  const formattedInt = parseInt(intPart.replace(/,/g, ""), 10).toLocaleString("en-US");
+  return decimalPart !== undefined ? `${formattedInt}.${decimalPart}` : formattedInt;
+};
+
+export const unformatCurrency = (formatted: string): number => {
+  const numeric = formatted.replace(/,/g, "");
+  return parseFloat(numeric) || 0;
+};
+
+export const getUnitPrice = (products: Product[], product_id: string) => {
   // eslint-disable-next-line
   const selectedProduct = products.find(({ _id }: any) => _id === product_id);
   return selectedProduct?.unit_price ?? 0;
