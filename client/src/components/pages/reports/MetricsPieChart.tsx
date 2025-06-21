@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { PieChart } from '@mui/x-charts/PieChart';
+import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
 import { useDrawingArea } from '@mui/x-charts/hooks';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
@@ -72,10 +72,14 @@ function PieCenterLabel({ primaryText, secondaryText }: PieCenterLabelProps) {
 }
 
 const colors = [
-  'hsl(220, 20%, 65%)',
-  'hsl(220, 20%, 42%)',
-  'hsl(220, 20%, 35%)',
-  'hsl(220, 20%, 25%)',
+  'hsl(0, 70%, 50%)', // bright red
+  'hsl(30, 90%, 55%)', // vivid orange
+  'hsl(120, 55%, 45%)', // green
+  'hsl(210, 90%, 60%)', // sky blue
+  'hsl(270, 60%, 60%)', // purple
+  'hsl(300, 70%, 60%)', // pink
+  'hsl(180, 70%, 40%)', // teal
+  'hsl(45, 85%, 50%)', // golden yellow
 ];
 
 interface IProps {
@@ -89,6 +93,17 @@ export default function MetricsPieChart({ title, data, totalValue }: IProps) {
     const total = data.reduce((accum, { value }) => accum + value, 0);
     return `${((value / total) * 100).toFixed(1)}%`;
   };
+
+  React.useEffect(() => {
+    const elements = Array.from(document.querySelectorAll('*')).filter(
+      (el) => el !== null && el.textContent?.trim() === 'No data to display',
+    ) as SVGTextElement[];
+    if (elements.length > 0) {
+      elements.forEach((element) => {
+        element.style.visibility = 'hidden';
+      });
+    }
+  }, [data]);
 
   return (
     <Card
@@ -112,6 +127,7 @@ export default function MetricsPieChart({ title, data, totalValue }: IProps) {
               {
                 data,
                 arcLabel: (item) => getPercentage(item.value),
+                arcLabelMinAngle: 10,
                 innerRadius: 75,
                 outerRadius: 100,
                 paddingAngle: 0,
@@ -122,6 +138,14 @@ export default function MetricsPieChart({ title, data, totalValue }: IProps) {
             width={260}
             slotProps={{
               legend: { hidden: true },
+            }}
+            sx={{
+              [`& .${pieArcLabelClasses.root}`]: {
+                fontSize: '14px',
+                fontFamily: 'Roboto, sans-serif',
+                fontWeight: 'bold',
+                textShadow: '2px 2px 4px rgba(0,0,0,0.7)',
+              },
             }}
           >
             <PieCenterLabel primaryText={totalValue} secondaryText="Total" />
