@@ -43,7 +43,7 @@ export const dataGridCustomizations: Partial<Theme> &
           },
         },
         '& .expired-column': {
-          backgroundColor: '#ef9a9a',
+          backgroundColor: theme.palette.warning.main,
         },
         '& .ack-expired-column': {
           backgroundColor: '#bdbdbd',

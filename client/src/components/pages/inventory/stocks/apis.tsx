@@ -37,12 +37,14 @@ export const generateInventoryPayload = (inventory: Inventory) => {
 
 export const fetchInventory = async ({
   company_id,
+  expiring,
 }: {
   company_id: string;
+  expiring?: string;
 }) => {
-  const response = await axiosConfig.get(
-    `${INVENTORY_API}?company_id=${company_id}`,
-  );
+  const response = await axiosConfig.get(`${INVENTORY_API}`, {
+    params: { company_id, expiring },
+  });
   return response?.data;
 };
 

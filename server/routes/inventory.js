@@ -22,21 +22,44 @@ router.post("/", authenticateToken, async (req, res) => {
 router.get("/", authenticateToken, async (req, res) => {
   try {
     const expiring = req.query.expiring;
-    let expiringQuery = {};
+    let expiryFilter = {};
     if (expiring) {
-      const daysToExpire = 30 * 6; // 6 months
       const today = new Date();
-      const expiryDateThreshold = new Date(today);
-      expiryDateThreshold.setDate(today.getDate() + daysToExpire);
-      expiringQuery = {
-        expiry_date: {
-          $lte: expiryDateThreshold, // Expiring within the next 6 months
-        },
-      };
+      const sixMonthsFromNow = new Date();
+      sixMonthsFromNow.setMonth(today.getMonth() + 6);
+
+      if (expiring === "soon") {
+        // Products expiring in the next 6 months
+        expiryFilter = {
+          expiry_date: {
+            $gt: today,
+            $lte: sixMonthsFromNow,
+          },
+        };
+      } else if (expiring === "expired") {
+        // Products already expired
+        expiryFilter = {
+          expiry_date: {
+            $lte: today,
+          },
+        };
+
+        // Update status of expired inventory to "EXPIRED"
+        await Inventory.updateMany(
+          {
+            company_id: req.query.company_id,
+            expiry_date: { $lte: today },
+          },
+          {
+            $set: { status: "EXPIRED" },
+          }
+        );
+      }
     }
+
     const inventory = await Inventory.find({
       company_id: req.query.company_id,
-      ...expiringQuery,
+      ...expiryFilter,
     })
       .populate("product_id", [
         "_id",
@@ -46,6 +69,7 @@ router.get("/", authenticateToken, async (req, res) => {
       ])
       .populate("supplier_id", ["_id", "supplier_name"])
       .populate("last_updated_by", ["_id", "first_name", "last_name"]);
+
     res.status(200).json(inventory);
   } catch (err) {
     res.status(500).json(err);

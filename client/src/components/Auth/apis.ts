@@ -62,7 +62,7 @@ export const fetchExpiringStocks = async ({
   company_id: string;
 }) => {
   const response = await axiosConfig.get(
-    `${INVENTORY_API}?company_id=${company_id}&expiring=true`,
+    `${INVENTORY_API}?company_id=${company_id}&expiring=soon`,
   );
   return response?.data;
 };

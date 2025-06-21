@@ -2,7 +2,13 @@ import React, { useContext, useState } from 'react';
 import AppNavbar from '../../../common/AppNavbar';
 import Header from '../../../common/Header';
 import PageWrapper from '../../../wrappers/PageWrapper';
-import { AlertColor, Button, Stack } from '@mui/material';
+import {
+  AlertColor,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Stack,
+} from '@mui/material';
 import SearchBar from '../../../common/SearchBar';
 import FormDrawer from '../../../common/FormDrawer';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -28,6 +34,7 @@ export default function Stocks() {
     message: string;
     type: AlertColor;
   }>({ open: false, message: '', type: 'success' });
+  const [showExpired, setShowExpired] = useState(false);
   const [dialogProps, setDialogProps] = useState<{
     open: boolean;
     title: string;
@@ -36,8 +43,12 @@ export default function Stocks() {
   const [selectedRow, setSelectedRow] = useState<Inventory | null>(null);
 
   const { data = [], isLoading: isLoadingInventory } = useQuery(
-    [FETCH_INVENTORY_QUERY_KEY, activeCompany?._id],
-    () => fetchInventory({ company_id: activeCompany?._id as string }),
+    [FETCH_INVENTORY_QUERY_KEY, activeCompany?._id, showExpired],
+    () =>
+      fetchInventory({
+        company_id: activeCompany?._id as string,
+        expiring: showExpired ? 'expired' : undefined,
+      }),
     {
       enabled: !!activeCompany?._id,
       refetchOnWindowFocus: false,
@@ -169,14 +180,27 @@ export default function Stocks() {
               searchText={searchText}
               setSearchText={setSearchText}
             />
-            <Button
-              size="small"
-              variant="contained"
-              onClick={toggleDrawer}
-              startIcon={<AddBoxOutlined />}
-            >
-              Add New Stocks
-            </Button>
+            <Stack direction={'row'} gap={1} alignItems={'center'}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={showExpired}
+                    onChange={() => setShowExpired(!showExpired)}
+                    color="success"
+                    sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
+                  />
+                }
+                label={'Show Expired Stocks'}
+              />
+              <Button
+                size="small"
+                variant="contained"
+                onClick={toggleDrawer}
+                startIcon={<AddBoxOutlined />}
+              >
+                Add New Stocks
+              </Button>
+            </Stack>
             <FormDrawer
               open={openDrawer}
               toggleDrawer={toggleDrawer}
