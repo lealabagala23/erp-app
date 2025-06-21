@@ -91,6 +91,8 @@ const DEFAULT_ITEM = {
   unit_price: 0,
 };
 
+const PAYMENT_USERNAME = 'lmt.basio2001';
+
 export default function GenerateSales() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -1001,33 +1003,35 @@ export default function GenerateSales() {
               alignItems={'center'}
               justifyContent={'center'}
             >
-              <Button
-                variant={
-                  [OrderStatus.UNPAID, OrderStatus.PARTIALLY_PAID].includes(
-                    order?.status,
-                  )
-                    ? 'contained'
-                    : 'outlined'
-                }
-                startIcon={<MoneyOutlined />}
-                sx={{
-                  cursor: [
-                    OrderStatus.UNPAID,
-                    OrderStatus.PARTIALLY_PAID,
-                  ].includes(order?.status)
-                    ? undefined
-                    : 'not-allowed',
-                }}
-                onClick={() =>
-                  (order?.payments || []).length > 0
-                    ? setOpenPaymentList(true)
-                    : setOpenPaymentForm(true)
-                }
-              >
-                {(order?.payments || []).length > 0
-                  ? 'See Payments'
-                  : 'Add Payment'}
-              </Button>
+              <Tooltip title={`Only user ${PAYMENT_USERNAME} can add payments`}>
+                <Button
+                  variant={
+                    [OrderStatus.UNPAID, OrderStatus.PARTIALLY_PAID].includes(
+                      order?.status,
+                    ) && userInfo?.user_name === PAYMENT_USERNAME
+                      ? 'contained'
+                      : 'outlined'
+                  }
+                  startIcon={<MoneyOutlined />}
+                  sx={{
+                    cursor:
+                      [OrderStatus.UNPAID, OrderStatus.PARTIALLY_PAID].includes(
+                        order?.status,
+                      ) && userInfo?.user_name === PAYMENT_USERNAME
+                        ? undefined
+                        : 'not-allowed',
+                  }}
+                  onClick={() =>
+                    (order?.payments || []).length > 0
+                      ? setOpenPaymentList(true)
+                      : setOpenPaymentForm(true)
+                  }
+                >
+                  {(order?.payments || []).length > 0
+                    ? 'See Payments'
+                    : 'Add Payment'}
+                </Button>
+              </Tooltip>
               <Button
                 variant={
                   order?.status === OrderStatus.UNAPPROVED &&
