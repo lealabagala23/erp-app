@@ -14,6 +14,16 @@ router.post("/", authenticateToken, async (req, res) => {
   }
 });
 
+// Get public company list (no auth required, limited fields)
+router.get("/public", async (req, res) => {
+  try {
+    const companies = await Company.find({}, "_id company_display_name company_logo");
+    res.status(200).json(companies);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 // Get all companies
 router.get("/", authenticateToken, async (req, res) => {
   try {

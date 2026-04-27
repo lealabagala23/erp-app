@@ -28,8 +28,7 @@ import FormAutocomplete from '../../common/FormAutocomplete';
 import ItemTable from './ItemTable';
 import { CancelItem, Order, OrderItem, Payment, TableItem } from './types';
 import { fetchProducts } from '../inventory/apis';
-import lhctPDF from '../../../assets/lhct_invoice.pdf';
-import lmtPDF from '../../../assets/lmt_invoice.pdf';
+import blankInvoicePDF from '../../../assets/blank.pdf';
 // import blankPDF from '../../../assets/blank.pdf';
 import {
   formatCurrency,
@@ -1068,13 +1067,7 @@ export default function GenerateSales() {
                     : 'not-allowed',
                 }}
                 onClick={() => {
-                  modifyPdf(
-                    activeCompany?.company_name?.includes('LHCT')
-                      ? lhctPDF
-                      : lmtPDF,
-                    // blankPDF,
-                    order,
-                  );
+                  modifyPdf(blankInvoicePDF, order);
                   if (order.status === OrderStatus.APPROVED) {
                     onUpdateOrderStatus(OrderStatus.UNPAID);
                   }

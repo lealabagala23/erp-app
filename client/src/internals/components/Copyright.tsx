@@ -17,7 +17,7 @@ export default function Copyright(props: any) {
     >
       {'Copyright © '}
       <Link color="inherit" href="https://mui.com/">
-        La Moreneta / LHCT Pharmaceutical
+        AAA Company
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}

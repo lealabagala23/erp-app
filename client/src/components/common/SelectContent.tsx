@@ -13,8 +13,7 @@ import { styled } from '@mui/material/styles';
 import AuthContext from '../auth/AuthContext';
 import { Company } from '../auth/types';
 import { Box, CircularProgress } from '@mui/material';
-import lamorenetaSmallLogo from '../../assets/la_moreneta_small.png';
-import lhctSmallLogo from '../../assets/lhct_small.png';
+import companyLogoSmall from '../../assets/company_logo_small.png';
 // import ConstructionRoundedIcon from '@mui/icons-material/ConstructionRounded';
 
 const Avatar = styled(MuiAvatar)(({ theme }) => ({
@@ -30,10 +29,7 @@ const ListItemAvatar = styled(MuiListItemAvatar)({
   marginRight: 12,
 });
 
-const icons = {
-  'La Moreneta': lamorenetaSmallLogo,
-  'LHCT Pharmaceutical': lhctSmallLogo,
-};
+const icons: Record<string, string> = {};
 
 export default function SelectContent() {
   const { companies, activeCompany, setActiveCompany } =
@@ -91,10 +87,8 @@ export default function SelectContent() {
         <MenuItem key={c._id} value={c.company_display_name}>
           <ListItemAvatar>
             <Avatar alt={c.company_display_name}>
-              {/* <DevicesRoundedIcon sx={{ fontSize: '1rem' }} /> */}
               <img
-                // eslint-disable-next-line
-                src={(icons as any)[c.company_display_name]}
+                src={icons[c.company_display_name] || companyLogoSmall}
                 width={20}
                 height={20}
               />

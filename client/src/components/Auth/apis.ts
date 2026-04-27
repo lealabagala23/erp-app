@@ -51,6 +51,11 @@ export const fetchCompanies = async () => {
   return response?.data;
 };
 
+export const fetchPublicCompanies = async () => {
+  const response = await axiosConfig.get(`${COMPANIES_API}/public`);
+  return response?.data;
+};
+
 export const fetchSuppliers = async () => {
   const response = await axiosConfig.get(`${SUPPLIERS_API}`);
   return response?.data;

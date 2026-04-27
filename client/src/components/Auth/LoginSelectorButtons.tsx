@@ -3,20 +3,12 @@ import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import ButtonBase from '@mui/material/ButtonBase';
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
+import { useQuery } from '@tanstack/react-query';
 
-import lhctLogo from '../../assets/lhct.png';
-import lamorenetaLogo from '../../assets/la_moreneta_small.png';
-
-const images = [
-  {
-    url: lamorenetaLogo,
-    title: 'La Moreneta',
-  },
-  {
-    url: lhctLogo,
-    title: 'LHCT',
-  },
-];
+import companyLogo from '../../assets/company_logo_square.png';
+import { fetchPublicCompanies } from './apis';
+import { Company } from './types';
 
 const ImageButton = styled(ButtonBase)(({ theme }) => ({
   position: 'relative',
@@ -87,6 +79,20 @@ interface IProps {
 }
 
 export default function LoginSelectorButtons({ onClick }: IProps) {
+  const { data: companies = [], isLoading } = useQuery<Company[]>(
+    ['publicCompanies'],
+    fetchPublicCompanies,
+    { refetchOnWindowFocus: false, retry: 1 },
+  );
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
     <Box
       sx={{
@@ -96,14 +102,18 @@ export default function LoginSelectorButtons({ onClick }: IProps) {
         width: '100%',
       }}
     >
-      {images.map((image) => (
+      {companies.map((company) => (
         <ImageButton
           focusRipple
-          key={image.title}
+          key={company._id}
           sx={{ height: 384 }}
-          onClick={() => onClick(image.title)}
+          onClick={() => onClick(company.company_display_name)}
         >
-          <ImageSrc style={{ backgroundImage: `url(${image.url})` }} />
+          <ImageSrc
+            style={{
+              backgroundImage: `url(${company.company_logo || companyLogo})`,
+            }}
+          />
           <ImageBackdrop className="MuiImageBackdrop-root" />
           <Image>
             <Typography
@@ -117,7 +127,7 @@ export default function LoginSelectorButtons({ onClick }: IProps) {
                 pb: `calc(${theme.spacing(1)} + 6px)`,
               })}
             >
-              {image.title}
+              {company.company_display_name}
               <ImageMarked className="MuiImageMarked-root" />
             </Typography>
           </Image>

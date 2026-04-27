@@ -1,5 +1,5 @@
 {
-  "name": "pharma-erp-server",
+  "name": "erp-app-server",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {

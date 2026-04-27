@@ -1,5 +1,5 @@
 {
-  "name": "pharma-erp-client",
+  "name": "erp-app-client",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

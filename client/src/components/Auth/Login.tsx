@@ -19,8 +19,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 import { fetchLogin } from './apis';
 import { useMutation } from '@tanstack/react-query';
-import lhctLogo from '../../assets/lhct_small.png';
-import lamorenetaLogo from '../../assets/la_moreneta.png';
+import companyLogo from '../../assets/company_logo.png';
 import AlertSnackbar from '../common/AlertSnackbar';
 import LoginSelectorButtons from './LoginSelectorButtons';
 
@@ -166,9 +165,7 @@ export default function Login() {
           <>
             <Stack direction={'row'} gap={2}>
               <img
-                src={
-                  selectedCompany === 'La Moreneta' ? lamorenetaLogo : lhctLogo
-                }
+                src={companyLogo}
                 style={{ width: 250 }}
               />
               <Typography
